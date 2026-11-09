@@ -48,12 +48,6 @@ public:
    * @brief Creates a new BackgroundColorSpan object.
    */
   static Dali::Toolkit::Text::BackgroundColorSpan New(const Vector4& color);
-
-  /**
-   * Default Constructor
-   */
-  BackgroundColorSpan();
-
   ///< Deleted copy constructor
   BackgroundColorSpan(const BackgroundColorSpan&) = delete;
 
@@ -65,13 +59,6 @@ public:
 
   ///< Deleted move assignment operator
   BackgroundColorSpan& operator=(BackgroundColorSpan&&) = delete;
-
-  /**
-   * @brief Destructor
-   *
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~BackgroundColorSpan() override;
 
 public: //Methods
   /**
@@ -97,6 +84,19 @@ public: //Methods for internal only
    * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
    */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
+
+protected:
+  /**
+   * Default Constructor
+   */
+  BackgroundColorSpan();
+
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~BackgroundColorSpan() override;
 
 private:
   struct Impl;

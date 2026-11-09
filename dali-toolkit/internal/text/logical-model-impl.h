@@ -248,12 +248,8 @@ private:
    * @brief Private constructor.
    */
   LogicalModel();
-
-  // Undefined
-  LogicalModel(const LogicalModel& handle);
-
-  // Undefined
-  LogicalModel& operator=(const LogicalModel& handle);
+  LogicalModel(const LogicalModel& handle)            = delete;
+  LogicalModel& operator=(const LogicalModel& handle) = delete;
 
 public:
   Vector<Character>                     mText;

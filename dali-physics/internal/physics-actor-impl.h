@@ -38,8 +38,6 @@ using PhysicsActorPtr = Dali::IntrusivePtr<PhysicsActor>;
 class PhysicsActor : public Dali::BaseObject
 {
 public:
-  PhysicsActor(Dali::Actor actor, Dali::Any body, PhysicsAdaptor& adaptor);
-  ~PhysicsActor() override;
   PhysicsActor(const PhysicsActor& handle)            = delete;
   PhysicsActor& operator=(const PhysicsActor& handle) = delete;
 
@@ -95,6 +93,10 @@ public:
    * @copydoc Dali::Toolkit::Physics::PhysicsActor::GetActorRotation
    */
   Dali::Quaternion GetActorRotation() const;
+
+protected:
+  PhysicsActor(Dali::Actor actor, Dali::Any body, PhysicsAdaptor& adaptor);
+  ~PhysicsActor() override;
 
 private:
   PhysicsAdaptor& mAdaptor;

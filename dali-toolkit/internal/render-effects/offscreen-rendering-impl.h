@@ -22,6 +22,7 @@
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/render-tasks/render-task.h>
@@ -52,10 +53,12 @@ class OffScreenRenderingImpl : public RenderEffectImpl
 {
 public:
   /**
-   * @brief Constructor
-   * @param[in] type Defines whether effect is enabled or not, and its refresh rate
+   * @brief Creates a reference-counted implementation.
    */
-  OffScreenRenderingImpl(DevelControl::OffScreenRenderingType type);
+  static Dali::IntrusivePtr<OffScreenRenderingImpl> New(DevelControl::OffScreenRenderingType type)
+  {
+    return Dali::IntrusivePtr<OffScreenRenderingImpl>(new OffScreenRenderingImpl(type));
+  }
 
   /**
    * @brief Set OffScreenRenderingType explicitly
@@ -76,6 +79,11 @@ public:
   Dali::Texture GetTexture() const;
 
 protected:
+  /**
+   * @brief Constructor
+   * @param[in] type Defines whether effect is enabled or not, and its refresh rate
+   */
+  OffScreenRenderingImpl(DevelControl::OffScreenRenderingType type);
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnInitialize
   void OnInitialize() override;
 
@@ -87,6 +95,7 @@ protected:
 
   // @copydoc Dali::Toolkit::Internal::RenderEffectImpl::OnRefresh
   void OnRefresh() override;
+  ~OffScreenRenderingImpl() override = default;
 
 private:
   /**

@@ -116,7 +116,7 @@ Panel::Panel()
   mIsDoubleSided(false),
   mIsUsingBackFacePlane(true),
   mBackFacePlaneColor(Vector3::ONE),
-  mShaderManager(new Scene3D::Loader::ShaderManager()),
+  mShaderManager(Scene3D::Loader::ShaderManager::New()),
   mSceneIblScaleFactor(1.0f),
   mSceneSpecularMipmapLevels(1u),
   mIsShadowCasting(true),

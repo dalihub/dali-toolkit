@@ -25,6 +25,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <memory>
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-url.h>
@@ -58,20 +59,6 @@ class SvgTask : public AsyncTask
 {
 public:
   /**
-   * Constructor
-   * @param[in] vectorRenderer The vector rasterizer.
-   * @param[in] id The id of this task.
-   * @param[in] callback The callback that is called when the operation is completed.
-   * @param[in] priorityType The priority of this task.
-   */
-  SvgTask(VectorImageRenderer vectorRenderer, int32_t id, CallbackBase* callback, AsyncTask::PriorityType priorityType = AsyncTask::PriorityType::DEFAULT);
-
-  /**
-   * Destructor.
-   */
-  virtual ~SvgTask() = default;
-
-  /**
    * Whether the task has succeeded.
    * @return True if the task has succeeded.
    */
@@ -98,6 +85,21 @@ public:
    */
   virtual PixelData GetPixelData() const;
 
+protected:
+  /**
+   * Constructor
+   * @param[in] vectorRenderer The vector rasterizer.
+   * @param[in] id The id of this task.
+   * @param[in] callback The callback that is called when the operation is completed.
+   * @param[in] priorityType The priority of this task.
+   */
+  SvgTask(VectorImageRenderer vectorRenderer, int32_t id, CallbackBase* callback, AsyncTask::PriorityType priorityType = AsyncTask::PriorityType::DEFAULT);
+
+  /**
+   * Destructor.
+   */
+  virtual ~SvgTask() = default;
+
 private:
   // Undefined
   SvgTask(const SvgTask& task) = delete;
@@ -115,19 +117,12 @@ class SvgLoadingTask : public SvgTask
 {
 public:
   /**
-   * Constructor
-   * @param[in] vectorRenderer The vector rasterizer.
-   * @param[in] id The id of this task.
-   * @param[in] url The URL to svg resource to use.
-   * @param[in] encodedImageBuffer The resource buffer if required.
-   * @param[in] callback The callback that is called when the operation is completed.
+   * @brief Creates a reference-counted implementation.
    */
-  SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, CallbackBase* callback);
-
-  /**
-   * Destructor.
-   */
-  ~SvgLoadingTask() override;
+  static Dali::IntrusivePtr<SvgLoadingTask> New(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<SvgLoadingTask>(new SvgLoadingTask(vectorRenderer, id, url, encodedImageBuffer, callback));
+  }
 
 public: // Implementation of AsyncTask
   /**
@@ -148,6 +143,22 @@ public:
    * @brief Collect the list of tasks to got notify to read after load completed at worker thread.
    */
   void AddNotifyObservedTaskList(SvgRasterizingTaskPtr rasterizingTask);
+
+protected:
+  /**
+   * Constructor
+   * @param[in] vectorRenderer The vector rasterizer.
+   * @param[in] id The id of this task.
+   * @param[in] url The URL to svg resource to use.
+   * @param[in] encodedImageBuffer The resource buffer if required.
+   * @param[in] callback The callback that is called when the operation is completed.
+   */
+  SvgLoadingTask(VectorImageRenderer vectorRenderer, int32_t id, const VisualUrl& url, EncodedImageBuffer encodedImageBuffer, CallbackBase* callback);
+
+  /**
+   * Destructor.
+   */
+  ~SvgLoadingTask() override;
 
 private:
   // Undefined
@@ -174,19 +185,12 @@ class SvgRasterizingTask : public SvgTask
 {
 public:
   /**
-   * Constructor
-   * @param[in] vectorRenderer The vector rasterizer.
-   * @param[in] id The id of this task.
-   * @param[in] width The rasterization width.
-   * @param[in] height The rasterization height.
-   * @param[in] callback The callback that is called when the operation is completed.
+   * @brief Creates a reference-counted implementation.
    */
-  SvgRasterizingTask(VectorImageRenderer vectorRenderer, int32_t id, uint32_t width, uint32_t height, CallbackBase* callback);
-
-  /**
-   * Destructor.
-   */
-  ~SvgRasterizingTask() override;
+  static Dali::IntrusivePtr<SvgRasterizingTask> New(VectorImageRenderer vectorRenderer, int32_t id, uint32_t width, uint32_t height, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<SvgRasterizingTask>(new SvgRasterizingTask(vectorRenderer, id, width, height, callback));
+  }
 
   /**
    * Get the rasterization result.
@@ -223,6 +227,22 @@ public: // Implementation of AsyncTask
   {
     return "SvgRasterizingTask";
   }
+
+protected:
+  /**
+   * Constructor
+   * @param[in] vectorRenderer The vector rasterizer.
+   * @param[in] id The id of this task.
+   * @param[in] width The rasterization width.
+   * @param[in] height The rasterization height.
+   * @param[in] callback The callback that is called when the operation is completed.
+   */
+  SvgRasterizingTask(VectorImageRenderer vectorRenderer, int32_t id, uint32_t width, uint32_t height, CallbackBase* callback);
+
+  /**
+   * Destructor.
+   */
+  ~SvgRasterizingTask() override;
 
 private:
   // Undefined

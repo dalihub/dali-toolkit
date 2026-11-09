@@ -146,12 +146,7 @@ class DALI_TOOLKIT_API ItemLayout : public RefObject
 public:
   class Extension; ///< Forward declare future extension interface
 
-  /**
-   * @brief Virtual destructor.
-   * @SINCE_1_0.0
-   */
-  virtual ~ItemLayout();
-
+public:
   /**
    * @brief Set the orientation of the layout.
    *
@@ -399,6 +394,12 @@ protected:
   ItemLayout();
 
   /**
+   * @brief Virtual destructor.
+   * @SINCE_1_0.0
+   */
+  ~ItemLayout() override;
+
+  /**
    * @brief For derived class to set the layout properties.
    *
    * Called by SetLayoutProperties.
@@ -414,13 +415,13 @@ private:
    * @brief Don't allow copy constructor
    * @SINCE_1_0.0
    */
-  ItemLayout(const ItemLayout& handle);
+  ItemLayout(const ItemLayout& handle) = delete;
 
   /**
    * @brief Don't allow copy operator
    * @SINCE_1_0.0
    */
-  ItemLayout& operator=(const ItemLayout& handle);
+  ItemLayout& operator=(const ItemLayout& handle) = delete;
 
 protected:
   struct Impl;

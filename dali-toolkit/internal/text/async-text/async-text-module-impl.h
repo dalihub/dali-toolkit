@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
@@ -40,14 +41,12 @@ class AsyncTextModule : public BaseObject
 {
 public:
   /**
-   * Constructor
+   * @brief Creates a reference-counted implementation.
    */
-  AsyncTextModule();
-
-  /**
-   * Destructor
-   */
-  ~AsyncTextModule();
+  static Dali::IntrusivePtr<AsyncTextModule> New()
+  {
+    return Dali::IntrusivePtr<AsyncTextModule>(new AsyncTextModule());
+  }
 
   /**
    * @copydoc Dali::AsyncTextModule::ClearCache()
@@ -84,12 +83,22 @@ public:
    */
   Text::MultilanguageSupport& GetMultilanguageSupport();
 
+protected:
+  /**
+   * Constructor
+   */
+  AsyncTextModule();
+
+  /**
+   * Destructor
+   */
+  ~AsyncTextModule();
+
 private:
   /**
    * private method
    */
 
-private:
   // Undefined copy constructor.
   AsyncTextModule(const AsyncTextModule&);
 

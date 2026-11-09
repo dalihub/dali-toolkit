@@ -2189,7 +2189,7 @@ void Control::SetOffScreenRendering(int32_t offScreenRenderingType)
   }
   else if(!mOffScreenRenderingContext || mOffScreenRenderingContext->mType == DevelControl::OffScreenRenderingType::NONE)
   {
-    EnsureOffscreenRenderingContext().mImpl.Reset(new Internal::OffScreenRenderingImpl(newType));
+    EnsureOffscreenRenderingContext().mImpl = Internal::OffScreenRenderingImpl::New(newType);
     mOffScreenRenderingContext->mImpl->SetOwnerControl(handle);
 
     if(DALI_LIKELY(mVisualData))

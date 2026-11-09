@@ -419,7 +419,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
 
     if(startPositionValue && startPositionValue->Get(startPosition) && endPositionValue && endPositionValue->Get(endPosition))
     {
-      mGradient = new LinearGradient(startPosition, endPosition, mGradient);
+      mGradient = LinearGradient::New(startPosition, endPosition, mGradient);
     }
     else
     {
@@ -434,7 +434,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
     float                  radius;
     if(centerValue && centerValue->Get(center) && radiusValue && radiusValue->Get(radius))
     {
-      mGradient = new RadialGradient(center, radius, mGradient);
+      mGradient = RadialGradient::New(center, radius, mGradient);
     }
     else
     {
@@ -449,7 +449,7 @@ bool GradientVisual::NewGradient(Type gradientType, const Property::Map& propert
     float                  startAngle;
     if(centerValue && centerValue->Get(center) && startAngleValue && startAngleValue->Get(startAngle))
     {
-      mGradient = new ConicGradient(center, Dali::Radian(startAngle), mGradient);
+      mGradient = ConicGradient::New(center, Dali::Radian(startAngle), mGradient);
     }
     else
     {

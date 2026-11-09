@@ -22,7 +22,7 @@ namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 ParticleRenderer ParticleRenderer::New()
 {
-  return {new Internal::ParticleRenderer()};
+  return {Internal::ParticleRenderer::NewForBaseHandle()};
 }
 
 ParticleRenderer::ParticleRenderer(Internal::ParticleRenderer* impl)

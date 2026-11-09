@@ -52,26 +52,14 @@ public:
                                            const Dali::TextAbstraction::FontWeight::Type& weight,
                                            const Dali::TextAbstraction::FontWidth::Type&  width,
                                            const Dali::TextAbstraction::FontSlant::Type&  slant);
-
-  /**
-   * Default Constructor
-   */
-  FontSpan();
-
   FontSpan(const FontSpan&)            = delete; ///< Deleted copy constructor
   FontSpan(FontSpan&&)                 = delete; ///< Deleted move constructor
   FontSpan& operator=(const FontSpan&) = delete; ///< Deleted copy assignment operator
   FontSpan& operator=(FontSpan&&)      = delete; ///< Deleted move assignment operator
 
-  /**
-   * @brief Destructor
-   *
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~FontSpan() override;
-
 public: //Methods
 public: //Methods
+  //Methods
   /**
    * @copydoc Dali::Toolkit::Text::FontSpan::GetFamilyName()
    */
@@ -167,10 +155,23 @@ private: //Methods
   void ProcessFontSlant(FontDescriptionRun& fontRun) const;
 
 public: //Methods for internal only
-        /**
-         * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
-         */
+  /**
+   * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
+   */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
+
+protected:
+  /**
+   * Default Constructor
+   */
+  FontSpan();
+
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~FontSpan() override;
 
 private:
   struct Impl;

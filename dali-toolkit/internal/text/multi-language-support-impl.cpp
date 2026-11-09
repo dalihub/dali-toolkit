@@ -621,7 +621,7 @@ Text::MultilanguageSupport MultilanguageSupport::Get()
     }
     else // create and register the object
     {
-      multilanguageSupportHandle = Text::MultilanguageSupport(new MultilanguageSupport);
+      multilanguageSupportHandle = Text::MultilanguageSupport(MultilanguageSupport::NewForBaseHandle());
       service.Register(gSingletonTypeInfoId, multilanguageSupportHandle);
     }
   }

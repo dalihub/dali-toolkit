@@ -24,7 +24,7 @@ namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 ParticleModifier ParticleModifier::New(UniquePtr<ParticleModifierInterface>&& modifierUpdater)
 {
-  return {new Internal::ParticleModifier(std::move(modifierUpdater))};
+  return {Internal::ParticleModifier::NewForBaseHandle(std::move(modifierUpdater))};
 }
 
 ParticleModifier::ParticleModifier(Internal::ParticleModifier* impl)

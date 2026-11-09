@@ -142,12 +142,8 @@ private:
     }
     return mFontClient;
   }
-
-  // Undefined
-  Metrics(const Metrics&);
-
-  // Undefined
-  Metrics& operator=(const Metrics& rhs);
+  Metrics(const Metrics&)                = delete;
+  Metrics& operator=(const Metrics& rhs) = delete;
 
 private:
   TextAbstraction::FontClient mFontClient;

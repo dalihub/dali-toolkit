@@ -46,11 +46,6 @@ public:
   static GridLayoutPtr New();
 
   /**
-   * @brief Virtual destructor.
-   */
-  virtual ~GridLayout();
-
-  /**
    * Apply grid layout Properties.
    * @param[in] properties The properties of the layout.
    */
@@ -204,6 +199,12 @@ public:
    * @copydoc ItemLayout::GetNextFocusItemID()
    */
   int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled) override;
+
+protected:
+  /**
+   * @brief Virtual destructor.
+   */
+  virtual ~GridLayout();
 
 private:
   /**

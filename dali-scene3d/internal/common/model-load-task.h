@@ -44,17 +44,12 @@ class ModelLoadTask : public AsyncTask
 {
 public:
   /**
-   * Constructor
-   * @param[in] modelUrl Model file path.(e.g., glTF, and DLI).
-   * @param[in] resourceDirectoryUrl Resource file path that includes binary, image etc.
-   * @param[in] callback The callback that is called when the operation is completed.
+   * @brief Creates a reference-counted implementation.
    */
-  ModelLoadTask(const std::string& modelUrl, const std::string& resourceDirectoryUrl, CallbackBase* callback);
-
-  /**
-   * Destructor.
-   */
-  ~ModelLoadTask();
+  static Dali::IntrusivePtr<ModelLoadTask> New(const std::string& modelUrl, const std::string& resourceDirectoryUrl, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<ModelLoadTask>(new ModelLoadTask(modelUrl, resourceDirectoryUrl, callback));
+  }
 
   /**
    * Whether the task has succeeded.
@@ -105,6 +100,20 @@ public: // Implementation of AsyncTask
   {
     return Dali::StringView("ModelLoadTask");
   }
+
+protected:
+  /**
+   * Constructor
+   * @param[in] modelUrl Model file path.(e.g., glTF, and DLI).
+   * @param[in] resourceDirectoryUrl Resource file path that includes binary, image etc.
+   * @param[in] callback The callback that is called when the operation is completed.
+   */
+  ModelLoadTask(const std::string& modelUrl, const std::string& resourceDirectoryUrl, CallbackBase* callback);
+
+  /**
+   * Destructor.
+   */
+  ~ModelLoadTask();
 
 private:
   // Undefined

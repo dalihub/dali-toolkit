@@ -48,25 +48,11 @@ public:
    * @brief Creates a new ForegroundColorSpan object.
    */
   static Dali::Toolkit::Text::ForegroundColorSpan New(Vector4 color);
-
-  /**
-   * Default Constructor
-   */
-  ForegroundColorSpan();
-
   ForegroundColorSpan(const ForegroundColorSpan&)            = delete; ///< Deleted copy constructor
   ForegroundColorSpan(ForegroundColorSpan&&)                 = delete; ///< Deleted move constructor
   ForegroundColorSpan& operator=(const ForegroundColorSpan&) = delete; ///< Deleted copy assignment operator
   ForegroundColorSpan& operator=(ForegroundColorSpan&&)      = delete; ///< Deleted move assignment operator
-
-  /**
-   * @brief Destructor
-   *
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~ForegroundColorSpan() override;
-
-public: //Methods
+public:                                                                //Methods
   /**
    * @copydoc Dali::Toolkit::Text::ForegroundColorSpan::GetForegroundColor()
    */
@@ -86,10 +72,23 @@ public: //Methods. Not intended for application developers
   void SetForegroundColor(Vector4 color);
 
 public: //Methods for internal only
-        /**
-         * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
-         */
+  /**
+   * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
+   */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
+
+protected:
+  /**
+   * Default Constructor
+   */
+  ForegroundColorSpan();
+
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~ForegroundColorSpan() override;
 
 private:
   struct Impl;

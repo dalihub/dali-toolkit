@@ -62,24 +62,11 @@ public:
    * @return A new StrikethroughSpan object.
    */
   static Dali::Toolkit::Text::StrikethroughSpan New(Vector4 color, float height);
-
-  /**
-   * Default Constructor
-   */
-  StrikethroughSpan();
   StrikethroughSpan(const StrikethroughSpan&)            = delete; ///< Deleted copy constructor
   StrikethroughSpan(StrikethroughSpan&&)                 = delete; ///< Deleted move constructor
   StrikethroughSpan& operator=(const StrikethroughSpan&) = delete; ///< Deleted copy assignment operator
   StrikethroughSpan& operator=(StrikethroughSpan&&)      = delete; ///< Deleted move assignment operator
-
-  /**
-   * @brief Destructor
-   *
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~StrikethroughSpan() override;
-
-public: //Methods
+public:                                                            //Methods
   /**
    * @copydoc Dali::Toolkit::Text::StrikethroughSpan::GetColor()
    */
@@ -120,6 +107,19 @@ public: //Methods for internal only
    * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
    */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
+
+protected:
+  /**
+   * Default Constructor
+   */
+  StrikethroughSpan();
+
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~StrikethroughSpan() override;
 
 private:
   struct Impl;

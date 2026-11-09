@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <map>
 #include <queue>
@@ -45,16 +46,23 @@ class AsyncTextManager : public BaseObject, public ConnectionTracker
 {
 public:
   /**
-   * Constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  AsyncTextManager();
+  static DALI_INTERNAL AsyncTextManager* NewForBaseHandle()
+  {
+    return new AsyncTextManager();
+  }
 
   /**
-   * Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @brief Creates a reference-counted implementation.
    */
-  ~AsyncTextManager();
+  static Dali::IntrusivePtr<AsyncTextManager> New()
+  {
+    return Dali::IntrusivePtr<AsyncTextManager>(new AsyncTextManager());
+  }
 
   /**
    * @copydoc Dali::AsyncTextManager::Get()
@@ -100,6 +108,19 @@ public: ///< Called from worker thread
    * @copydoc Dali::Toolkit::Text::Internal::AsyncTextManager::ReleaseLoaderToManager()
    */
   void ReleaseLoader(Toolkit::Internal::TextLoadingTaskPtr task, Text::AsyncTextLoader loader);
+
+protected:
+  /**
+   * Constructor
+   */
+  AsyncTextManager();
+
+  /**
+   * Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   */
+  ~AsyncTextManager();
 
 private:
   /**

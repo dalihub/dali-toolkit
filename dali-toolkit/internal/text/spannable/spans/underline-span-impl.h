@@ -81,25 +81,11 @@ public:
    * @return A new UnderlineSpan object.
    */
   static Dali::Toolkit::Text::UnderlineSpan NewDouble(Vector4 color, float height);
-
-  /**
-   * Default Constructor
-   */
-  UnderlineSpan();
-
   UnderlineSpan(const UnderlineSpan&)            = delete; ///< Deleted copy constructor
   UnderlineSpan(UnderlineSpan&&)                 = delete; ///< Deleted move constructor
   UnderlineSpan& operator=(const UnderlineSpan&) = delete; ///< Deleted copy assignment operator
   UnderlineSpan& operator=(UnderlineSpan&&)      = delete; ///< Deleted move assignment operator
-
-  /**
-   * @brief Destructor
-   *
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~UnderlineSpan() override;
-
-public: //Methods
+public:                                                    //Methods
   /**
    * @copydoc Dali::Toolkit::Text::UnderlineSpan::GetType()
    */
@@ -187,10 +173,23 @@ public: //Methods. Not intended for application developers
   void SetDashWidth(const float& dashWidth);
 
 public: //Methods for internal only
-        /**
-         * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
-         */
+  /**
+   * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
+   */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
+
+protected:
+  /**
+   * Default Constructor
+   */
+  UnderlineSpan();
+
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~UnderlineSpan() override;
 
 private:
   struct Impl;

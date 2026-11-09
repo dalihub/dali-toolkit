@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/adaptor-framework/shader-precompiler.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
@@ -49,11 +50,23 @@ class VisualFactory : public BaseObject, public ConnectionTracker
 {
 public:
   /**
-   * @brief Constructor
-   *
-   * @param[in] debugEnabled If true, use debug renderer to replace all the concrete renderer.
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  VisualFactory(bool debugEnabled);
+  static DALI_INTERNAL VisualFactory* NewForBaseHandle(bool debugEnabled)
+  {
+    return new VisualFactory(debugEnabled);
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<VisualFactory> New(bool debugEnabled)
+  {
+    return Dali::IntrusivePtr<VisualFactory>(new VisualFactory(debugEnabled));
+  }
 
   /**
    * @brief StyleChanged callback
@@ -146,6 +159,13 @@ public:
   Internal::VisualFactoryCache& GetFactoryCache();
 
 protected:
+  /**
+   * @brief Constructor
+   *
+   * @param[in] debugEnabled If true, use debug renderer to replace all the concrete renderer.
+   */
+  VisualFactory(bool debugEnabled);
+
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */

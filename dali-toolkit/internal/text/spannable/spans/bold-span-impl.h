@@ -48,13 +48,6 @@ public:
    * @return Dali::Toolkit::Text::BoldSpan
    */
   static Dali::Toolkit::Text::BoldSpan New();
-
-  /**
-   * @brief Construct a new Bold Span object
-   *
-   */
-  BoldSpan();
-
   ///< Deleted copy constructor
   BoldSpan(const BoldSpan& rhs) = delete;
 
@@ -68,16 +61,22 @@ public:
   BoldSpan& operator=(BoldSpan&& rhs) = delete;
 
   /**
-   * @brief Destructor
-   * A reference counted object may only be deleted by calling Unreference().
-   */
-  ~BoldSpan() override;
-
-  /**
    * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
    */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
 
+protected:
+  /**
+   * @brief Construct a new Bold Span object
+   *
+   */
+  BoldSpan();
+
+  /**
+   * @brief Destructor
+   * A reference counted object may only be deleted by calling Unreference().
+   */
+  ~BoldSpan() override;
 }; // class BoldSpan
 
 } // namespace Internal

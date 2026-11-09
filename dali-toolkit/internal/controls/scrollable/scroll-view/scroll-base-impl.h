@@ -48,22 +48,10 @@ class ScrollBase : public Scrollable
 public:
   struct ActorInfo : public Dali::RefObject
   {
-    /**
-     * ActorInfo constructor
-     * @param[in] actor The actor that this ActorInfo represents.
-     */
-    ActorInfo(Actor actor)
-    : mActor(actor)
+  public:
+    static Dali::IntrusivePtr<ActorInfo> New(Actor actor)
     {
-    }
-
-    /**
-     * ActorInfo destructor
-     * removes scrollview-related constraints only.
-     */
-    ~ActorInfo()
-    {
-      RemoveConstraints();
+      return Dali::IntrusivePtr<ActorInfo>(new ActorInfo(actor));
     }
 
     /**
@@ -95,6 +83,30 @@ public:
       mConstraints.clear();
     }
 
+  protected:
+    /**
+     * ActorInfo constructor
+     * @param[in] actor The actor that this ActorInfo represents.
+     */
+    ActorInfo(Actor actor)
+    : mActor(actor)
+    {
+    }
+
+    /**
+     * ActorInfo destructor
+     * removes scrollview-related constraints only.
+     */
+    ~ActorInfo()
+    {
+      RemoveConstraints();
+    }
+
+  private:
+    ActorInfo(const ActorInfo&)            = delete;
+    ActorInfo& operator=(const ActorInfo&) = delete;
+
+  public:
     Actor                   mActor;       ///< The Actor that this ActorInfo represents.
     std::vector<Constraint> mConstraints; ///< A list keeping track of constraints applied to the actor via this delegate.
   };
@@ -176,8 +188,6 @@ public:
 
 protected:
   static const char* const SCROLL_DOMAIN_OFFSET_PROPERTY_NAME;
-
-protected:
   /**
    * Removed default costructor.
    */

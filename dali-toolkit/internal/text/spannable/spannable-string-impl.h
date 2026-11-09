@@ -52,21 +52,15 @@ public:
    */
   static Dali::Toolkit::Text::SpannableString New(const std::string& text);
 
-  /**
-   * @brief Destructor
-   *
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~SpannableString() override;
-
 protected:
   /**
    * @brief Constructs a new SpannableString.
    */
   SpannableString(const std::string& text);
 
-  // Removed constructors and assignment operators
 public:
+  // Removed constructors and assignment operators
+
   SpannableString(const SpannableString&)            = delete; ///< Deleted copy constructor
   SpannableString(SpannableString&&)                 = delete; ///< Deleted move constructor
   SpannableString& operator=(const SpannableString&) = delete; ///< Deleted copy assignment operator
@@ -110,6 +104,14 @@ public:
    * @copydoc Dali::Toolkit::Text::Spanned::RetrieveAllSpansAndRanges()
    */
   void RetrieveAllSpansAndRanges(std::vector<Dali::Toolkit::Text::BaseSpan>& spans, std::vector<Dali::Toolkit::Text::Range>& ranges) const override;
+
+protected:
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~SpannableString() override;
 
 private:
   struct Impl;

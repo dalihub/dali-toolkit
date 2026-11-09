@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/adaptor-framework/window.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <memory>
@@ -79,14 +80,28 @@ public:
   };
 
   /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL KeyboardFocusManager* NewForBaseHandle()
+  {
+    return new KeyboardFocusManager();
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<KeyboardFocusManager> New()
+  {
+    return Dali::IntrusivePtr<KeyboardFocusManager>(new KeyboardFocusManager());
+  }
+
+  /**
    * @copydoc Toolkit::KeyboardFocusManager::Get
    */
   static Toolkit::KeyboardFocusManager Get();
-
-  /**
-   * Construct a new KeyboardFocusManager.
-   */
-  KeyboardFocusManager();
 
   /**
    * @copydoc Toolkit::KeyboardFocusManager::SetCurrentFocusActor
@@ -238,6 +253,11 @@ public:
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
 protected:
+  /**
+   * Construct a new KeyboardFocusManager.
+   */
+  KeyboardFocusManager();
+
   /**
    * Destructor
    */
@@ -409,8 +429,6 @@ private:
    * @param[in] actor The actor removed from the scene.
    */
   void OnSceneDisconnection(Dali::Actor actor);
-
-private:
   // Undefined
   KeyboardFocusManager(const KeyboardFocusManager&);
 

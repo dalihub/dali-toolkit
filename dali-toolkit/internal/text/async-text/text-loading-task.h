@@ -21,6 +21,7 @@
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <memory> ///< for std::unique_ptr
 
 // INTERNAL INCLUDES
@@ -38,19 +39,12 @@ class TextLoadingTask : public AsyncTask
 {
 public:
   /**
-   * Constructor.
-   * @param [in] id The task id assigned from async text manager.
-   * @param [in] paramaters The async text parameters.
-   * @param [in] callback The callback that is called when the operation is completed.
+   * @brief Creates a reference-counted implementation.
    */
-  TextLoadingTask(const uint32_t                   id,
-                  const Text::AsyncTextParameters& paramaters,
-                  CallbackBase*                    callback);
-
-  /**
-   * Destructor.
-   */
-  ~TextLoadingTask() override;
+  static Dali::IntrusivePtr<TextLoadingTask> New(const uint32_t id, const Text::AsyncTextParameters& paramaters, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<TextLoadingTask>(new TextLoadingTask(id, paramaters, callback));
+  }
 
   /**
    * Returns the id assigned when creating a task.
@@ -106,6 +100,22 @@ public:
   Text::AsyncTextLoader     mLoader;
   Text::AsyncTextParameters mParameters;
   Text::AsyncTextRenderInfo mRenderInfo;
+
+protected:
+  /**
+   * Constructor.
+   * @param [in] id The task id assigned from async text manager.
+   * @param [in] paramaters The async text parameters.
+   * @param [in] callback The callback that is called when the operation is completed.
+   */
+  TextLoadingTask(const uint32_t                   id,
+                  const Text::AsyncTextParameters& paramaters,
+                  CallbackBase*                    callback);
+
+  /**
+   * Destructor.
+   */
+  ~TextLoadingTask() override;
 
 private:
   bool  mIsReady : 1; ///< Whether this task ready to run

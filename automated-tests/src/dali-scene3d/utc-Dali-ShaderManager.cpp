@@ -258,7 +258,7 @@ int UtcDaliShaderManagerProduceShader(void)
   };
 
   ToolkitTestApplication application;
-  ShaderManager          shaderManager;
+  auto                   shaderManager = ShaderManager::New();
   for(auto& permutationSet : permutationSets)
   {
     static int tc = 0;
@@ -307,14 +307,14 @@ int UtcDaliShaderManagerProduceShader(void)
     }
     option1.AddOption(ShaderOption::Type::THREE_TEXTURE);
 
-    ShaderOption option2 = shaderManager.ProduceShaderOption(materialDefinition, meshDefinition);
+    ShaderOption option2 = shaderManager->ProduceShaderOption(materialDefinition, meshDefinition);
 
-    Shader shaderFromOption1 = shaderManager.ProduceShader(option1);
-    Shader shaderFromOption2 = shaderManager.ProduceShader(option2);
+    Shader shaderFromOption1 = shaderManager->ProduceShader(option1);
+    Shader shaderFromOption2 = shaderManager->ProduceShader(option2);
     DALI_TEST_EQUAL(option1.GetOptionHash(), option2.GetOptionHash());
     DALI_TEST_EQUAL(shaderFromOption1, shaderFromOption2);
 
-    RendererState::Type rendererStateFromMaterialDefinition = shaderManager.GetRendererState(materialDefinition);
+    RendererState::Type rendererStateFromMaterialDefinition = shaderManager->GetRendererState(materialDefinition);
     DALI_TEST_EQUAL(rendererStateFromMaterialDefinition, rendererState);
   }
 
@@ -324,7 +324,7 @@ int UtcDaliShaderManagerProduceShader(void)
 int UtcDaliShaderManagerAddAndRemoveLights(void)
 {
   ToolkitTestApplication application;
-  ShaderManagerPtr       shaderManager = new ShaderManager();
+  ShaderManagerPtr       shaderManager = ShaderManager::New();
 
   ShaderOption option1;
   option1.AddOption(ShaderOption::Type::THREE_TEXTURE);

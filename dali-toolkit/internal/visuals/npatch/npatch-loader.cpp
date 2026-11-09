@@ -252,7 +252,7 @@ NPatchDataPtr NPatchLoader::GetNPatchData(const VisualUrl& url, const Dali::Exte
   // If this is new image loading, make new cache data
   if(infoPtr == nullptr)
   {
-    NPatchInfo info(new NPatchData());
+    NPatchInfo info(NPatchData::New());
     info.mData->SetId(GenerateUniqueNPatchDataId());
     info.mData->SetHash(hash);
     info.mData->SetUrl(url);
@@ -265,7 +265,7 @@ NPatchDataPtr NPatchLoader::GetNPatchData(const VisualUrl& url, const Dali::Exte
   // Else if LOAD_COMPLETE, Same url but border is different - use the existing texture
   else if(infoPtr->mData->GetLoadingState() == NPatchData::LoadingState::LOAD_COMPLETE)
   {
-    NPatchInfo info(new NPatchData());
+    NPatchInfo info(NPatchData::New());
 
     info.mData->SetId(GenerateUniqueNPatchDataId());
     info.mData->SetHash(hash);

@@ -82,9 +82,9 @@ bool AsyncTextLoader::IsModuleClearNeeded()
 
 AsyncTextLoader AsyncTextLoader::New()
 {
-  auto asyncTextLoaderImpl = new Internal::AsyncTextLoader();
+  auto asyncTextLoaderImpl = Internal::AsyncTextLoader::New();
 
-  return AsyncTextLoader(asyncTextLoaderImpl);
+  return AsyncTextLoader(asyncTextLoaderImpl.Get());
 }
 
 Size AsyncTextLoader::SetupRenderScale(AsyncTextParameters& parameters, bool& cachedNaturalSize)

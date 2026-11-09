@@ -47,12 +47,6 @@ public:
    * @brief Creates a new ItalicSpan object.
    */
   static Dali::Toolkit::Text::ItalicSpan New();
-
-  /**
-   * Default Constructor
-   */
-  ItalicSpan();
-
   ///< Deleted copy constructor
   ItalicSpan(const ItalicSpan&) = delete;
 
@@ -64,6 +58,17 @@ public:
 
   ///< Deleted move assignment operator
   ItalicSpan& operator=(ItalicSpan&&) = delete;
+  //Methods for internal only
+  /**
+   * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
+   */
+  void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
+
+protected:
+  /**
+   * Default Constructor
+   */
+  ItalicSpan();
 
   /**
    * @brief Destructor.
@@ -71,13 +76,6 @@ public:
    * A reference counted object may only be deleted by calling Unreference().
    */
   ~ItalicSpan() override;
-
-  //Methods for internal only
-  /**
-   * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
-   */
-  void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
-
 }; // class ItalicSpan
 
 } // namespace Internal
