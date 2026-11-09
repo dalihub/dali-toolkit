@@ -39,7 +39,7 @@
 
    To enforce horizontal-only scrolling, the Y-axis ruler can be disabled
    @code
-   RulerPtr rulerY = new DefaultRuler();
+   RulerPtr rulerY = DefaultRuler::New();
    rulerY->Disable();
    myScrollView.SetRulerY(rulerY);
    @endcode
@@ -48,7 +48,7 @@
    @code
    Stage stage = Dali::Stage::GetCurrent();
    Size size = stage.GetSize();
-   RulerPtr rulerX = new FixedRuler(size.width);
+   RulerPtr rulerX = FixedRuler::New(size.width);
    myScrollView.SetRulerX(rulerX);
    @endcode
 
@@ -56,7 +56,7 @@
    @code
    Stage stage = Dali::Stage::GetCurrent();
    Size size = stage.GetSize();
-   RulerPtr rulerX = new FixedRuler(size.width);
+   RulerPtr rulerX = FixedRuler::New(size.width);
    rulerX->SetDomain(RulerDomain(0.0f, size.width*4.0f));
    myScrollView.SetRulerX(rulerX);
    @endcode

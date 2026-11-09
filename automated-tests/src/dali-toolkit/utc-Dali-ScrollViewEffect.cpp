@@ -79,9 +79,9 @@ RulerPtr CreateRuler(float gridSize = 0.0f)
 {
   if(gridSize <= Math::MACHINE_EPSILON_0)
   {
-    return new DefaultRuler();
+    return DefaultRuler::New();
   }
-  return new FixedRuler(gridSize);
+  return FixedRuler::New(gridSize);
 }
 
 // Callback probes.

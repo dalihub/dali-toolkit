@@ -30,6 +30,7 @@ SET(TC_SOURCES
   utc-Dali-PropertyBridge.cpp
   utc-Dali-ScrollBar.cpp
   utc-Dali-ScrollView.cpp
+  utc-Dali-RulerOwnership.cpp
   utc-Dali-ShaderEffects.cpp
   utc-Dali-ScaleTransition.cpp
   utc-Dali-SlideTransition.cpp

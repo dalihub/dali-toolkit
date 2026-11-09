@@ -110,6 +110,11 @@ float Ruler::SnapAndClamp(float x, float bias, float length, float scale, ClampS
 // DefaultRuler
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+IntrusivePtr<DefaultRuler> DefaultRuler::New()
+{
+  return IntrusivePtr<DefaultRuler>(new DefaultRuler());
+}
+
 DefaultRuler::DefaultRuler()
 {
   mType = FREE;
@@ -139,6 +144,11 @@ unsigned int DefaultRuler::GetTotalPages() const
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // FixedRuler
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+IntrusivePtr<FixedRuler> FixedRuler::New(float spacing)
+{
+  return IntrusivePtr<FixedRuler>(new FixedRuler(spacing));
+}
 
 FixedRuler::FixedRuler(float spacing)
 : mSpacing(spacing)
