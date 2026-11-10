@@ -110,17 +110,17 @@ DALI_ENUM_TO_STRING_TABLE_END(CIRCULAR_ALIGNMENT_TYPE)
 
 struct InternalDataModel
 {
-  InternalDataModel(FontClient&    fontClient,
-                    MetricsPtr     metrics,
-                    Text::ModelPtr textModel)
-  : fontClient(fontClient),
-    metrics(metrics),
-    textModel(textModel),
+  InternalDataModel(FontClient&    initFontClient,
+                    MetricsPtr     initMetrics,
+                    Text::ModelPtr initTextModel)
+  : fontClient(initFontClient),
+    metrics(initMetrics),
+    textModel(initTextModel),
     numberOfCharacters{0u},
     isTextMirrored{false},
     numberOfGlyphs{0u}
   {
-    layoutEngine.SetMetrics(metrics);
+    layoutEngine.SetMetrics(initMetrics);
   }
 
   FontClient&               fontClient;

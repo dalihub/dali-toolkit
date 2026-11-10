@@ -918,7 +918,7 @@ void ControlImpl::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, D
 
   static auto findValueVector4 = [](const Property::Map& map, Property::Index index, const Vector4& defaultValue = Vector4()) -> Vector4
   {
-    Property::Value* propertyValue = map.Find(index);
+    const Property::Value* propertyValue = map.Find(index);
     if(propertyValue)
     {
       return propertyValue->Get<Vector4>();
@@ -928,7 +928,7 @@ void ControlImpl::MakeVisualTransition(Dali::Property::Map& sourcePropertyMap, D
 
   static auto findValueFloat = [](const Property::Map& map, Property::Index index, const float& defaultValue = 0.0f) -> float
   {
-    Property::Value* propertyValue = map.Find(index);
+    const Property::Value* propertyValue = map.Find(index);
     if(propertyValue)
     {
       return propertyValue->Get<float>();

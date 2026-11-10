@@ -199,7 +199,7 @@ Geometry CreateBorderGeometry(Uint16Pair gridSize)
       //left and right
       rowIdx     = nextRowIdx - 2u;
       nextRowIdx = rowIdx + 4u;
-      for(uint16_t y = 2u; y < 2u * (gridHeight - 3u); ++y, rowIdx += 2u, nextRowIdx += 2u)
+      for(uint16_t innerY = 2u; innerY < 2u * (gridHeight - 3u); ++innerY, rowIdx += 2u, nextRowIdx += 2u)
       {
         AddQuadIndices(indices, rowIdx, nextRowIdx);
       }

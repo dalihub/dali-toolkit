@@ -53,9 +53,9 @@ Shader CreateShader(std::string_view vertexSrc, std::string_view fragmentSrc, Da
         {
           return visualFactoryCache.GetExternalShader(iter->second);
         }
-        Shader shader            = Shader::New(ToDaliStringView(vertexSrc), ToDaliStringView(fragmentSrc), hints, ToDaliStringView(shaderName));
-        gShaderIdMap[shaderName] = visualFactoryCache.RegisterExternalShader(shader);
-        return shader;
+        Shader newShader         = Shader::New(ToDaliStringView(vertexSrc), ToDaliStringView(fragmentSrc), hints, ToDaliStringView(shaderName));
+        gShaderIdMap[shaderName] = visualFactoryCache.RegisterExternalShader(newShader);
+        return newShader;
       }
     }
 

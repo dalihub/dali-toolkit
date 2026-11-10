@@ -49,12 +49,12 @@ struct ParticleDataStream
   /**
    * Creates new stream of requested capacity and (optionally) fills with default data
    */
-  ParticleDataStream(uint32_t capacity, uint32_t dataSize, const void* defaultValue, ParticleStream::StreamDataType dataType, const char* name, bool localStream)
+  ParticleDataStream(uint32_t capacity, uint32_t initDataSize, const void* defaultValue, ParticleStream::StreamDataType dataType, const char* name, bool initLocalStream)
   : type(dataType),
-    data(capacity * dataSize),
+    data(capacity * initDataSize),
     streamName(name ? name : ""),
-    dataSize(dataSize),
-    localStream(localStream)
+    dataSize(initDataSize),
+    localStream(initLocalStream)
   {
     if(defaultValue)
     {
@@ -62,8 +62,8 @@ struct ParticleDataStream
       const auto* defaultValuePtr = reinterpret_cast<const uint8_t*>(defaultValue);
       for(auto i = 0u; i < capacity; ++i)
       {
-        memcpy(dstPtr, defaultValuePtr, dataSize);
-        dstPtr += dataSize;
+        memcpy(dstPtr, defaultValuePtr, initDataSize);
+        dstPtr += initDataSize;
       }
     }
   }

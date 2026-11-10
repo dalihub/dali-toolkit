@@ -56,8 +56,8 @@ WireframeVisualPtr WireframeVisual::New(VisualFactoryCache& factoryCache, Visual
   WireframeVisualPtr wireframeVisual(new WireframeVisual(factoryCache, actualVisual));
 
   // Instead of calling SetProperties, looking for the only valid property 'transform'
-  Property::Value* transformValue = properties.Find(Toolkit::Visual::Property::TRANSFORM, TRANSFORM);
-  Property::Map    transformMap;
+  const Property::Value* transformValue = properties.Find(Toolkit::Visual::Property::TRANSFORM, TRANSFORM);
+  Property::Map          transformMap;
   if(transformValue && transformValue->Get(transformMap))
   {
     wireframeVisual->SetTransformAndSize(transformMap, Vector2::ZERO);
@@ -120,7 +120,7 @@ void WireframeVisual::DoCreateInstancePropertyMap(Property::Map& map) const
 
 void WireframeVisual::DoSetProperties(const Property::Map& propertyMap)
 {
-  Property::Value* mixValue = propertyMap.Find(Toolkit::Visual::Property::MIX_COLOR, MIX_COLOR);
+  const Property::Value* mixValue = propertyMap.Find(Toolkit::Visual::Property::MIX_COLOR, MIX_COLOR);
   if(mixValue)
   {
     Vector4 mixColor;

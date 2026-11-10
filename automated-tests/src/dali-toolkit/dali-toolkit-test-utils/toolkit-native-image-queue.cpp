@@ -123,6 +123,10 @@ uint32_t NativeImageQueue::GetQueueCount() const
   return 0;
 }
 
+void NativeImageQueue::SetAlphaPreMultiplied(bool preMultiplied)
+{
+}
+
 uint32_t NativeImageQueue::GetWidth() const
 {
   return 0;
@@ -131,6 +135,11 @@ uint32_t NativeImageQueue::GetWidth() const
 uint32_t NativeImageQueue::GetHeight() const
 {
   return 0;
+}
+
+bool NativeImageQueue::IsAlphaPreMultiplied() const
+{
+  return false;
 }
 
 bool NativeImageQueue::RequiresBlending() const

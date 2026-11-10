@@ -71,14 +71,14 @@ void Style::ApplyVisualsAndPropertiesRecursively(
         statePtr->ApplyProperties(handle);
 
         // Apply substate visuals
-        Property::Value value = control.GetProperty(DevelControl::Property::SUB_STATE);
+        Property::Value subStateValue = control.GetProperty(DevelControl::Property::SUB_STATE);
         Dali::String    subStateName;
-        if(value.Get(subStateName) && !subStateName.Empty())
+        if(subStateValue.Get(subStateName) && !subStateName.Empty())
         {
-          const StylePtr* stylePtr = statePtr->subStates.FindConst(ToStdStringView(subStateName));
-          if(stylePtr)
+          const StylePtr* subStateStylePtr = statePtr->subStates.FindConst(ToStdStringView(subStateName));
+          if(subStateStylePtr)
           {
-            const StylePtr subStatePtr(*stylePtr);
+            const StylePtr subStatePtr(*subStateStylePtr);
             // We have a sub-state match.
             subStatePtr->ApplyVisuals(handle, instancedProperties);
             subStatePtr->ApplyProperties(handle);
@@ -127,8 +127,8 @@ void Style::ApplyVisual(
     // merge them into the visual map
     if(instancedProperties)
     {
-      Property::Value* instanceTypeValue = instancedProperties->Find(Toolkit::Visual::Property::TYPE);
-      Property::Value* newTypeValue      = visualMap.Find(Toolkit::Visual::Property::TYPE, VISUAL_TYPE);
+      const Property::Value* instanceTypeValue = instancedProperties->Find(Toolkit::Visual::Property::TYPE);
+      const Property::Value* newTypeValue      = visualMap.Find(Toolkit::Visual::Property::TYPE, VISUAL_TYPE);
       if(instanceTypeValue && newTypeValue)
       {
         int instanceVisualType = -1;

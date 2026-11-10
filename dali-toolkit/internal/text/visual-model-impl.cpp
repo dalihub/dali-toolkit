@@ -299,9 +299,9 @@ LineIndex VisualModel::GetLineOfCharacter(CharacterIndex characterIndex)
       it != endIt;
       ++it, ++index)
   {
-    const LineRun& lineRun = *it;
+    const LineRun& currentLineRun = *it;
 
-    if(characterIndex < lineRun.characterRun.characterIndex + lineRun.characterRun.numberOfCharacters)
+    if(characterIndex < currentLineRun.characterRun.characterIndex + currentLineRun.characterRun.numberOfCharacters)
     {
       mCachedLineIndex = index;
       break;

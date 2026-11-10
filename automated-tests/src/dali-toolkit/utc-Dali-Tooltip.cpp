@@ -266,7 +266,7 @@ int UtcDaliTooltipCreateWithArray(void)
   const Property::Value mapValue1 = contentArray->GetElementAt(0);
   const Property::Map*  map1      = mapValue1.GetMap();
   DALI_TEST_CHECK(map1);
-  Property::Value* urlValue = map1->Find(ImageVisual::Property::URL);
+  const Property::Value* urlValue = map1->Find(ImageVisual::Property::URL);
   DALI_TEST_CHECK(urlValue);
   DALI_TEST_EQUALS("dummy-url.png", urlValue->Get<Dali::String>(), TEST_LOCATION);
 
@@ -274,7 +274,7 @@ int UtcDaliTooltipCreateWithArray(void)
   const Property::Value mapValue2 = contentArray->GetElementAt(1);
   const Property::Map*  map2      = mapValue2.GetMap();
   DALI_TEST_CHECK(map2);
-  Property::Value* textValue = map2->Find(TextVisual::Property::TEXT);
+  const Property::Value* textValue = map2->Find(TextVisual::Property::TEXT);
   DALI_TEST_CHECK(textValue);
   DALI_TEST_EQUALS("Hello Array Test", textValue->Get<Dali::String>(), TEST_LOCATION);
 

@@ -46,19 +46,19 @@ struct Parameters
   /**
    * Constructor with the needed parameters to layout the text.
    *
-   * @param[in] boundingBox The size of the box containing the text.
-   * @param[in,out] textModel The text's model.
-   * @param[in] fontClient The FontClient to use obtain glyph information.
-   * @param[in] bidirectionalSupport The BidirectionalSupport for using lines reorders.
+   * @param[in] initBoundingBox The size of the box containing the text.
+   * @param[in,out] initTextModel The text's model.
+   * @param[in] initFontClient The FontClient to use obtain glyph information.
+   * @param[in] initBidirectionalSupport The BidirectionalSupport for using lines reorders.
    */
-  Parameters(const Vector2&                         boundingBox,
-             ModelPtr                               textModel,
-             TextAbstraction::FontClient&           fontClient,
-             TextAbstraction::BidirectionalSupport& bidirectionalSupport)
-  : boundingBox{boundingBox},
-    textModel{textModel},
-    fontClient{fontClient},
-    bidirectionalSupport{bidirectionalSupport},
+  Parameters(const Vector2&                         initBoundingBox,
+             ModelPtr                               initTextModel,
+             TextAbstraction::FontClient&           initFontClient,
+             TextAbstraction::BidirectionalSupport& initBidirectionalSupport)
+  : boundingBox{initBoundingBox},
+    textModel{initTextModel},
+    fontClient{initFontClient},
+    bidirectionalSupport{initBidirectionalSupport},
     lineBidirectionalInfoRunsBuffer{nullptr},
     numberOfBidirectionalInfoRuns{0u},
     startGlyphIndex{0u},

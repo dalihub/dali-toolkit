@@ -141,7 +141,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
 {
   Visual::BasePtr visualPtr;
 
-  Property::Value*           typeValue  = propertyMap.Find(Toolkit::Visual::Property::TYPE, VISUAL_TYPE);
+  const Property::Value*     typeValue  = propertyMap.Find(Toolkit::Visual::Property::TYPE, VISUAL_TYPE);
   Toolkit::DevelVisual::Type visualType = Toolkit::DevelVisual::IMAGE; // Default to IMAGE type.
   if(typeValue)
   {
@@ -171,8 +171,8 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
     case Toolkit::Visual::IMAGE:
     case Toolkit::Visual::ANIMATED_IMAGE:
     {
-      Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string      imageUrl;
+      const Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
+      std::string            imageUrl;
       if(imageURLValue)
       {
         if(GetStdString(*imageURLValue, imageUrl))
@@ -219,7 +219,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
         }
         else
         {
-          Property::Array* array = imageURLValue->GetArray();
+          const Property::Array* array = imageURLValue->GetArray();
           if(array && array->Count() > 0)
           {
             visualPtr = AnimatedImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), *array, propertyMap);
@@ -255,8 +255,8 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
 
     case Toolkit::Visual::N_PATCH:
     {
-      Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string      imageUrl;
+      const Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
+      std::string            imageUrl;
       if(imageURLValue && GetStdString(*imageURLValue, imageUrl))
       {
         if(!imageUrl.empty())
@@ -269,8 +269,8 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
 
     case Toolkit::Visual::SVG:
     {
-      Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string      imageUrl;
+      const Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
+      std::string            imageUrl;
       if(imageURLValue && GetStdString(*imageURLValue, imageUrl))
       {
         if(!imageUrl.empty())
@@ -283,8 +283,8 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
 
     case Toolkit::DevelVisual::ANIMATED_VECTOR_IMAGE:
     {
-      Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
-      std::string      imageUrl;
+      const Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
+      std::string            imageUrl;
       if(imageURLValue && GetStdString(*imageURLValue, imageUrl))
       {
         if(!imageUrl.empty())
@@ -316,7 +316,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual(const Property::Map& propertyM
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "VisualFactory::CreateVisual( VisualType:%s %s%s)\n", Scripting::GetEnumerationName<Toolkit::DevelVisual::Type>(visualType, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT), (visualType == Toolkit::DevelVisual::IMAGE) ? "url:" : "", ((visualType == Toolkit::DevelVisual::IMAGE) ? (([&]()
   {
                                                                                                                                                                                                                                                                                   // Return URL if present in PropertyMap else return "not found message"
-                                                                                                                                                                                                                                                                                  Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
+                                                                                                                                                                                                                                                                                  const Property::Value* imageURLValue = propertyMap.Find(Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME);
                                                                                                                                                                                                                                                                                   return (imageURLValue) ? ToStdString(*imageURLValue) : std::string("url not found in PropertyMap"); })())
                                                                                                                                                                                                                                                                                                                              : std::string(""))
                                                                                                                                                                                                                                                                                   .c_str());

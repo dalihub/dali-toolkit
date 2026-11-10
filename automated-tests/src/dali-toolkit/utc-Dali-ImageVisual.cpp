@@ -4521,7 +4521,7 @@ int UtcDaliImageVisualLoadFastTrackImagePlanesLoadFailed(void)
   const Property::Map* programMap = programValue.GetMap();
   DALI_TEST_CHECK(programMap);
 
-  Property::Value* fragmentValue = programMap->Find("fragment");
+  const Property::Value* fragmentValue = programMap->Find("fragment");
   DALI_TEST_CHECK(fragmentValue);
 
   Dali::String fragmentShader = fragmentValue->Get<Dali::String>();

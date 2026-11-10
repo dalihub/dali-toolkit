@@ -261,10 +261,10 @@ Animation CreateAnimation(const TreeNode& child, const Replacement& constant, Da
 
         KeyFrames keyframes = KeyFrames::New();
 
-        const TreeNode::ConstIterator endIter = (*keyFrameChild).CEnd();
-        for(TreeNode::ConstIterator iter = (*keyFrameChild).CBegin(); endIter != iter; ++iter)
+        const TreeNode::ConstIterator keyFrameEndIter = (*keyFrameChild).CEnd();
+        for(TreeNode::ConstIterator keyFrameIter = (*keyFrameChild).CBegin(); keyFrameEndIter != keyFrameIter; ++keyFrameIter)
         {
-          const TreeNode::KeyNodePair& kfKeyChild = *iter;
+          const TreeNode::KeyNodePair& kfKeyChild = *keyFrameIter;
 
           OptionalFloat kfProgress = constant.IsFloat(IsChild(kfKeyChild.second, "progress"));
           DALI_ASSERT_ALWAYS(kfProgress && "Key frame entry must have 'progress'");

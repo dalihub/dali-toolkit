@@ -746,9 +746,9 @@ void Controller::Impl::CalculateTextUpdateIndices(Length& numberOfCharacters)
         (mTextUpdateInfo.mCharacterIndex + mTextUpdateInfo.mNumberOfCharactersToRemove)))
     {
       // The new paragraph character of the last updated paragraph has been removed so is going to be merged with the next one.
-      const ParagraphRun& lastParagraph = *(mModel->mLogicalModel->mParagraphInfo.Begin() + lastParagraphIndex + 1u);
+      const ParagraphRun& lastParagraphRun = *(mModel->mLogicalModel->mParagraphInfo.Begin() + lastParagraphIndex + 1u);
 
-      numberOfCharacters = lastParagraph.characterRun.characterIndex + lastParagraph.characterRun.numberOfCharacters - mTextUpdateInfo.mParagraphCharacterIndex;
+      numberOfCharacters = lastParagraphRun.characterRun.characterIndex + lastParagraphRun.characterRun.numberOfCharacters - mTextUpdateInfo.mParagraphCharacterIndex;
     }
     else
     {

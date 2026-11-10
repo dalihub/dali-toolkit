@@ -349,9 +349,9 @@ void AnimatedVectorImageVisual::DoSetProperty(Property::Index index, const Prope
         Dali::String daliMarkerName;
         if(value.Get(daliMarkerName))
         {
-          Property::Array array;
-          array.Add(Property::Value(std::move(daliMarkerName)));
-          mAnimationData.playRange = std::move(array);
+          Property::Array markerArray;
+          markerArray.Add(Property::Value(std::move(daliMarkerName)));
+          mAnimationData.playRange = std::move(markerArray);
           mAnimationData.resendFlag |= VectorAnimationTask::RESEND_PLAY_RANGE;
         }
       }

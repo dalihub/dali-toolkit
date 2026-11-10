@@ -155,13 +155,13 @@ void NPatchVisual::DoSetProperties(const Property::Map& propertyMap)
 {
   // URL is already passed in via constructor
 
-  Property::Value* borderOnlyValue = propertyMap.Find(Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY);
+  const Property::Value* borderOnlyValue = propertyMap.Find(Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY);
   if(borderOnlyValue)
   {
     borderOnlyValue->Get(mBorderOnly);
   }
 
-  Property::Value* borderValue = propertyMap.Find(Toolkit::ImageVisual::Property::BORDER, BORDER);
+  const Property::Value* borderValue = propertyMap.Find(Toolkit::ImageVisual::Property::BORDER, BORDER);
   if(borderValue)
   {
     if(!GetExtents(*borderValue, mBorder)) // If value exists and is Extents (or Vector4), just set mBorder
@@ -183,7 +183,7 @@ void NPatchVisual::DoSetProperties(const Property::Map& propertyMap)
     Dali::ClampInPlace(mBorder.bottom, static_cast<int16_t>(0), static_cast<int16_t>(0x7FFF));
   }
 
-  Property::Value* auxImage = propertyMap.Find(Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE, AUXILIARY_IMAGE_NAME);
+  const Property::Value* auxImage = propertyMap.Find(Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE, AUXILIARY_IMAGE_NAME);
   if(auxImage)
   {
     Dali::String daliString;
@@ -194,13 +194,13 @@ void NPatchVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* auxImageAlpha = propertyMap.Find(Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, AUXILIARY_IMAGE_ALPHA_NAME);
+  const Property::Value* auxImageAlpha = propertyMap.Find(Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, AUXILIARY_IMAGE_ALPHA_NAME);
   if(auxImageAlpha)
   {
     auxImageAlpha->Get(mAuxiliaryImageAlpha);
   }
 
-  Property::Value* synchronousLoading = propertyMap.Find(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, SYNCHRONOUS_LOADING);
+  const Property::Value* synchronousLoading = propertyMap.Find(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, SYNCHRONOUS_LOADING);
   if(synchronousLoading)
   {
     bool sync = false;
@@ -215,7 +215,7 @@ void NPatchVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* releasePolicy = propertyMap.Find(Toolkit::ImageVisual::Property::RELEASE_POLICY, RELEASE_POLICY_NAME);
+  const Property::Value* releasePolicy = propertyMap.Find(Toolkit::ImageVisual::Property::RELEASE_POLICY, RELEASE_POLICY_NAME);
   if(releasePolicy)
   {
     releasePolicy->Get(mReleasePolicy);

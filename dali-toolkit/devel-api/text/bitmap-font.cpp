@@ -39,11 +39,11 @@ Glyph::Glyph()
 {
 }
 
-Glyph::Glyph(const std::string& url, const std::string utf8Character, float ascender, float descender)
-: url{url},
+Glyph::Glyph(const std::string& initUrl, const std::string utf8Character, float initAscender, float initDescender)
+: url{initUrl},
   utf8{},
-  ascender{ascender},
-  descender{descender}
+  ascender{initAscender},
+  descender{initDescender}
 {
   DALI_ASSERT_DEBUG(utf8Character.size() <= 6u);
 

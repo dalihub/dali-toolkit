@@ -1445,8 +1445,8 @@ void TextLabel::OnPropertySet(Property::Index index, const Property::Value& prop
       mController->SetBackgroundWithCutoutEnabled(cutoutEnabled);
       if(cutoutEnabled)
       {
-        const Property::Map backgroundMap   = Self().GetProperty(Toolkit::Control::Property::BACKGROUND).Get<Property::Map>();
-        Property::Value*    backgroundValue = backgroundMap.Find(ColorVisual::Property::MIX_COLOR);
+        const Property::Map    backgroundMap   = Self().GetProperty(Toolkit::Control::Property::BACKGROUND).Get<Property::Map>();
+        const Property::Value* backgroundValue = backgroundMap.Find(ColorVisual::Property::MIX_COLOR);
         if(backgroundValue)
         {
           Vector4 backgroundColor = Vector4::ZERO;

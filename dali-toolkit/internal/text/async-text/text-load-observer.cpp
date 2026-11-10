@@ -24,9 +24,9 @@ namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
-TextLoadObserver::TextInformation::TextInformation(const Text::AsyncTextRenderInfo& renderInfo, const Text::AsyncTextParameters& parameters)
-: renderInfo(renderInfo),
-  parameters(parameters)
+TextLoadObserver::TextInformation::TextInformation(const Text::AsyncTextRenderInfo& initRenderInfo, const Text::AsyncTextParameters& initParameters)
+: renderInfo(initRenderInfo),
+  parameters(initParameters)
 {
 }
 

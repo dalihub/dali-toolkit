@@ -54,10 +54,10 @@ protected:
    * @brief Constructor.
    * Default constructor to set the default values
    *
-   * @param[in] characterRun the character run
+   * @param[in] initCharacterRun the character run
    */
-  AbstractStyleCharacterRun(const CharacterRun& characterRun)
-  : characterRun{characterRun}
+  AbstractStyleCharacterRun(const CharacterRun& initCharacterRun)
+  : characterRun{initCharacterRun}
   {
   }
 

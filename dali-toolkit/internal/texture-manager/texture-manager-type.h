@@ -211,43 +211,43 @@ enum class MultiplyOnLoad
  */
 struct TextureInfo
 {
-  TextureInfo(const TextureId                   textureId,
-              const TextureId                   maskTextureId,
-              const VisualUrl&                  url,
-              const Dali::ImageDimensions&      desiredSize,
-              const float                       scaleFactor,
-              const Dali::SamplingMode::Type    samplingMode,
-              const bool                        loadSynchronously,
-              const bool                        cropToMask,
-              const TextureHash                 hash,
-              const bool                        orientationCorrection,
-              const bool                        preMultiplyOnLoad,
-              const Dali::AnimatedImageLoading& animatedImageLoading,
-              const uint32_t                    frameIndex,
-              const bool                        loadYuvPlanes)
-  : url(url),
-    desiredSize(desiredSize),
-    useSize(desiredSize),
-    textureId(textureId),
-    maskTextureId(maskTextureId),
-    hash(hash),
-    scaleFactor(scaleFactor),
+  TextureInfo(const TextureId                   initTextureId,
+              const TextureId                   initMaskTextureId,
+              const VisualUrl&                  initUrl,
+              const Dali::ImageDimensions&      initDesiredSize,
+              const float                       initScaleFactor,
+              const Dali::SamplingMode::Type    initSamplingMode,
+              const bool                        initLoadSynchronously,
+              const bool                        initCropToMask,
+              const TextureHash                 initHash,
+              const bool                        initOrientationCorrection,
+              const bool                        initPreMultiplyOnLoad,
+              const Dali::AnimatedImageLoading& initAnimatedImageLoading,
+              const uint32_t                    initFrameIndex,
+              const bool                        initLoadYuvPlanes)
+  : url(initUrl),
+    desiredSize(initDesiredSize),
+    useSize(initDesiredSize),
+    textureId(initTextureId),
+    maskTextureId(initMaskTextureId),
+    hash(initHash),
+    scaleFactor(initScaleFactor),
     referenceCount(1),
     loadState(LoadState::NOT_STARTED),
-    samplingMode(samplingMode),
+    samplingMode(initSamplingMode),
     storageType(StorageType::UPLOAD_TO_TEXTURE),
-    animatedImageLoading(animatedImageLoading),
-    frameIndex(frameIndex),
+    animatedImageLoading(initAnimatedImageLoading),
+    frameIndex(initFrameIndex),
     frameCount(0u),
     frameInterval(0u),
-    loadSynchronously(loadSynchronously),
-    cropToMask(cropToMask),
+    loadSynchronously(initLoadSynchronously),
+    cropToMask(initCropToMask),
     orientationCorrection(true),
-    preMultiplyOnLoad(preMultiplyOnLoad),
-    preMultiplied(preMultiplyOnLoad),
-    loadYuvPlanes(loadYuvPlanes)
+    preMultiplyOnLoad(initPreMultiplyOnLoad),
+    preMultiplied(initPreMultiplyOnLoad),
+    loadYuvPlanes(initLoadYuvPlanes)
   {
-    isAnimatedImageFormat = (animatedImageLoading) ? true : false;
+    isAnimatedImageFormat = (initAnimatedImageLoading) ? true : false;
   }
 
   /**
@@ -288,13 +288,13 @@ struct TextureInfo
  */
 struct ExternalTextureInfo
 {
-  ExternalTextureInfo(const TextureId   textureId,
-                      const TextureSet& textureSet,
-                      const bool        preMultiplied)
-  : textureId(textureId),
-    textureSet(textureSet),
+  ExternalTextureInfo(const TextureId   initTextureId,
+                      const TextureSet& initTextureSet,
+                      const bool        initPreMultiplied)
+  : textureId(initTextureId),
+    textureSet(initTextureSet),
     referenceCount(1),
-    preMultiplied(preMultiplied)
+    preMultiplied(initPreMultiplied)
   {
   }
 

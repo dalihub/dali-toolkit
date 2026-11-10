@@ -42,12 +42,12 @@ UniquePtr<Algorithm::NavigationMesh> NavigationMeshFactory::CreateFromFile(Dali:
   if(DALI_UNLIKELY(!fin))
   {
     const int bufferLength = 128;
-    char      buffer[bufferLength];
+    char      lineBuffer[bufferLength];
 
     // Return type of stderror_r is different between system type. We should not use return value.
-    [[maybe_unused]] auto ret = strerror_r(errno, buffer, bufferLength - 1);
+    [[maybe_unused]] auto ret = strerror_r(errno, lineBuffer, bufferLength - 1);
 
-    DALI_LOG_ERROR("NavigationMesh: Can't open %s for reading: %s", stdFilename.c_str(), buffer);
+    DALI_LOG_ERROR("NavigationMesh: Can't open %s for reading: %s", stdFilename.c_str(), lineBuffer);
     return {};
   }
 

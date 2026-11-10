@@ -747,11 +747,11 @@ void ItemView::InsertItems(const ItemContainer& newItems, float durationSeconds)
       foundIter->second = iter->second;
 
       // Move the existing actors to make room
-      for(ItemIter iter = ++foundIter; mItemPool.End() != iter; ++iter)
+      for(ItemIter nextIter = ++foundIter; mItemPool.End() != nextIter; ++nextIter)
       {
-        Actor temp   = iter->second;
-        iter->second = moveMe;
-        moveMe       = temp;
+        Actor temp       = nextIter->second;
+        nextIter->second = moveMe;
+        moveMe           = temp;
       }
 
       // Create last item

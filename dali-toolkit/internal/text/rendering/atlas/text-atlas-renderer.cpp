@@ -635,18 +635,18 @@ struct AtlasRenderer::Impl
           }
         } // decorative-lines
 
-        AtlasGlyphManager::GlyphStyle style;
-        style.isItalic = glyph.isItalicRequired;
-        style.isBold   = glyph.isBoldRequired;
+        AtlasGlyphManager::GlyphStyle glyphStyle;
+        glyphStyle.isItalic = glyph.isItalicRequired;
+        glyphStyle.isBold   = glyph.isBoldRequired;
 
         // Retrieves and caches the glyph's bitmap.
-        CacheGlyph(glyph, lastFontId, style, slot);
+        CacheGlyph(glyph, lastFontId, glyphStyle, slot);
 
         // Retrieves and caches the outline glyph's bitmap.
         if(isOutline)
         {
-          style.outline = outlineWidth;
-          CacheGlyph(glyph, lastFontId, style, slotOutline);
+          glyphStyle.outline = outlineWidth;
+          CacheGlyph(glyph, lastFontId, glyphStyle, slotOutline);
         }
 
         // Move the origin (0,0) of the mesh to the center of the actor

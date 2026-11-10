@@ -25,45 +25,45 @@ namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
-TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const bool preMultiplied)
-: returnType(returnType),
-  textureId(textureId),
-  textureSet(textureSet),
-  preMultiplied(preMultiplied),
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType initReturnType, const int32_t initTextureId, TextureSet initTextureSet, const bool initPreMultiplied)
+: returnType(initReturnType),
+  textureId(initTextureId),
+  textureSet(initTextureSet),
+  preMultiplied(initPreMultiplied),
   pixelBuffer(),
   url()
 {
 }
 
-TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const std::string& url, const bool preMultiplied)
-: returnType(returnType),
-  textureId(textureId),
-  textureSet(textureSet),
-  preMultiplied(preMultiplied),
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType initReturnType, const int32_t initTextureId, TextureSet initTextureSet, const std::string& initUrl, const bool initPreMultiplied)
+: returnType(initReturnType),
+  textureId(initTextureId),
+  textureSet(initTextureSet),
+  preMultiplied(initPreMultiplied),
   pixelBuffer(),
-  url(url)
+  url(initUrl)
 {
 }
 
-TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, PixelBuffer pixelBuffer, const std::string& url, const bool preMultiplied)
-: returnType(returnType),
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType initReturnType, PixelBuffer initPixelBuffer, const std::string& initUrl, const bool initPreMultiplied)
+: returnType(initReturnType),
   textureId(Internal::TextureManagerType::INVALID_TEXTURE_ID),
   textureSet(),
-  preMultiplied(preMultiplied),
-  pixelBuffer(pixelBuffer),
-  url(url)
+  preMultiplied(initPreMultiplied),
+  pixelBuffer(initPixelBuffer),
+  url(initUrl)
 {
 }
 
-TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType returnType, const int32_t textureId, TextureSet textureSet, const uint32_t frameCount, const uint32_t interval, const bool preMultiplied)
-: returnType(returnType),
-  textureId(textureId),
-  textureSet(textureSet),
-  preMultiplied(preMultiplied),
+TextureUploadObserver::TextureInformation::TextureInformation(const ReturnType initReturnType, const int32_t initTextureId, TextureSet initTextureSet, const uint32_t initFrameCount, const uint32_t initInterval, const bool initPreMultiplied)
+: returnType(initReturnType),
+  textureId(initTextureId),
+  textureSet(initTextureSet),
+  preMultiplied(initPreMultiplied),
   pixelBuffer(),
   url(),
-  frameCount(frameCount),
-  interval(interval)
+  frameCount(initFrameCount),
+  interval(initInterval)
 {
 }
 

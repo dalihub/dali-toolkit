@@ -129,9 +129,9 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, PanGesture gesture)
     mPointDown         = true;
     mDragControl       = control;
     mFirstEnter.clear();
-    for(auto&& control : mControls)
+    for(auto&& registeredControl : mControls)
     {
-      mFirstEnter.push_back(control.GetProperty<int>(Actor::Property::ID));
+      mFirstEnter.push_back(registeredControl.GetProperty<int>(Actor::Property::ID));
     }
     float   width    = control.GetProperty<float>(Dali::Actor::Property::SIZE_WIDTH);
     float   height   = control.GetProperty<float>(Dali::Actor::Property::SIZE_HEIGHT);

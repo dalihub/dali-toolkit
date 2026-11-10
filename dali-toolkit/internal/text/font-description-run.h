@@ -55,30 +55,30 @@ struct FontDescriptionRun : public AbstractStyleCharacterRun
   {
   }
 
-  FontDescriptionRun(const CharacterRun& characterRun,
-                     char*               familyName,
-                     Length              familyLength,
-                     FontWeight          weight,
-                     FontWidth           width,
-                     FontSlant           slant,
-                     PointSize26Dot6     size,
-                     bool                familyDefined,
-                     bool                weightDefined,
-                     bool                widthDefined,
-                     bool                slantDefined,
-                     bool                sizeDefined)
-  : AbstractStyleCharacterRun(characterRun),
-    familyName{familyName},
-    familyLength{familyLength},
-    weight{weight},
-    width{width},
-    slant{slant},
-    size{size},
-    familyDefined{familyDefined},
-    weightDefined{weightDefined},
-    widthDefined{widthDefined},
-    slantDefined{slantDefined},
-    sizeDefined{sizeDefined}
+  FontDescriptionRun(const CharacterRun& initCharacterRun,
+                     char*               initFamilyName,
+                     Length              initFamilyLength,
+                     FontWeight          initWeight,
+                     FontWidth           initWidth,
+                     FontSlant           initSlant,
+                     PointSize26Dot6     initSize,
+                     bool                initFamilyDefined,
+                     bool                initWeightDefined,
+                     bool                initWidthDefined,
+                     bool                initSlantDefined,
+                     bool                initSizeDefined)
+  : AbstractStyleCharacterRun(initCharacterRun),
+    familyName{initFamilyName},
+    familyLength{initFamilyLength},
+    weight{initWeight},
+    width{initWidth},
+    slant{initSlant},
+    size{initSize},
+    familyDefined{initFamilyDefined},
+    weightDefined{initWeightDefined},
+    widthDefined{initWidthDefined},
+    slantDefined{initSlantDefined},
+    sizeDefined{initSizeDefined}
   {
   }
 

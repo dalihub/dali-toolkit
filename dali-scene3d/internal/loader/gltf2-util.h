@@ -38,9 +38,9 @@ struct NodeMapping
   Index gltfIndex;
   Index runtimeIndex;
 
-  bool operator<(Index gltfIndex) const
+  bool operator<(Index otherIndex) const
   {
-    return this->gltfIndex < gltfIndex;
+    return this->gltfIndex < otherIndex;
   }
 };
 

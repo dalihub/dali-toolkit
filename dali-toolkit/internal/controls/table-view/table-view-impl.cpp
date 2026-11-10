@@ -1227,36 +1227,36 @@ void TableView::SetHeightOrWidthProperty(TableView& tableViewImpl,
     unsigned int index(0);
     for(unsigned int i = 0, count = map->Count(); i < count; ++i)
     {
-      Property::Value& item     = map->GetValue(i);
-      Property::Map*   childMap = item.GetMap();
+      const Property::Value& item     = map->GetValue(i);
+      const Property::Map*   childMap = item.GetMap();
 
       auto iss = std::istringstream(ToStdString(map->GetKeyAt(i).stringKey));
       iss.imbue(std::locale::classic());
       iss >> index;
       if(childMap)
       {
-        Property::Value* policy = childMap->Find("policy");
+        const Property::Value* policy = childMap->Find("policy");
         if(policy)
         {
           std::string policyValue;
           if(DALI_LIKELY(GetStdString(*policy, policyValue)))
           {
-            Toolkit::TableView::LayoutPolicy policy;
+            Toolkit::TableView::LayoutPolicy layoutPolicy;
             if(Scripting::GetEnumeration<Toolkit::TableView::LayoutPolicy>(policyValue.c_str(),
                                                                            LAYOUT_POLICY_STRING_TABLE,
                                                                            LAYOUT_POLICY_STRING_TABLE_COUNT,
-                                                                           policy))
+                                                                           layoutPolicy))
             {
-              switch(policy)
+              switch(layoutPolicy)
               {
                 case Toolkit::TableView::FIXED:
                 case Toolkit::TableView::RELATIVE:
                 {
-                  Property::Value* childMapValue = childMap->Find("value");
-                  float            childValue    = 0.0f;
+                  const Property::Value* childMapValue = childMap->Find("value");
+                  float                  childValue    = 0.0f;
                   if(DALI_LIKELY(childMapValue && childMapValue->Get(childValue)))
                   {
-                    if(policy == Toolkit::TableView::FIXED)
+                    if(layoutPolicy == Toolkit::TableView::FIXED)
                     {
                       (tableViewImpl.*funcFixed)(index, childValue);
                     }
@@ -1488,8 +1488,8 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
       }
 
       // Check whether the previous focused actor is a layout container and also a child of this TableView
-      Toolkit::TableView::CellPosition position;
-      if(wasFocusedOnLayoutContainer && FindChildPosition(previousFocusedActor, position))
+      Toolkit::TableView::CellPosition cellPosition;
+      if(wasFocusedOnLayoutContainer && FindChildPosition(previousFocusedActor, cellPosition))
       {
         nextFocusableActor = GetNextKeyboardFocusableActor(previousFocusedActor, direction, loopEnabled);
       }

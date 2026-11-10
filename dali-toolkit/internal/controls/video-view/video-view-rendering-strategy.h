@@ -25,6 +25,7 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/adaptor-framework/window.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/weak-handle.h>
@@ -66,6 +67,14 @@ public:
   virtual bool Initialize() = 0;
 
   /**
+   * @brief Checks whether a rendering target has been submitted to the player.
+   */
+  bool HasRenderingTarget() const
+  {
+    return mRenderingTargetSet;
+  }
+
+  /**
    * @brief Update the display area when the actor's transform changes
    */
   virtual void UpdateDisplayArea(Dali::PropertyNotification source) = 0;
@@ -101,6 +110,14 @@ public:
 
 protected:
   /**
+   * @brief Records a submitted target; the plugin does not return a binding result.
+   */
+  void MarkRenderingTargetSet()
+  {
+    mRenderingTargetSet = true;
+  }
+
+  /**
    * @brief Gets the VideoView handle if it's still valid
    * @return Valid VideoView handle or empty handle
    */
@@ -121,6 +138,9 @@ protected:
 
 protected:
   Dali::WeakHandle<Toolkit::VideoView> mVideoViewWeakHandle;
+
+private:
+  bool mRenderingTargetSet{false};
 };
 
 /**
@@ -216,9 +236,10 @@ private:
   void ResetOverlayTextureVisual();
 
 private:
-  Dali::PropertyNotification mPositionUpdateNotification;
-  Dali::PropertyNotification mSizeUpdateNotification;
-  Dali::PropertyNotification mScaleUpdateNotification;
+  Dali::WeakHandle<Dali::Window> mTargetWindow;
+  Dali::PropertyNotification     mPositionUpdateNotification;
+  Dali::PropertyNotification     mSizeUpdateNotification;
+  Dali::PropertyNotification     mScaleUpdateNotification;
 
   Dali::Texture               mPreviousFrameTexture;
   Dali::Texture               mCurrentFrameTexture;

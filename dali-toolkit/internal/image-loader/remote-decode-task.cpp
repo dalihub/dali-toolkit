@@ -31,7 +31,7 @@ namespace Toolkit
 namespace Internal
 {
 
-RemoteDecodeTask::RemoteDecodeTask(TextureManagerType::TextureId            textureId,
+RemoteDecodeTask::RemoteDecodeTask(TextureManagerType::TextureId            initTextureId,
                                    const std::string&                       localFilePath,
                                    const Dali::ImageDimensions&             desiredSize,
                                    Dali::SamplingMode::Type                 samplingMode,
@@ -40,7 +40,7 @@ RemoteDecodeTask::RemoteDecodeTask(TextureManagerType::TextureId            text
                                    bool                                     loadYuvPlanes,
                                    CallbackBase*                            callback)
 : AsyncTask(callback),
-  textureId(textureId),
+  textureId(initTextureId),
   pixelBuffers(),
   mLocalFilePath(localFilePath),
   mDesiredSize(desiredSize),

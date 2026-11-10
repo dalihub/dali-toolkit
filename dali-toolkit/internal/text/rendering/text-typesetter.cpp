@@ -329,9 +329,9 @@ PixelBuffer Typesetter::RenderWithPixelBuffer(const Vector2& size, Toolkit::Deve
   if((RENDER_NO_STYLES != behaviour) && (RENDER_MASK != behaviour))
   {
     // Generate the outline if enabled
-    const uint16_t outlineWidth = viewModel.GetOutlineWidth();
-    const float    outlineAlpha = viewModel.GetOutlineColor().a;
-    if(outlineWidth != 0u && fabsf(outlineAlpha) > Math::MACHINE_EPSILON_1 && RENDER_OVERLAY_STYLE != behaviour)
+    const uint16_t viewOutlineWidth = viewModel.GetOutlineWidth();
+    const float    outlineAlpha     = viewModel.GetOutlineColor().a;
+    if(viewOutlineWidth != 0u && fabsf(outlineAlpha) > Math::MACHINE_EPSILON_1 && RENDER_OVERLAY_STYLE != behaviour)
     {
       // Create the image buffer for outline
       PixelBuffer outlineImageBuffer = mImpl->CreateImageBuffer(bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, startIndexOfGlyphs, endIndexOfGlyphs);
