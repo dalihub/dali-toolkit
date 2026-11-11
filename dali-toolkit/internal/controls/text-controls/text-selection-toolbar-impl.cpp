@@ -211,9 +211,9 @@ void TextSelectionToolbar::SetUpScrollView()
   mScrollView.ScrollCompletedSignal().Connect(this, &TextSelectionToolbar::OnScrollCompleted);
   mScrollView.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX); // In a new layer, so clip to scroll-view's bounding box
 
-  mRulerX = new DefaultRuler(); // IntrusivePtr which is unreferenced when ScrollView is destroyed.
+  mRulerX = DefaultRuler::New(); // IntrusivePtr which is unreferenced when ScrollView is destroyed.
 
-  RulerPtr rulerY = new DefaultRuler(); // IntrusivePtr which is unreferenced when ScrollView is destroyed.
+  RulerPtr rulerY = DefaultRuler::New(); // IntrusivePtr which is unreferenced when ScrollView is destroyed.
   rulerY->Disable();
   mScrollView.SetRulerY(rulerY);
 

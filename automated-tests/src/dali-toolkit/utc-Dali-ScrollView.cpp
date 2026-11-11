@@ -457,9 +457,9 @@ int UtcDaliToolkitScrollViewScrollToPositionWithDirectionBiasP(void)
 
   ScrollView scrollView = ScrollView::New();
   application.GetScene().Add(scrollView);
-  RulerPtr rulerX = new FixedRuler(100.0f);
+  RulerPtr rulerX = FixedRuler::New(100.0f);
   rulerX->SetDomain(RulerDomain(0.0f, 200.0f, true));
-  RulerPtr rulerY = new FixedRuler(100.0f);
+  RulerPtr rulerY = FixedRuler::New(100.0f);
   rulerY->SetDomain(RulerDomain(0.0f, 200.0f, true));
 
   scrollView.SetRulerX(rulerX);
@@ -529,9 +529,9 @@ int UtcDaliToolkitScrollViewScrollToPositionWithAlphaFunctionAndDirectionBiasP(v
 
   ScrollView scrollView = ScrollView::New();
   application.GetScene().Add(scrollView);
-  RulerPtr rulerX = new FixedRuler(100.0f);
+  RulerPtr rulerX = FixedRuler::New(100.0f);
   rulerX->SetDomain(RulerDomain(0.0f, 200.0f, true));
-  RulerPtr rulerY = new FixedRuler(100.0f);
+  RulerPtr rulerY = FixedRuler::New(100.0f);
   rulerY->SetDomain(RulerDomain(0.0f, 200.0f, true));
 
   scrollView.SetRulerX(rulerX);
@@ -577,9 +577,9 @@ int UtcDaliToolkitScrollViewScrollToPageP(void)
 
   ScrollView scrollView = ScrollView::New();
   application.GetScene().Add(scrollView);
-  RulerPtr rulerX = new FixedRuler(100.0f);
+  RulerPtr rulerX = FixedRuler::New(100.0f);
   rulerX->SetDomain(RulerDomain(0.0f, 800.0f, true));
-  RulerPtr rulerY = new FixedRuler(100.0f);
+  RulerPtr rulerY = FixedRuler::New(100.0f);
   rulerY->SetDomain(RulerDomain(0.0f, 400.0f, true));
 
   scrollView.SetRulerX(rulerX);
@@ -613,9 +613,9 @@ int UtcDaliToolkitScrollViewScrollToPageP(void)
   DALI_TEST_EQUALS(static_cast<int>(scrollView.GetCurrentPage()), 9, TEST_LOCATION);
 
   // Apply DefaultRulers instead and see what happens.
-  rulerX = new DefaultRuler();
+  rulerX = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, 800.0f, true));
-  rulerY = new DefaultRuler();
+  rulerY = DefaultRuler::New();
   rulerY->SetDomain(RulerDomain(0.0f, 400.0f, true));
 
   scrollView.SetRulerX(rulerX);
@@ -881,9 +881,9 @@ int UtcDaliToolkitScrollViewScrollToPageWithDirectionBiasP(void)
 
   ScrollView scrollView = ScrollView::New();
   application.GetScene().Add(scrollView);
-  RulerPtr rulerX = new FixedRuler(100.0f);
+  RulerPtr rulerX = FixedRuler::New(100.0f);
   rulerX->SetDomain(RulerDomain(0.0f, 200.0f, true));
-  RulerPtr rulerY = new FixedRuler(100.0f);
+  RulerPtr rulerY = FixedRuler::New(100.0f);
   rulerY->SetDomain(RulerDomain(0.0f, 200.0f, true));
 
   scrollView.SetRulerX(rulerX);
@@ -962,9 +962,9 @@ int UtcDaliToolkitScrollViewScrollToSnapPointP(void)
 
   ScrollView scrollView = ScrollView::New();
   application.GetScene().Add(scrollView);
-  RulerPtr rulerX = new FixedRuler(100.0f);
+  RulerPtr rulerX = FixedRuler::New(100.0f);
   rulerX->SetDomain(RulerDomain(0.0f, 800.0f, true));
-  RulerPtr rulerY = new FixedRuler(100.0f);
+  RulerPtr rulerY = FixedRuler::New(100.0f);
   rulerY->SetDomain(RulerDomain(0.0f, 400.0f, true));
 
   scrollView.SetRulerX(rulerX);
@@ -1009,8 +1009,8 @@ int UtcDaliToolkitScrollViewSetWrapModeP(void)
   scrollView.Add(actor);
 
   // Position rulers. 4x4 grid.
-  RulerPtr rulerX = new FixedRuler(50.0f);
-  RulerPtr rulerY = new FixedRuler(50.0f);
+  RulerPtr rulerX = FixedRuler::New(50.0f);
+  RulerPtr rulerY = FixedRuler::New(50.0f);
   rulerX->SetDomain(RulerDomain(0.0f, 200.0f, false));
   rulerY->SetDomain(RulerDomain(0.0f, 200.0f, false));
   scrollView.SetRulerX(rulerX);
@@ -1037,8 +1037,8 @@ int UtcDaliToolkitScrollViewActorAutoSnap(void)
   application.GetScene().Add(scrollView);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, 1000.0f, false));
   rulerY->SetDomain(RulerDomain(0.0f, 1000.0f, false));
   scrollView.SetRulerX(rulerX);
@@ -1088,8 +1088,8 @@ int UtcDaliToolkitScrollViewSignalsStartComplete(void)
   application.GetScene().Add(scrollView);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, 1000.0f, false));
   rulerY->SetDomain(RulerDomain(0.0f, 1000.0f, false));
   scrollView.SetRulerX(rulerX);
@@ -1122,8 +1122,8 @@ int UtcDaliToolkitScrollViewSignalsUpdate01(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, 1000.0f, false));
   rulerY->SetDomain(RulerDomain(0.0f, 1000.0f, false));
   scrollView.SetRulerX(rulerX);
@@ -1184,8 +1184,8 @@ int UtcDaliToolkitScrollViewSignalsUpdate02(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, 1000.0f, false));
   rulerY->SetDomain(RulerDomain(0.0f, 1000.0f, false));
   scrollView.SetRulerX(rulerX);
@@ -1251,8 +1251,8 @@ int UtcDaliToolkitScrollViewScrollSensitive(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true));
   rulerY->SetDomain(RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true));
   scrollView.SetRulerX(rulerX);
@@ -1298,8 +1298,8 @@ int UtcDaliToolkitScrollViewAxisAutoLock(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true));
   rulerY->SetDomain(RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true));
   scrollView.SetRulerX(rulerX);
@@ -1403,8 +1403,8 @@ int UtcDaliToolkitScrollViewConstraints(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true));
   rulerY->SetDomain(RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true));
   scrollView.SetRulerX(rulerX);
@@ -1448,8 +1448,8 @@ int UtcDaliToolkitScrollViewBind(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true));
   rulerY->SetDomain(RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true));
   scrollView.SetRulerX(rulerX);
@@ -1509,8 +1509,8 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true));
   rulerY->SetDomain(RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true));
   scrollView.SetRulerX(rulerX);
@@ -1641,8 +1641,8 @@ int UtcDaliToolkitScrollViewSnapStartedSignalP(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true));
   rulerY->SetDomain(RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true));
   scrollView.SetRulerX(rulerX);
@@ -1674,9 +1674,9 @@ int UtcDaliToolkitScrollViewGetCurrentPageP(void)
 
   ScrollView scrollView = ScrollView::New();
   application.GetScene().Add(scrollView);
-  RulerPtr rulerX = new FixedRuler(100.0f);
+  RulerPtr rulerX = FixedRuler::New(100.0f);
   rulerX->SetDomain(RulerDomain(0.0f, 800.0f, true));
-  RulerPtr rulerY = new FixedRuler(100.0f);
+  RulerPtr rulerY = FixedRuler::New(100.0f);
   rulerY->SetDomain(RulerDomain(0.0f, 400.0f, true));
 
   scrollView.SetRulerX(rulerX);
@@ -1711,8 +1711,8 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true));
   rulerY->SetDomain(RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true));
   scrollView.SetRulerX(rulerX);
@@ -1946,7 +1946,7 @@ int UtcDaliToolkitScrollViewSetRulerXP(void)
 
   ScrollView scrollView = ScrollView::New();
   application.GetScene().Add(scrollView);
-  RulerPtr rulerX = new FixedRuler(100.0f);
+  RulerPtr rulerX = FixedRuler::New(100.0f);
   rulerX->SetDomain(RulerDomain(0.0f, 800.0f, true));
 
   scrollView.SetRulerX(rulerX);
@@ -1955,7 +1955,7 @@ int UtcDaliToolkitScrollViewSetRulerXP(void)
   Wait(application);
   DALI_TEST_EQUALS(scrollView.GetCurrentScrollPosition(), Vector2(100.0f, 0.0f), TEST_LOCATION);
 
-  RulerPtr newRulerX = new FixedRuler(200.0f);
+  RulerPtr newRulerX = FixedRuler::New(200.0f);
   newRulerX->SetDomain(RulerDomain(0.0f, 800.0f, true));
 
   scrollView.SetRulerX(newRulerX);
@@ -1975,7 +1975,7 @@ int UtcDaliToolkitScrollViewSetRulerYP(void)
   ScrollView scrollView = ScrollView::New();
   application.GetScene().Add(scrollView);
 
-  RulerPtr rulerY = new FixedRuler(200.0f);
+  RulerPtr rulerY = FixedRuler::New(200.0f);
   rulerY->SetDomain(RulerDomain(0.0f, 400.0f, true));
 
   scrollView.SetRulerY(rulerY);
@@ -1984,7 +1984,7 @@ int UtcDaliToolkitScrollViewSetRulerYP(void)
   Wait(application);
   DALI_TEST_EQUALS(scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 350.0f), TEST_LOCATION);
 
-  RulerPtr newRulerY = new FixedRuler(100.0f);
+  RulerPtr newRulerY = FixedRuler::New(100.0f);
   newRulerY->SetDomain(RulerDomain(0.0f, 200.0f, true));
   scrollView.SetRulerY(newRulerY);
 
@@ -2341,7 +2341,7 @@ int UtcDaliToolkitScrollViewDefaultRulerConstructorP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerConstructorP");
 
-  RulerPtr defaultRuler = new DefaultRuler();
+  RulerPtr defaultRuler = DefaultRuler::New();
   DALI_TEST_CHECK(defaultRuler);
 
   END_TEST;
@@ -2352,7 +2352,7 @@ int UtcDaliToolkitScrollViewDefaultRulerDestructorP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerDestructorP");
 
-  RulerPtr defaultRuler = new DefaultRuler();
+  RulerPtr defaultRuler = DefaultRuler::New();
 
   DALI_TEST_CHECK(true);
   END_TEST;
@@ -2363,10 +2363,10 @@ int UtcDaliToolkitScrollViewFixedRulerConstructorP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewFixedRulerConstructorP");
 
-  RulerPtr fixedRuler = new FixedRuler(100.0f);
+  RulerPtr fixedRuler = FixedRuler::New(100.0f);
   DALI_TEST_CHECK(fixedRuler);
 
-  fixedRuler = new FixedRuler(0.0f);
+  fixedRuler = FixedRuler::New(0.0f);
   DALI_TEST_CHECK(fixedRuler);
 
   END_TEST;
@@ -2377,7 +2377,7 @@ int UtcDaliToolkitScrollViewFixedRulerDestructorP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewFixedRulerDestructorP");
 
-  RulerPtr fixedRuler = new FixedRuler(100.0f);
+  RulerPtr fixedRuler = FixedRuler::New(100.0f);
 
   DALI_TEST_CHECK(true);
   END_TEST;
@@ -2388,11 +2388,11 @@ int UtcDaliToolkitScrollViewRulerGetTypeP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewRulerGetTypeP");
 
-  RulerPtr defaultRuler = new DefaultRuler();
+  RulerPtr defaultRuler = DefaultRuler::New();
   DALI_TEST_CHECK(defaultRuler);
   DALI_TEST_EQUALS(defaultRuler->GetType(), Dali::Toolkit::Ruler::FREE, TEST_LOCATION);
 
-  RulerPtr fixedRuler = new FixedRuler(100.0f);
+  RulerPtr fixedRuler = FixedRuler::New(100.0f);
   DALI_TEST_CHECK(fixedRuler);
   DALI_TEST_EQUALS(fixedRuler->GetType(), Dali::Toolkit::Ruler::FIXED, TEST_LOCATION);
 
@@ -2404,11 +2404,11 @@ int UtcDaliToolkitScrollViewRulerGetExtensionP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewRulerGetExtensionP");
 
-  RulerPtr defaultRuler = new DefaultRuler();
+  RulerPtr defaultRuler = DefaultRuler::New();
   DALI_TEST_CHECK(defaultRuler);
   DALI_TEST_CHECK(!defaultRuler->GetExtension());
 
-  RulerPtr fixedRuler = new FixedRuler(100.0f);
+  RulerPtr fixedRuler = FixedRuler::New(100.0f);
   DALI_TEST_CHECK(fixedRuler);
   DALI_TEST_CHECK(!fixedRuler->GetExtension());
 
@@ -2420,7 +2420,7 @@ int UtcDaliToolkitScrollViewRulerEnableDisable(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewRulerEnableDisable");
 
-  RulerPtr ruler = new DefaultRuler();
+  RulerPtr ruler = DefaultRuler::New();
 
   DALI_TEST_CHECK(ruler->IsEnabled());
   ruler->Disable();
@@ -2435,7 +2435,7 @@ int UtcDaliToolkitScrollViewRulerDomainEnableDisable(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewRulerDomainEnableDisable");
 
-  RulerPtr ruler = new DefaultRuler();
+  RulerPtr ruler = DefaultRuler::New();
   DALI_TEST_EQUALS(ruler->GetDomain().GetSize(), 1.0f, TEST_LOCATION);
 
   ruler->SetDomain(RulerDomain(0.0f, 100.0f, true));
@@ -2455,7 +2455,7 @@ int UtcDaliToolkitScrollViewRulerSnapAndClamp(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewRulerSnapAndClamp");
 
-  RulerPtr ruler = new FixedRuler(50.0f);
+  RulerPtr ruler = FixedRuler::New(50.0f);
   ruler->SetDomain(RulerDomain(0.0f, 400.0f, true));
 
   // default testing. (snap and clamp)
@@ -2510,7 +2510,7 @@ int UtcDaliToolkitScrollViewFixedRulerGetPositionFromPageP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewFixedRulerGetPositionFromPageP");
 
-  RulerPtr rulerNormal = new FixedRuler(25.0f);
+  RulerPtr rulerNormal = FixedRuler::New(25.0f);
   rulerNormal->SetDomain(RulerDomain(10.0f, 90.0f, true));
 
   unsigned int volume;
@@ -2543,7 +2543,7 @@ int UtcDaliToolkitScrollViewDefaultRulerGetTotalPagesP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerGetTotalPagesP");
 
-  RulerPtr defaultRuler = new DefaultRuler();
+  RulerPtr defaultRuler = DefaultRuler::New();
   DALI_TEST_CHECK(defaultRuler);
   DALI_TEST_EQUALS(defaultRuler->GetTotalPages(), 1u, TEST_LOCATION);
 
@@ -2555,7 +2555,7 @@ int UtcDaliToolkitScrollViewDefaultRulerGetPageFromPositionP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerGetPageFromPositionP");
 
-  RulerPtr defaultRuler = new DefaultRuler();
+  RulerPtr defaultRuler = DefaultRuler::New();
   DALI_TEST_CHECK(defaultRuler);
   DALI_TEST_EQUALS(defaultRuler->GetPageFromPosition(100.0f, true), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(defaultRuler->GetPageFromPosition(-300.0f, false), 0u, TEST_LOCATION);
@@ -2568,7 +2568,7 @@ int UtcDaliToolkitScrollViewDefaultRulerGetPositionFromPageP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerGetPositionFromPageP");
 
-  RulerPtr defaultRuler = new DefaultRuler();
+  RulerPtr defaultRuler = DefaultRuler::New();
   DALI_TEST_CHECK(defaultRuler);
 
   unsigned int volume;
@@ -2586,7 +2586,7 @@ int UtcDaliToolkitScrollViewDefaultRulerSnapP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewDefaultRulerSnapP");
 
-  RulerPtr defaultRuler = new DefaultRuler();
+  RulerPtr defaultRuler = DefaultRuler::New();
   DALI_TEST_CHECK(defaultRuler);
 
   DALI_TEST_EQUALS(defaultRuler->Snap(50.0f, 0.5f), 50.0f, TEST_LOCATION);
@@ -2600,7 +2600,7 @@ int UtcDaliToolkitScrollViewFixedRulerGetTotalPagesP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewFixedRulerGetTotalPagesP");
 
-  RulerPtr fixedRuler = new FixedRuler(100.0f);
+  RulerPtr fixedRuler = FixedRuler::New(100.0f);
   fixedRuler->SetDomain(RulerDomain(0.0f, 400.0f, true));
 
   fixedRuler->Enable();
@@ -2617,7 +2617,7 @@ int UtcDaliToolkitScrollViewFixedRulerGetPageFromPositionP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewFixedRulerGetPageFromPositionP");
 
-  RulerPtr fixedRuler = new FixedRuler(100.0f);
+  RulerPtr fixedRuler = FixedRuler::New(100.0f);
   fixedRuler->SetDomain(RulerDomain(0.0f, 400.0f, true));
 
   fixedRuler->Enable();
@@ -2655,7 +2655,7 @@ int UtcDaliToolkitScrollViewFixedRulerSnapP(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitScrollViewFixedRulerSnapP");
 
-  RulerPtr fixedRuler = new FixedRuler(100.0f);
+  RulerPtr fixedRuler = FixedRuler::New(100.0f);
   fixedRuler->SetDomain(RulerDomain(0.0f, 400.0f, true));
 
   DALI_TEST_EQUALS(fixedRuler->Snap(-30.0f, 0.0f), -100.0f, TEST_LOCATION);
@@ -2711,8 +2711,8 @@ int UtcDaliToolkitScrollViewConstraintsMove(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true));
   rulerY->SetDomain(RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true));
   scrollView.SetRulerX(rulerX);
@@ -2756,8 +2756,8 @@ int UtcDaliToolkitScrollViewConstraintsWrap(void)
   scrollView.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   // Position rulers.
-  RulerPtr rulerX = new DefaultRuler();
-  RulerPtr rulerY = new DefaultRuler();
+  RulerPtr rulerX = DefaultRuler::New();
+  RulerPtr rulerY = DefaultRuler::New();
   rulerX->SetDomain(RulerDomain(0.0f, stageSize.width + CLAMP_EXCESS_WIDTH, true));
   rulerY->SetDomain(RulerDomain(0.0f, stageSize.height + CLAMP_EXCESS_HEIGHT, true));
   scrollView.SetRulerX(rulerX);
@@ -2814,11 +2814,11 @@ int UtcDaliToolkitScrollViewGesturePageLimit(void)
 
   // Position rulers.
   // We set the X ruler to fixed to give us pages to snap to.
-  Dali::Toolkit::FixedRuler* rulerX = new Dali::Toolkit::FixedRuler(viewPageSize.width);
+  IntrusivePtr<Dali::Toolkit::FixedRuler> rulerX = Dali::Toolkit::FixedRuler::New(viewPageSize.width);
   // Note: The 3x page width is arbitary, but we need enough to show that we are
   // capping page movement by the page limiter, and not the domain.
   rulerX->SetDomain(Dali::Toolkit::RulerDomain(0.0f, viewPageSize.width * 3.0f, false));
-  Dali::Toolkit::RulerPtr rulerY = new Dali::Toolkit::DefaultRuler();
+  Dali::Toolkit::RulerPtr rulerY = Dali::Toolkit::DefaultRuler::New();
   rulerY->Disable();
   scrollView.SetRulerX(rulerX);
   scrollView.SetRulerY(rulerY);
@@ -3036,11 +3036,11 @@ int UtcDaliToolkitScrollViewWheelEvent(void)
 
   // Position rulers.
   // We set the X ruler to fixed to give us pages to snap to.
-  Dali::Toolkit::FixedRuler* rulerX = new Dali::Toolkit::FixedRuler(viewPageSize.width);
+  IntrusivePtr<Dali::Toolkit::FixedRuler> rulerX = Dali::Toolkit::FixedRuler::New(viewPageSize.width);
   // Note: The 3x page width is arbitary, but we need enough to show that we are
   // capping page movement by the page limiter, and not the domain.
   rulerX->SetDomain(Dali::Toolkit::RulerDomain(0.0f, viewPageSize.width * 3.0f, false));
-  Dali::Toolkit::RulerPtr rulerY = new Dali::Toolkit::DefaultRuler();
+  Dali::Toolkit::RulerPtr rulerY = Dali::Toolkit::DefaultRuler::New();
   rulerY->Disable();
   scrollView.SetRulerX(rulerX);
   scrollView.SetRulerY(rulerY);
@@ -3075,7 +3075,7 @@ int UtcDaliToolkitScrollViewWheelEvent(void)
   DALI_TEST_CHECK(gOnWheelEventCalled);
 
   // Set X ruler to free
-  Dali::Toolkit::DefaultRuler* defaultRuler = new Dali::Toolkit::DefaultRuler();
+  IntrusivePtr<Dali::Toolkit::DefaultRuler> defaultRuler = Dali::Toolkit::DefaultRuler::New();
   scrollView.SetRulerX(defaultRuler);
 
   // Perform a wheel event
@@ -3095,7 +3095,7 @@ int UtcDaliToolkitScrollViewWheelEvent(void)
   Wait(application, RENDER_DELAY_SCROLL);
 
   // Set Y ruler to fixed
-  Dali::Toolkit::FixedRuler* fixedRulerY = new Dali::Toolkit::FixedRuler(viewPageSize.height);
+  IntrusivePtr<Dali::Toolkit::FixedRuler> fixedRulerY = Dali::Toolkit::FixedRuler::New(viewPageSize.height);
   scrollView.SetRulerY(fixedRulerY);
 
   // Perform a wheel event

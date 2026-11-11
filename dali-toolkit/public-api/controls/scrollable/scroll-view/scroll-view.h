@@ -200,12 +200,6 @@ public:
 
 public:
   /**
-   * @brief Constructs ruler, enabled by default, with limitless domain.
-   * @SINCE_1_0.0
-   */
-  Ruler();
-
-  /**
    * @brief Snaps (x) in accordance to the ruler settings.
    *
    * @SINCE_1_0.0
@@ -384,6 +378,18 @@ public:
 
 protected:
   /**
+   * @brief Constructs ruler, enabled by default, with limitless domain.
+   * @SINCE_1_0.0
+   */
+  Ruler();
+
+  /**
+   * @brief Copy constructor.
+   * @SINCE_3_0.0
+   */
+  Ruler(const Ruler&) = default;
+
+  /**
    * @brief Destructor - A reference counted object may only be deleted by calling Unreference().
    * @SINCE_1_0.0
    */
@@ -405,10 +411,11 @@ class DALI_TOOLKIT_API DefaultRuler : public Ruler
 {
 public:
   /**
-   * @brief DefaultRuler constructor.
-   * @SINCE_1_0.0
+   * @brief Creates a reference-counted ruler with no snapping and one page.
+   * @SINCE_3_0.0
+   * @return An intrusive pointer owning the new ruler
    */
-  DefaultRuler();
+  static IntrusivePtr<DefaultRuler> New();
 
   /**
    * @copydoc Toolkit::Ruler::Snap
@@ -429,6 +436,25 @@ public:
    * @copydoc Toolkit::Ruler::GetTotalPages
    */
   unsigned int GetTotalPages() const override;
+
+protected:
+  /**
+   * @brief DefaultRuler constructor.
+   * @SINCE_1_0.0
+   */
+  DefaultRuler();
+
+  /**
+   * @brief Copy constructor.
+   * @SINCE_3_0.0
+   */
+  DefaultRuler(const DefaultRuler&) = default;
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   * @SINCE_3_0.0
+   */
+  ~DefaultRuler() override = default;
 };
 
 /**
@@ -439,12 +465,13 @@ class DALI_TOOLKIT_API FixedRuler : public Ruler
 {
 public:
   /**
-   * @brief Constructor.
+   * @brief Creates a reference-counted ruler with fixed snapping.
    *
-   * @SINCE_1_0.0
+   * @SINCE_3_0.0
    * @param[in] spacing The spacing between each interval on this ruler
+   * @return An intrusive pointer owning the new ruler
    */
-  FixedRuler(float spacing = 1.0f);
+  static IntrusivePtr<FixedRuler> New(float spacing = 1.0f);
 
   /**
    * @copydoc Toolkit::Ruler::Snap
@@ -465,6 +492,27 @@ public:
    * @copydoc Toolkit::Ruler::GetTotalPages
    */
   unsigned int GetTotalPages() const override;
+
+protected:
+  /**
+   * @brief Constructor.
+   *
+   * @SINCE_1_0.0
+   * @param[in] spacing The spacing between each interval on this ruler
+   */
+  FixedRuler(float spacing = 1.0f);
+
+  /**
+   * @brief Copy constructor.
+   * @SINCE_3_0.0
+   */
+  FixedRuler(const FixedRuler&) = default;
+
+  /**
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   * @SINCE_3_0.0
+   */
+  ~FixedRuler() override = default;
 
 private:
   float mSpacing; ///< The spacing between each interval
