@@ -199,6 +199,9 @@ void OffScreenRenderingImpl::OnRenderFinished(Dali::RenderTask task)
     Toolkit::Control control = GetOwnerControl();
     if(control)
     {
+      // Keep ourselves alive during the emit; a handler may disable offscreen rendering.
+      OffScreenRenderingImplPtr self(this);
+
       mTexture = mFrameBuffer.GetColorTexture();
 
       control.OffScreenRenderingFinishedSignal().Emit(control);

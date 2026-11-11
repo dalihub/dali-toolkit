@@ -1743,6 +1743,67 @@ int UtcDaliControlOffScreenRenderingGetOutput(void)
   END_TEST;
 }
 
+namespace
+{
+uint32_t gOffscreenRenderingFinishedCount = 0u;
+void     OnOffscreenRenderingFinishedDisable(Toolkit::Control control)
+{
+  ++gOffscreenRenderingFinishedCount;
+  gOffscreenRenderingOutput = Toolkit::GetImplementation(control).GetOffScreenRenderingOutput();
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::NONE);
+}
+} //namespace
+
+int UtcDaliControlOffScreenRenderingDisableInFinishedSignal(void)
+{
+  ToolkitTestApplication application;
+
+  gOffscreenRenderingFinishedCount = 0u;
+  gOffscreenRenderingOutput.Reset();
+
+  Control control = Control::New();
+  control.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
+  control.OffScreenRenderingFinishedSignal().Connect(OnOffscreenRenderingFinishedDisable);
+  application.GetScene().Add(control);
+
+  control.SetBackgroundColor(Color::RED);
+
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // The handler disabled offscreen rendering while the signal was being emitted.
+  DALI_TEST_EQUALS(gOffscreenRenderingFinishedCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<int>(DevelControl::Property::OFFSCREEN_RENDERING), static_cast<int>(DevelControl::OffScreenRenderingType::NONE), TEST_LOCATION);
+
+  // The output taken inside the handler must outlive the effect.
+  Dali::Texture texture = std::move(gOffscreenRenderingOutput);
+  DALI_TEST_CHECK(texture);
+  DALI_TEST_EQUALS(texture.GetHeight(), 50.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(texture.GetWidth(), 50.0f, TEST_LOCATION);
+  texture.Reset();
+
+  // Offscreen rendering can be enabled again, and finishes again.
+  control.SetProperty(DevelControl::Property::OFFSCREEN_RENDERING, DevelControl::OffScreenRenderingType::REFRESH_ONCE);
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gOffscreenRenderingFinishedCount, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(control.GetProperty<int>(DevelControl::Property::OFFSCREEN_RENDERING), static_cast<int>(DevelControl::OffScreenRenderingType::NONE), TEST_LOCATION);
+
+  gOffscreenRenderingOutput.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliControlNewWithDisableVisuals(void)
 {
   ToolkitTestApplication application;
