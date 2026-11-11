@@ -83,7 +83,7 @@ BaseHandle Create()
     SingletonService singletonService(SingletonService::Get());
     if(singletonService)
     {
-      Toolkit::StyleManager manager = Toolkit::StyleManager(new Internal::StyleManager());
+      Toolkit::StyleManager manager = Toolkit::StyleManager(Internal::StyleManager::NewForBaseHandle());
       singletonService.Register(gSingletonTypeInfoId, manager);
       handle = manager;
     }

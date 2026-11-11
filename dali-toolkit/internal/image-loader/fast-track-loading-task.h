@@ -23,6 +23,7 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/rendering/texture.h>
 #include <memory>
@@ -49,20 +50,12 @@ class FastTrackLoadingTask : public AsyncTask
 {
 public:
   /**
-   * @brief Constructor.
+   * @brief Creates a reference-counted implementation.
    */
-  FastTrackLoadingTask(const VisualUrl&                         url,
-                       ImageDimensions                          dimensions,
-                       SamplingMode::Type                       samplingMode,
-                       bool                                     orientationCorrection,
-                       DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
-                       bool                                     loadPlanes,
-                       CallbackBase*                            callback);
-
-  /**
-   * @brief Destructor.
-   */
-  ~FastTrackLoadingTask() override;
+  static Dali::IntrusivePtr<FastTrackLoadingTask> New(const VisualUrl& url, ImageDimensions dimensions, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<FastTrackLoadingTask>(new FastTrackLoadingTask(url, dimensions, samplingMode, orientationCorrection, preMultiplyOnLoad, loadPlanes, callback));
+  }
 
 public: // Implementation of AsyncTask
   /**
@@ -148,6 +141,23 @@ public:
   bool mPremultiplied : 1;       ///< True if the image's color was multiplied by it's alpha
   bool mPlanesLoaded : 1;        ///< True if the image load as planes.
   bool mHasAlpha : 1;
+
+protected:
+  /**
+   * @brief Constructor.
+   */
+  FastTrackLoadingTask(const VisualUrl&                         url,
+                       ImageDimensions                          dimensions,
+                       SamplingMode::Type                       samplingMode,
+                       bool                                     orientationCorrection,
+                       DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+                       bool                                     loadPlanes,
+                       CallbackBase*                            callback);
+
+  /**
+   * @brief Destructor.
+   */
+  ~FastTrackLoadingTask() override;
 };
 
 } // namespace Internal

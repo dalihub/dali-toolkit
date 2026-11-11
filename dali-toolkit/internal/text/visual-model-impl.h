@@ -813,12 +813,8 @@ private:
    * @brief Private constructor.
    */
   VisualModel();
-
-  // Undefined
-  VisualModel(const VisualModel& handle);
-
-  // Undefined
-  VisualModel& operator=(const VisualModel& handle);
+  VisualModel(const VisualModel& handle)            = delete;
+  VisualModel& operator=(const VisualModel& handle) = delete;
 
 public:
   Vector<GlyphInfo>                mGlyphs;                    ///< For each glyph, the font's id, glyph's index within the font and glyph's metrics.

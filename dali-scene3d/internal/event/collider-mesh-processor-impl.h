@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
@@ -36,11 +37,31 @@ namespace Internal
 class ColliderMeshProcessor : public BaseObject, public Dali::ConnectionTracker, public Dali::Integration::Processor
 {
 public:
+  /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL ColliderMeshProcessor* NewForBaseHandle()
+  {
+    return new ColliderMeshProcessor();
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<ColliderMeshProcessor> New()
+  {
+    return Dali::IntrusivePtr<ColliderMeshProcessor>(new ColliderMeshProcessor());
+  }
+
+  void ColliderMeshChanged(Collidable& collidable);
+
+protected:
   ColliderMeshProcessor();
 
   ~ColliderMeshProcessor();
-
-  void ColliderMeshChanged(Collidable& collidable);
 
 private:
   void ModelOnScene(Actor actor);

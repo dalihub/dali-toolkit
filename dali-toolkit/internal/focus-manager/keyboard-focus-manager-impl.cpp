@@ -101,7 +101,7 @@ BaseHandle Create()
     SingletonService singletonService(SingletonService::Get());
     if(singletonService)
     {
-      Toolkit::KeyboardFocusManager manager = Toolkit::KeyboardFocusManager(new Internal::KeyboardFocusManager());
+      Toolkit::KeyboardFocusManager manager = Toolkit::KeyboardFocusManager(Internal::KeyboardFocusManager::NewForBaseHandle());
       singletonService.Register(gSingletonTypeInfoId, manager);
       handle = manager;
     }

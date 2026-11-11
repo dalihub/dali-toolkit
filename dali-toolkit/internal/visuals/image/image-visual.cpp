@@ -734,7 +734,7 @@ void ImageVisual::LoadTexture(TextureSet& textures, const Dali::ImageDimensions&
     EnablePreMultipliedAlpha(preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD);
 
     // Set new TextureSet with fast track loading task
-    mFastTrackLoadingTask = new FastTrackLoadingTask(mImageUrl, size, mSamplingMode, mOrientationCorrection, preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, mFactoryCache.GetLoadYuvPlanes(), MakeCallback(this, &ImageVisual::FastLoadComplete));
+    mFastTrackLoadingTask = FastTrackLoadingTask::New(mImageUrl, size, mSamplingMode, mOrientationCorrection, preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF, mFactoryCache.GetLoadYuvPlanes(), MakeCallback(this, &ImageVisual::FastLoadComplete));
 
     TextureSet textureSet = TextureSet::New();
     if(!mFastTrackLoadingTask->mLoadPlanesAvaliable)

@@ -29,7 +29,7 @@ namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 ParticleEmitter ParticleEmitter::New()
 {
-  return {new Dali::Toolkit::ParticleSystem::Internal::ParticleEmitter()};
+  return {Dali::Toolkit::ParticleSystem::Internal::ParticleEmitter::NewForBaseHandle()};
 }
 
 ParticleEmitter ParticleEmitter::DownCast(BaseHandle handle)

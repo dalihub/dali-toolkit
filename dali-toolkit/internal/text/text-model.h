@@ -409,17 +409,13 @@ public:
    */
   const Vector<CharacterDirection>& GetCharacterDirections() const override;
 
-private: // Private contructors & copy operator.
+private:
   /**
    * @brief Private constructor.
    */
   Model();
-
-  // Undefined.
-  Model(const Model& handle);
-
-  // Undefined.
-  Model& operator=(const Model& handle);
+  Model(const Model& handle)            = delete;
+  Model& operator=(const Model& handle) = delete;
 
 protected:
   /**

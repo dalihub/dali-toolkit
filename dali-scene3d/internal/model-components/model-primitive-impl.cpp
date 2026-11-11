@@ -285,7 +285,7 @@ void ModelPrimitive::ApplyMaterialToRenderer(MaterialModifyObserver::ModifyFlag 
 
     if(DALI_UNLIKELY(!mShaderManager))
     {
-      mShaderManager = new Scene3D::Loader::ShaderManager();
+      mShaderManager = Scene3D::Loader::ShaderManager::New();
     }
 
     Shader newShader = mShaderManager->ProduceShader(shaderOption);

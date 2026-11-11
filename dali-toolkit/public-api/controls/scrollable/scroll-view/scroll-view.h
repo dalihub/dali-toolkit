@@ -384,10 +384,16 @@ protected:
   Ruler();
 
   /**
-   * @brief Copy constructor.
+   * @brief Copy construction is not supported.
    * @SINCE_3_0.0
    */
-  Ruler(const Ruler&) = default;
+  Ruler(const Ruler&) = delete;
+
+  /**
+   * @brief Copy assignment is not supported.
+   * @SINCE_3_0.0
+   */
+  Ruler& operator=(const Ruler&) = delete;
 
   /**
    * @brief Destructor - A reference counted object may only be deleted by calling Unreference().
@@ -445,10 +451,10 @@ protected:
   DefaultRuler();
 
   /**
-   * @brief Copy constructor.
+   * @brief Copy construction is not supported.
    * @SINCE_3_0.0
    */
-  DefaultRuler(const DefaultRuler&) = default;
+  DefaultRuler(const DefaultRuler&) = delete;
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -503,10 +509,10 @@ protected:
   FixedRuler(float spacing = 1.0f);
 
   /**
-   * @brief Copy constructor.
+   * @brief Copy construction is not supported.
    * @SINCE_3_0.0
    */
-  FixedRuler(const FixedRuler&) = default;
+  FixedRuler(const FixedRuler&) = delete;
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().

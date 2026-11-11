@@ -110,11 +110,9 @@ protected:
   ~Style() override;
 
 private:
-  // Not implemented
-  DALI_INTERNAL Style(const Style& rhs);
+  DALI_INTERNAL Style(const Style& rhs) = delete;
 
-  // Not implemented
-  DALI_INTERNAL Style& operator=(const Style& rhs);
+  DALI_INTERNAL Style& operator=(const Style& rhs) = delete;
 
 public:
   // Everything must be shallow-copiable.

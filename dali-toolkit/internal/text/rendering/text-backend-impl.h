@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
@@ -39,14 +40,23 @@ class Backend : public BaseObject
 {
 public:
   /**
-   * Constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  Backend();
+  static DALI_INTERNAL Backend* NewForBaseHandle()
+  {
+    return new Backend();
+  }
 
   /**
-   * Destructor
+   * @brief Creates a reference-counted implementation.
    */
-  ~Backend();
+  static Dali::IntrusivePtr<Backend> New()
+  {
+    return Dali::IntrusivePtr<Backend>(new Backend());
+  }
 
   /**
    * @copydoc Dali::Toolkit::Text::Backend::Get()
@@ -57,6 +67,17 @@ public:
    * @copydoc Dali::Toolkit::Text::Backend::NewRenderer()
    */
   RendererPtr NewRenderer(unsigned int renderingType);
+
+protected:
+  /**
+   * Constructor
+   */
+  Backend();
+
+  /**
+   * Destructor
+   */
+  ~Backend();
 
 private:
   // Undefined copy constructor.

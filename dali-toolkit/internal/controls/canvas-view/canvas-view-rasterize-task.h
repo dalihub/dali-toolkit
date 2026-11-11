@@ -53,16 +53,12 @@ class CanvasRendererRasterizingTask : public AsyncTask
 {
 public:
   /**
-   * Constructor
-   * @param[in] canvasRenderer The renderer which the rasterized canvas to be applied.
-   * @param[in] callback The callback that is called when the operation is completed.
+   * @brief Creates a reference-counted implementation.
    */
-  CanvasRendererRasterizingTask(CanvasRenderer canvasRenderer, CallbackBase* callback);
-
-  /**
-   * Destructor.
-   */
-  ~CanvasRendererRasterizingTask() = default;
+  static Dali::IntrusivePtr<CanvasRendererRasterizingTask> New(CanvasRenderer canvasRenderer, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<CanvasRendererRasterizingTask>(new CanvasRendererRasterizingTask(canvasRenderer, callback));
+  }
 
   /**
    * Do the rasterization with the mRasterizer.
@@ -100,6 +96,19 @@ public: // Implementation of AsyncTask
   {
     return "CanvasRendererRasterizingTask";
   }
+
+protected:
+  /**
+   * Constructor
+   * @param[in] canvasRenderer The renderer which the rasterized canvas to be applied.
+   * @param[in] callback The callback that is called when the operation is completed.
+   */
+  CanvasRendererRasterizingTask(CanvasRenderer canvasRenderer, CallbackBase* callback);
+
+  /**
+   * Destructor.
+   */
+  ~CanvasRendererRasterizingTask() = default;
 
 private:
   // Undefined

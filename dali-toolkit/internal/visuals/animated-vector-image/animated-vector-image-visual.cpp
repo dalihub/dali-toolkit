@@ -136,7 +136,7 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual(VisualFactoryCache& factory
 : Visual::Base(factoryCache, Visual::FittingMode::DONT_CARE, static_cast<Toolkit::Visual::Type>(Toolkit::DevelVisual::ANIMATED_VECTOR_IMAGE), Visual::DECORATION_CORNER_RADIUS | Visual::DECORATION_BORDERLINE),
   mImageUrl(imageUrl),
   mAnimationData(),
-  mVectorAnimationTask(new VectorAnimationTask(factoryCache)),
+  mVectorAnimationTask(VectorAnimationTask::New(factoryCache)),
   mImageVisualShaderFactory(shaderFactory),
   mVisualSize(),
   mVisualScale(Vector2::ONE),

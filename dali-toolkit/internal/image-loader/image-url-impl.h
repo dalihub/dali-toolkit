@@ -39,16 +39,6 @@ class ImageUrl : public BaseObject
 {
 public:
   /**
-   * @brief Constructor.
-   */
-  ImageUrl(Texture& texture, bool preMultiplied);
-
-  /**
-   * @brief Constructor.
-   */
-  ImageUrl(const EncodedImageBuffer& encodedImageBuffer);
-
-  /**
    * @copydoc Dali::Toolkit::ImageUrl::New
    */
   static ImageUrlPtr New(Texture& texture, bool preMultiplied);
@@ -64,6 +54,16 @@ public:
   const Dali::String& GetUrl() const;
 
 protected:
+  /**
+   * @brief Constructor.
+   */
+  ImageUrl(Texture& texture, bool preMultiplied);
+
+  /**
+   * @brief Constructor.
+   */
+  ImageUrl(const EncodedImageBuffer& encodedImageBuffer);
+
   /**
    * @brief A reference counted object may only be deleted by calling Unreference()
    */

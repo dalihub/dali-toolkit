@@ -24,6 +24,7 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/property-array.h>
 #include <chrono>
 #include <memory>
@@ -138,16 +139,12 @@ public:
   };
 
   /**
-   * @brief Constructor.
-   *
-   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @brief Creates a reference-counted implementation.
    */
-  VectorAnimationTask(VisualFactoryCache& factoryCache);
-
-  /**
-   * @brief Destructor.
-   */
-  ~VectorAnimationTask() override;
+  static Dali::IntrusivePtr<VectorAnimationTask> New(VisualFactoryCache& factoryCache)
+  {
+    return Dali::IntrusivePtr<VectorAnimationTask>(new VectorAnimationTask(factoryCache));
+  }
 
   /**
    * @brief Finalizes the task.
@@ -301,6 +298,19 @@ public: // Implementation of AsyncTask
   {
     return "VectorAnimationTask";
   }
+
+protected:
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   */
+  VectorAnimationTask(VisualFactoryCache& factoryCache);
+
+  /**
+   * @brief Destructor.
+   */
+  ~VectorAnimationTask() override;
 
 private:
   /**

@@ -127,7 +127,7 @@ Text::AsyncTextManager AsyncTextManager::Get()
     }
     else // create and register the object
     {
-      asyncTextManagerHandle = Text::AsyncTextManager(new AsyncTextManager);
+      asyncTextManagerHandle = Text::AsyncTextManager(AsyncTextManager::NewForBaseHandle());
       service.Register(gSingletonTypeInfoId, asyncTextManagerHandle);
     }
   }
@@ -235,7 +235,7 @@ uint32_t AsyncTextManager::RequestLoad(AsyncTextParameters& parameters, TextLoad
   // Each task must have its own unique id.
   mTaskId++;
 
-  auto task = new Dali::Toolkit::Internal::TextLoadingTask(mTaskId, parameters, MakeCallback(this, &AsyncTextManager::LoadComplete));
+  auto task = Dali::Toolkit::Internal::TextLoadingTask::New(mTaskId, parameters, MakeCallback(this, &AsyncTextManager::LoadComplete));
 
   LoadElement element(task, observer, parameters);
 

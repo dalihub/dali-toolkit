@@ -47,17 +47,26 @@ class VectorBlobAtlasShare::Impl : public Dali::BaseObject
 {
 public:
   /**
-   * @brief Constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  Impl()
+  static DALI_INTERNAL Impl* NewForBaseHandle()
   {
+    return new Impl();
+  }
+
+  static Dali::IntrusivePtr<Impl> New()
+  {
+    return Dali::IntrusivePtr<Impl>(new Impl());
   }
 
   VectorBlobAtlas* GetCurrentAtlas()
   {
     if(!mCurrentAtlas)
     {
-      mCurrentAtlas = new VectorBlobAtlas(INITIAL_VECTOR_BLOB_ATLAS_WIDTH, INITIAL_VECTOR_BLOB_ATLAS_HEIGHT, VECTOR_BLOB_ATLAS_ITEM_WIDTH, VECTOR_BLOB_ATLAS_HEIGHT_QUANTUM);
+      mCurrentAtlas = VectorBlobAtlas::New(INITIAL_VECTOR_BLOB_ATLAS_WIDTH, INITIAL_VECTOR_BLOB_ATLAS_HEIGHT, VECTOR_BLOB_ATLAS_ITEM_WIDTH, VECTOR_BLOB_ATLAS_HEIGHT_QUANTUM);
     }
 
     return mCurrentAtlas.Get();
@@ -68,12 +77,19 @@ public:
     // The current atlas should have been filled, before asking for a new one
     DALI_ASSERT_DEBUG(mCurrentAtlas->IsFull() && "Current atlas is not full yet");
 
-    mCurrentAtlas = new VectorBlobAtlas(NEW_VECTOR_BLOB_ATLAS_WIDTH, NEW_VECTOR_BLOB_ATLAS_HEIGHT, VECTOR_BLOB_ATLAS_ITEM_WIDTH, VECTOR_BLOB_ATLAS_HEIGHT_QUANTUM);
+    mCurrentAtlas = VectorBlobAtlas::New(NEW_VECTOR_BLOB_ATLAS_WIDTH, NEW_VECTOR_BLOB_ATLAS_HEIGHT, VECTOR_BLOB_ATLAS_ITEM_WIDTH, VECTOR_BLOB_ATLAS_HEIGHT_QUANTUM);
 
     return mCurrentAtlas.Get();
   }
 
 protected:
+  /**
+   * @brief Constructor
+   */
+  Impl()
+  {
+  }
+
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
@@ -111,7 +127,7 @@ VectorBlobAtlasShare VectorBlobAtlasShare::Get()
     if(!manager)
     {
       // If not, create the VectorBlobAtlasShare and register it as a singleton
-      manager = VectorBlobAtlasShare(new VectorBlobAtlasShare::Impl());
+      manager = VectorBlobAtlasShare(VectorBlobAtlasShare::Impl::NewForBaseHandle());
       singletonService.Register(gSingletonTypeInfoId, manager);
     }
   }

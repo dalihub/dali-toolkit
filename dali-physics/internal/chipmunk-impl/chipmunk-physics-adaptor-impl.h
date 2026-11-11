@@ -18,18 +18,20 @@
 
 // INTERNAL INCLUDES
 #include <dali-physics/internal/physics-adaptor-impl.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 class ChipmunkPhysicsAdaptor : public PhysicsAdaptor
 {
 public:
-  ChipmunkPhysicsAdaptor();
-
   /**
-   * A reference counted object may only be deleted by calling Unreference()
+   * @brief Creates a reference-counted implementation.
    */
-  ~ChipmunkPhysicsAdaptor() override;
+  static Dali::IntrusivePtr<ChipmunkPhysicsAdaptor> New()
+  {
+    return Dali::IntrusivePtr<ChipmunkPhysicsAdaptor>(new ChipmunkPhysicsAdaptor());
+  }
 
   // Remove copy constructor and copy assignment
   ChipmunkPhysicsAdaptor(const PhysicsAdaptor& handle)            = delete;
@@ -105,9 +107,16 @@ public:
    */
   Dali::Vector3 ProjectPoint(Dali::Vector3 origin, Dali::Vector3 direction, float distance) override;
 
+protected:
+  ChipmunkPhysicsAdaptor();
+
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~ChipmunkPhysicsAdaptor() override;
+
 private:
   Actor mDebugActor;
-  // Physics world owns debug renderer
 };
 
 } //namespace DALI_NAMESPACE::Toolkit::Physics::Internal

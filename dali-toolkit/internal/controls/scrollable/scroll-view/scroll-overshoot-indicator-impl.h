@@ -46,16 +46,6 @@ class ScrollOvershootIndicator : public Dali::RefObject
 {
 public:
   /**
-   * ScrollOvershootIndicator constructor.
-   */
-  ScrollOvershootIndicator();
-
-  /**
-   * Virtual destructor
-   */
-  virtual ~ScrollOvershootIndicator();
-
-  /**
    * Attaches the scroll indicator to a scrollable actor
    *
    * &param[in] scrollable The scrollable actor to attach to
@@ -88,6 +78,21 @@ public:
   void SetOvershootEffectColor(const Vector4& color);
 
 private:
+  ScrollOvershootIndicator(const ScrollOvershootIndicator&)            = delete;
+  ScrollOvershootIndicator& operator=(const ScrollOvershootIndicator&) = delete;
+
+protected:
+  /**
+   * ScrollOvershootIndicator constructor.
+   */
+  ScrollOvershootIndicator();
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~ScrollOvershootIndicator();
+
+private:
   ScrollOvershootEffectPtr mEffectX; ///< effect used for x-axis/horizontal display
   ScrollOvershootEffectPtr mEffectY; ///< effect used for y-axis/vertical display
 };
@@ -99,20 +104,6 @@ private:
 class ScrollOvershootEffect : public Dali::RefObject
 {
 public:
-  /**
-   * Create a new overshoot effect, passing in whether it is vertical or horizontal
-   *
-   * @param[in] vertical whether this effect is a vertical or horizontal one
-   */
-  ScrollOvershootEffect(bool vertical);
-
-  /**
-   * Virtual destructor
-   */
-  virtual ~ScrollOvershootEffect()
-  {
-  }
-
   /**
    * Returns if this is a vertical or horizontal overhoot effect
    *
@@ -160,6 +151,25 @@ public:
   virtual void SetOvershoot(float amount, bool animate = true) = 0;
 
 private:
+  ScrollOvershootEffect(const ScrollOvershootEffect&)            = delete;
+  ScrollOvershootEffect& operator=(const ScrollOvershootEffect&) = delete;
+
+protected:
+  /**
+   * Create a new overshoot effect, passing in whether it is vertical or horizontal
+   *
+   * @param[in] vertical whether this effect is a vertical or horizontal one
+   */
+  ScrollOvershootEffect(bool vertical);
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~ScrollOvershootEffect()
+  {
+  }
+
+private:
   bool mVertical; ///< whether this is a vertical/horizontal effect
 };
 
@@ -176,14 +186,6 @@ public:
     AnimatingOut = 0x02, ///< animating overshoot to negative (overshoot image displays in +ve area of screen)
     AnimateBack  = 0x04, ///< indicates that we need to animate overshoot back to zero immediately after it has finished animating in
   };
-
-public:
-  /**
-   * Create a new gradient overshoot effect, passing in whether it is vertical or horizontal
-   *
-   * @param[in] vertical Whether this indicator is vertical or horizontal
-   */
-  ScrollOvershootEffectRipple(bool vertical, Scrollable& scrollable);
 
   /**
    * @copydoc ScrollOvershootEffect::Apply
@@ -245,6 +247,15 @@ public:
    * @return a pointer to the new effect
    */
   static ScrollOvershootEffectRipplePtr New(bool vertical, Scrollable& scrollable);
+
+protected:
+  /**
+   * Create a new gradient overshoot effect, passing in whether it is vertical or horizontal
+   *
+   * @param[in] vertical Whether this indicator is vertical or horizontal
+   */
+  ScrollOvershootEffectRipple(bool vertical, Scrollable& scrollable);
+  ~ScrollOvershootEffectRipple() override = default;
 
 private:
   Actor                mOvershootOverlay;              ///< the actor which displays the overshoot effect

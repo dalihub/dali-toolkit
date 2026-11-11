@@ -49,7 +49,7 @@ uint32_t AsyncImageLoader::LoadAnimatedImage(Dali::AnimatedImageLoading         
                                              uint32_t                                 frameIndex,
                                              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
+  LoadingTaskPtr loadingTask = LoadingTask::New(++mLoadTaskId, animatedImageLoading, frameIndex, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
   return mLoadTaskId;
 }
@@ -61,7 +61,7 @@ uint32_t AsyncImageLoader::LoadAnimatedImage(Dali::AnimatedImageLoading         
                                              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
                                              bool                                     loadPlanes)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, samplingMode, preMultiplyOnLoad, loadPlanes, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
+  LoadingTaskPtr loadingTask = LoadingTask::New(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, samplingMode, preMultiplyOnLoad, loadPlanes, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
   return mLoadTaskId;
 }
@@ -73,7 +73,7 @@ uint32_t AsyncImageLoader::Load(const VisualUrl&                         url,
                                 DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
                                 bool                                     loadPlanes)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, url, dimensions, samplingMode, orientationCorrection, preMultiplyOnLoad, loadPlanes, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
+  LoadingTaskPtr loadingTask = LoadingTask::New(++mLoadTaskId, url, dimensions, samplingMode, orientationCorrection, preMultiplyOnLoad, loadPlanes, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   AsyncTaskManager::Get().AddTask(loadingTask);
   mLoadingTasks.push_back(AsyncImageLoadingInfo(loadingTask, mLoadTaskId));
   return mLoadTaskId;
@@ -85,7 +85,7 @@ uint32_t AsyncImageLoader::LoadEncodedImageBuffer(const EncodedImageBuffer&     
                                                   bool                                     orientationCorrection,
                                                   DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, encodedImageBuffer, dimensions, samplingMode, orientationCorrection, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
+  LoadingTaskPtr loadingTask = LoadingTask::New(++mLoadTaskId, encodedImageBuffer, dimensions, samplingMode, orientationCorrection, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
   mLoadingTasks.push_back(AsyncImageLoadingInfo(loadingTask, mLoadTaskId));
   return mLoadTaskId;
@@ -97,7 +97,7 @@ uint32_t AsyncImageLoader::ApplyMask(PixelBuffer                              pi
                                      bool                                     cropToMask,
                                      DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
+  LoadingTaskPtr loadingTask = LoadingTask::New(++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad, MakeCallback(this, &AsyncImageLoader::ProcessLoadedImage));
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
   mLoadingTasks.push_back(AsyncImageLoadingInfo(loadingTask, mLoadTaskId));
   return mLoadTaskId;

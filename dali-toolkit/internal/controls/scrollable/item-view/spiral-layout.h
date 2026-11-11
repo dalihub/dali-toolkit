@@ -44,11 +44,6 @@ public:
   static SpiralLayoutPtr New();
 
   /**
-   * Virtual destructor.
-   */
-  virtual ~SpiralLayout();
-
-  /**
    * Apply spiral layout Properties.
    * @param[in] properties The properties of the layout.
    */
@@ -132,6 +127,12 @@ public:
    * @copydoc ItemLayout::GetClosestOnScreenLayoutPosition()
    */
   float GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) override;
+
+protected:
+  /**
+   * Virtual destructor.
+   */
+  virtual ~SpiralLayout();
 
 private:
   /**

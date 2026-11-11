@@ -62,6 +62,9 @@ public:
   void SetDuration(float duration);
 
 private: // Implementation
+  TextVerticalScroller(const TextVerticalScroller&)            = delete;
+  TextVerticalScroller& operator=(const TextVerticalScroller&) = delete;
+
   /**
    * Constructor
    */

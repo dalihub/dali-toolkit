@@ -27,13 +27,6 @@ namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 class BulletPhysicsAdaptor : public PhysicsAdaptor
 {
 public:
-  BulletPhysicsAdaptor();
-
-  /**
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~BulletPhysicsAdaptor() override;
-
   // Remove copy constructor and copy assignment
   BulletPhysicsAdaptor(const PhysicsAdaptor& handle)            = delete;
   BulletPhysicsAdaptor& operator=(const PhysicsAdaptor& handle) = delete;
@@ -110,6 +103,14 @@ public:
    * @copydoc Dali::Toolkit::Physics::PhysicsAdaptor::ProjectPoint
    */
   Dali::Vector3 ProjectPoint(Dali::Vector3 origin, Dali::Vector3 direction, float distance) override;
+
+protected:
+  BulletPhysicsAdaptor();
+
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~BulletPhysicsAdaptor() override;
 
 private:
   Actor                           mDebugActor;

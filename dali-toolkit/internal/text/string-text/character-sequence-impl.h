@@ -45,26 +45,13 @@ typedef const CharacterSequence*        CharacterSequenceConstPtr;
 class CharacterSequence : public BaseObject
 {
 public:
-  /**
-   * This constructor is only used by derived classes.
-   */
-  CharacterSequence();
-
-  /**
-   * @brief Virtual destructor.
-   *
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  virtual ~CharacterSequence() = 0;
-
   // Removed constructors and assignment operators
-public:
+
   CharacterSequence(const CharacterSequence&)            = delete; ///< Deleted copy constructor
   CharacterSequence(CharacterSequence&&)                 = delete; ///< Deleted move constructor
   CharacterSequence& operator=(const CharacterSequence&) = delete; ///< Deleted copy assignment operator
   CharacterSequence& operator=(CharacterSequence&&)      = delete; ///< Deleted move assignment operator
-
-public: //Methods
+public:                                                            //Methods
   /**
    * @copydoc Dali::Toolkit::Text::CharacterSequence::GetCharacters()
    */
@@ -80,6 +67,18 @@ public: //Methods
    */
   virtual std::string ToString() const = 0;
 
+protected:
+  /**
+   * This constructor is only used by derived classes.
+   */
+  CharacterSequence();
+
+  /**
+   * @brief Virtual destructor.
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~CharacterSequence() = 0;
 }; // class CharacterSequence
 
 } // namespace Internal

@@ -61,7 +61,7 @@ void SubmitRemoteDecodeTask(Dali::AsyncTaskManager                   asyncTaskMa
     return;
   }
 
-  RemoteDecodeTaskPtr remoteDecodeTask = new RemoteDecodeTask(textureId, localFilePath, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, callback);
+  RemoteDecodeTaskPtr remoteDecodeTask = RemoteDecodeTask::New(textureId, localFilePath, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, callback);
   asyncTaskManager.AddTask(remoteDecodeTask);
 }
 } //namespace
@@ -80,7 +80,7 @@ void TextureAsyncLoadingHelper::LoadAnimatedImage(const TextureManager::TextureI
                                                   const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
                                                   const bool                                     loadYuvPlanes)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, samplingMode, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+  LoadingTaskPtr loadingTask = LoadingTask::New(++mLoadTaskId, animatedImageLoading, frameIndex, desiredSize, samplingMode, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   loadingTask->SetTextureId(textureId);
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }
@@ -95,7 +95,7 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId            
 {
   if(DALI_UNLIKELY(url.IsBufferResource()))
   {
-    LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, mTextureManager.GetEncodedImageBuffer(url), desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+    LoadingTaskPtr loadingTask = LoadingTask::New(++mLoadTaskId, mTextureManager.GetEncodedImageBuffer(url), desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
     loadingTask->SetTextureId(textureId);
     Dali::AsyncTaskManager::Get().AddTask(loadingTask);
     return;
@@ -132,7 +132,7 @@ void TextureAsyncLoadingHelper::Load(const TextureManager::TextureId            
 
   // Default: submit directly (Worker Thread will handle download synchronously for curl, or decode for local).
   DALI_LOG_DEBUG_INFO("TextureAsyncLoadingHelper::Load textureId[%d] via AsyncTaskManager url[%s]\n", textureId, url.GetEllipsedUrl().c_str());
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, url, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+  LoadingTaskPtr loadingTask = LoadingTask::New(++mLoadTaskId, url, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   loadingTask->SetTextureId(textureId);
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }
@@ -144,7 +144,7 @@ void TextureAsyncLoadingHelper::ApplyMask(const TextureManager::TextureId       
                                           const bool                                     cropToMask,
                                           const DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
-  LoadingTaskPtr loadingTask = new LoadingTask(++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
+  LoadingTaskPtr loadingTask = LoadingTask::New(++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad, MakeCallback(this, &TextureAsyncLoadingHelper::AsyncLoadComplete));
   loadingTask->SetTextureId(textureId);
   Dali::AsyncTaskManager::Get().AddTask(loadingTask);
 }

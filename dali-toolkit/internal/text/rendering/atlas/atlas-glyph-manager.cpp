@@ -59,7 +59,7 @@ AtlasGlyphManager AtlasGlyphManager::Get()
     if(!manager)
     {
       // If not, create the AtlasGlyphManager and register it as a singleton
-      manager = AtlasGlyphManager(new Internal::AtlasGlyphManager());
+      manager = AtlasGlyphManager(Internal::AtlasGlyphManager::NewForBaseHandle());
       singletonService.Register(gSingletonTypeInfoId, manager);
     }
   }
