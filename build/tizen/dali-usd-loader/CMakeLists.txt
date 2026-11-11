@@ -84,6 +84,9 @@ set(prefix_include_dir "${prefix}/include")
 
 include_directories(BEFORE
   ${repo_root_dir}
+)
+
+include_directories(BEFORE SYSTEM
   ${USD_ROOT_DIR}/include
 )
 
