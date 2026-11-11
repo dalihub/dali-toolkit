@@ -30,8 +30,8 @@ WebView::WebView()
 {
 }
 
-WebView::WebView(const WebView& WebView)
-: Control(WebView)
+WebView::WebView(const WebView& webView)
+: Control(webView)
 {
 }
 

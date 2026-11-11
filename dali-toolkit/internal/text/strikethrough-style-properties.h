@@ -47,14 +47,14 @@ struct StrikethroughStyleProperties
   {
   }
 
-  StrikethroughStyleProperties(Vector4 color,
-                               float   height,
-                               bool    colorDefined,
-                               bool    heightDefined)
-  : color{color},
-    height{height},
-    colorDefined{colorDefined},
-    heightDefined{heightDefined}
+  StrikethroughStyleProperties(Vector4 initColor,
+                               float   initHeight,
+                               bool    initColorDefined,
+                               bool    initHeightDefined)
+  : color{initColor},
+    height{initHeight},
+    colorDefined{initColorDefined},
+    heightDefined{initHeightDefined}
 
   {
   }

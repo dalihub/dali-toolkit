@@ -403,31 +403,31 @@ void DeterminePropertyFromNode(const TreeNode& node, Property::Value& value, con
             value = *v;
             done  = true;
           }
-          else if(OptionalMatrix3 v = IsMatrix3(node))
+          else if(OptionalMatrix3 matrix3 = IsMatrix3(node))
           {
-            value = *v;
+            value = *matrix3;
             done  = true;
           }
-          else if(OptionalVector4 v = IsVector4(node))
+          else if(OptionalVector4 vector4 = IsVector4(node))
           {
-            value = *v;
+            value = *vector4;
             done  = true;
           }
-          else if(OptionalVector3 v = IsVector3(node))
+          else if(OptionalVector3 vector3 = IsVector3(node))
           {
-            value = *v;
+            value = *vector3;
             done  = true;
           }
-          else if(OptionalVector2 v = IsVector2(node))
+          else if(OptionalVector2 vector2 = IsVector2(node))
           {
-            value = *v;
+            value = *vector2;
             done  = true;
           }
           else if(4 == node.Size())
           {
-            if(OptionalVector4 v = IsVector4(node))
+            if(OptionalVector4 vector4Value = IsVector4(node))
             {
-              value = *v;
+              value = *vector4Value;
               done  = true;
             }
           }

@@ -185,7 +185,7 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
 {
   // By virtue of DoSetProperties being called last, this will override
   // anything set by Toolkit::Visual::Property::MIX_COLOR
-  Property::Value* colorValue = propertyMap.Find(Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR);
+  const Property::Value* colorValue = propertyMap.Find(Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR);
   if(colorValue)
   {
     Vector4 color;
@@ -208,7 +208,7 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* blurRadiusValue = propertyMap.Find(Toolkit::DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME);
+  const Property::Value* blurRadiusValue = propertyMap.Find(Toolkit::DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME);
   if(blurRadiusValue)
   {
     if(!blurRadiusValue->Get(mBlurRadius))
@@ -243,7 +243,7 @@ void ColorVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* cutoutPolicyValue = propertyMap.Find(Toolkit::DevelColorVisual::Property::CUTOUT_POLICY, CUTOUT_POLICY_NAME);
+  const Property::Value* cutoutPolicyValue = propertyMap.Find(Toolkit::DevelColorVisual::Property::CUTOUT_POLICY, CUTOUT_POLICY_NAME);
   if(cutoutPolicyValue)
   {
     int cutoutPolicy = static_cast<int>(DevelColorVisual::CutoutPolicy::NONE) - 1; ///< Make always invalid

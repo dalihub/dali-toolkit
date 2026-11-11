@@ -137,7 +137,8 @@ Toolkit::VideoView VideoView::New(Dali::VideoPlayerPlugin::VideoSourceDescriptor
   VideoView*         impl   = new VideoView(syncMode);
   Toolkit::VideoView handle = Toolkit::VideoView(*impl);
 
-  impl->mVideoPlayer = Dali::VideoPlayer::New(impl->Self(), source, syncMode);
+  impl->mHasExternalSource = true;
+  impl->mVideoPlayer       = Dali::VideoPlayer::New(impl->Self(), source, syncMode);
   impl->Initialize();
   return handle;
 }
@@ -609,26 +610,36 @@ void VideoView::OnSceneConnection(int depth)
     }
   }
 
-  int  curPos     = mVideoPlayer.GetPlayPosition();
-  bool wasPlaying = IsPlay();
+  int  curPos     = mHasExternalSource ? 0 : mVideoPlayer.GetPlayPosition();
+  bool wasPlaying = !mHasExternalSource && IsPlay();
 
   if(wasPlaying)
   {
     Pause();
   }
 
-  if(!mRenderingStrategy->Initialize())
+  bool initialized = mRenderingStrategy->Initialize();
+  if(!initialized)
   {
     if(!mIsUnderlay)
     {
       mIsUnderlay                        = true;
       Toolkit::VideoView videoViewHandle = Toolkit::VideoView::DownCast(self);
       mRenderingStrategy                 = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
-      mRenderingStrategy->Initialize();
+      initialized                        = mRenderingStrategy->Initialize();
     }
   }
 
-  ApplyBackupProperties();
+  if(!initialized)
+  {
+    ControlImpl::OnSceneConnection(depth);
+    return;
+  }
+
+  if(!mHasExternalSource)
+  {
+    ApplyBackupProperties();
+  }
 
   if(wasPlaying)
   {
@@ -678,32 +689,32 @@ void VideoView::OnChildOrderChanged(Actor parent, Actor child)
   int   currentSiblingOrder = self.GetProperty<int>(Dali::DevelActor::Property::SIBLING_ORDER);
   if(currentSiblingOrder != mSiblingOrder)
   {
-    Actor parent = self.GetParent();
-    Actor child;
+    Actor selfParent = self.GetParent();
+    Actor sibling;
     Actor upper;
     Actor lower;
 
-    int numChildren = static_cast<int>(parent.GetChildCount());
+    int numChildren = static_cast<int>(selfParent.GetChildCount());
     for(int i = 0; i < numChildren; i++)
     {
-      child = parent.GetChildAt(i);
-      if(!IsVideoView(child))
+      sibling = selfParent.GetChildAt(i);
+      if(!IsVideoView(sibling))
       {
         continue;
       }
 
-      if(child == self)
+      if(sibling == self)
       {
         continue;
       }
 
       if(i < currentSiblingOrder)
       {
-        lower = child;
+        lower = sibling;
       }
       else if(i > currentSiblingOrder)
       {
-        upper = child;
+        upper = sibling;
         break;
       }
     }
@@ -749,10 +760,16 @@ void VideoView::SetUnderlay(bool isUnderlay)
 
   if(isUnderlay != mIsUnderlay || !mRenderingStrategy)
   {
+    if(mHasExternalSource && mRenderingStrategy && mRenderingStrategy->HasRenderingTarget())
+    {
+      DALI_LOG_ERROR("VideoView: create a new view with an IDLE external player to change underlay mode\n");
+      return;
+    }
+
     mSettingUnderlay = true;
     mIsUnderlay      = isUnderlay;
-    int  curPos      = mVideoPlayer.GetPlayPosition();
-    bool wasPlaying  = IsPlay();
+    int  curPos      = mHasExternalSource ? 0 : mVideoPlayer.GetPlayPosition();
+    bool wasPlaying  = !mHasExternalSource && IsPlay();
 
     if(wasPlaying)
     {
@@ -774,14 +791,17 @@ void VideoView::SetUnderlay(bool isUnderlay)
     {
       if(!mIsUnderlay)
       {
-        mIsUnderlay                        = true;
-        Toolkit::VideoView videoViewHandle = Toolkit::VideoView::DownCast(Self());
-        mRenderingStrategy                 = std::make_unique<WindowSurfaceStrategy>(videoViewHandle);
+        mIsUnderlay                   = true;
+        Toolkit::VideoView selfHandle = Toolkit::VideoView::DownCast(Self());
+        mRenderingStrategy            = std::make_unique<WindowSurfaceStrategy>(selfHandle);
         mRenderingStrategy->Initialize();
       }
     }
 
-    ApplyBackupProperties();
+    if(!mHasExternalSource)
+    {
+      ApplyBackupProperties();
+    }
 
     if(wasPlaying)
     {
@@ -924,6 +944,11 @@ bool VideoView::IsVideoView(Actor actor) const
 VideoPlayer VideoView::GetVideoPlayer()
 {
   return mVideoPlayer;
+}
+
+bool VideoView::HasExternalSource() const
+{
+  return mHasExternalSource;
 }
 
 void VideoView::SetAutoRotationEnabled(bool enable)

@@ -548,16 +548,16 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
 
         // Get the lines for the given range of glyphs.
         // The lines contain the alignment offset which needs to be added to the glyph's position.
-        LineIndex firstLineIndex = 0u;
-        Length    numberOfLines  = 0u;
+        LineIndex firstLineIndex        = 0u;
+        Length    ellipsisNumberOfLines = 0u;
         mImpl->mVisualModel->GetNumberOfLines(glyphIndex,
                                               numberOfLaidOutGlyphs,
                                               firstLineIndex,
-                                              numberOfLines);
+                                              ellipsisNumberOfLines);
 
-        Vector<LineRun> lines;
-        lines.Resize(numberOfLines);
-        LineRun* lineBuffer = lines.Begin();
+        Vector<LineRun> ellipsisLines;
+        ellipsisLines.Resize(ellipsisNumberOfLines);
+        LineRun* lineBuffer = ellipsisLines.Begin();
 
         mImpl->mVisualModel->GetLinesOfGlyphRange(lineBuffer,
                                                   glyphIndex,
@@ -587,7 +587,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
             // Get the next line.
             ++lineIndex;
 
-            if(lineIndex < numberOfLines)
+            if(lineIndex < ellipsisNumberOfLines)
             {
               line          = lineBuffer + lineIndex;
               minLineOffset = Min(minLineOffset, line->alignmentOffset);
@@ -639,7 +639,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
         {
           const LineRun& elidedLine = *ellipsisLine;
 
-          if((1u == numberOfLines) &&
+          if((1u == ellipsisNumberOfLines) &&
              (GetLineHeight(elidedLine, true) > mImpl->mVisualModel->mControlSize.height))
           {
             // Replace the first glyph with ellipsis glyph
@@ -676,7 +676,7 @@ Length View::GetGlyphs(GlyphInfo* glyphs,
 
           // Tail Mode: start by the end of line.
           const bool isTailMode = ellipsisPosition == DevelText::EllipsisPosition::END ||
-                                  (ellipsisPosition == DevelText::EllipsisPosition::MIDDLE && numberOfLines != 1u);
+                                  (ellipsisPosition == DevelText::EllipsisPosition::MIDDLE && ellipsisNumberOfLines != 1u);
 
           // The ellipsis glyph has to fit in the place where the last glyph(s) is(are) removed.
           InsertEllipsisGlyph(

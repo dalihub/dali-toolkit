@@ -181,16 +181,16 @@ public:
     /**
      * @brief Constructor to initialise values to defaults for convenience.
      * @SINCE_1_0.0
-     * @param[in] rowIndex The row index initialized
-     * @param[in] columnIndex The column index initialized
-     * @param[in] rowSpan The row span initialized
-     * @param[in] columnSpan The column span initialized
+     * @param[in] initRowIndex The row index initialized
+     * @param[in] initColumnIndex The column index initialized
+     * @param[in] initRowSpan The row span initialized
+     * @param[in] initColumnSpan The column span initialized
      */
-    CellPosition(unsigned int rowIndex = 0, unsigned int columnIndex = 0, unsigned int rowSpan = 1, unsigned int columnSpan = 1)
-    : rowIndex(rowIndex),
-      columnIndex(columnIndex),
-      rowSpan(rowSpan),
-      columnSpan(columnSpan)
+    CellPosition(unsigned int initRowIndex = 0, unsigned int initColumnIndex = 0, unsigned int initRowSpan = 1, unsigned int initColumnSpan = 1)
+    : rowIndex(initRowIndex),
+      columnIndex(initColumnIndex),
+      rowSpan(initRowSpan),
+      columnSpan(initColumnSpan)
     {
     }
 

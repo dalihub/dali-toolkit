@@ -21,7 +21,6 @@
 // EXTERNAL HEADERS
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
-#include <dali/devel-api/images/pixel-buffer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -88,7 +87,7 @@ void PreMultiply(PixelBuffer pixelBuffer, TextureManager::MultiplyOnLoad& preMul
   {
     DevelPixelBufferOperations::MultiplyColorByAlpha(pixelBuffer);
 
-    if(!DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer))
+    if(!pixelBuffer.IsAlphaPreMultiplied())
     {
       preMultiplyOnLoad = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
     }
@@ -982,7 +981,7 @@ void TextureManager::PostLoad(TextureManager::TextureInfo& textureInfo, std::vec
       PixelBuffer pixelBuffer = pixelBuffers[0];
       if(pixelBuffer && (pixelBuffer.GetWidth() != 0) && (pixelBuffer.GetHeight() != 0))
       {
-        textureInfo.preMultiplied = DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffer);
+        textureInfo.preMultiplied = pixelBuffer.IsAlphaPreMultiplied();
 
         if(textureInfo.storageType == TextureManager::StorageType::UPLOAD_TO_TEXTURE)
         {
@@ -1223,7 +1222,7 @@ void TextureManager::UploadTextures(std::vector<PixelBuffer>& pixelBuffers, Text
     DALI_LOG_INFO(gTextureManagerLogFilter, Debug::General, "  TextureManager::UploadTextures() New Texture for textureId:%d\n", textureInfo.textureId);
 
     // Check if this pixelBuffer is premultiplied
-    textureInfo.preMultiplied = DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffers[0]);
+    textureInfo.preMultiplied = pixelBuffers[0].IsAlphaPreMultiplied();
 
     auto& renderingAddOn = RenderingAddOn::Get();
     if(renderingAddOn.IsValid())

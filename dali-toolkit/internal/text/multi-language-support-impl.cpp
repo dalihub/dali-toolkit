@@ -884,9 +884,9 @@ void MultilanguageSupport::SetScripts(const Vector<Character>& text, CharacterIn
 
     for(Vector<ScriptRun>::Iterator it = scripts.Begin() + scriptIndex, endIt = scripts.End(); it != endIt; ++it)
     {
-      ScriptRun& run                  = *it;
-      run.characterRun.characterIndex = nextCharacterIndex;
-      nextCharacterIndex += run.characterRun.numberOfCharacters;
+      ScriptRun& scriptRun                  = *it;
+      scriptRun.characterRun.characterIndex = nextCharacterIndex;
+      nextCharacterIndex += scriptRun.characterRun.numberOfCharacters;
     }
   }
 }
@@ -963,9 +963,9 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient& fontClient
                                              const TextAbstraction::FontDescription& fontDescription,
                                              TextAbstraction::PointSize26Dot6        pointSize,
                                              FaceIndex                               faceIndex,
-                                             Property::Map*                          variationsMapPtr)
+                                             Property::Map*                          lookupVariationsMapPtr)
   {
-    const std::size_t variationsMapHash = variationsMapPtr ? variationsMapPtr->GetHash() : 0u;
+    const std::size_t variationsMapHash = lookupVariationsMapPtr ? lookupVariationsMapPtr->GetHash() : 0u;
     if(lastCache.isValid &&
        IsSameFontIdLookupCacheItem(lastCache.item, fontDescription, pointSize, faceIndex, variationsMapHash))
     {
@@ -975,7 +975,7 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient& fontClient
     FontId fontId = FindCachedFontId(fontDescription, pointSize, faceIndex, variationsMapHash);
     if(0u == fontId)
     {
-      fontId = fontClient.GetFontId(fontDescription, pointSize, faceIndex, variationsMapPtr);
+      fontId = fontClient.GetFontId(fontDescription, pointSize, faceIndex, lookupVariationsMapPtr);
       CacheFontId(fontDescription, pointSize, faceIndex, variationsMapHash, fontId);
     }
 
@@ -1315,10 +1315,10 @@ void MultilanguageSupport::ValidateFonts(TextAbstraction::FontClient& fontClient
 
     for(Vector<FontRun>::Iterator it = fonts.Begin() + fontIndex, endIt = fonts.End(); it != endIt; ++it)
     {
-      FontRun& run = *it;
+      FontRun& fontRun = *it;
 
-      run.characterRun.characterIndex = nextCharacterIndex;
-      nextCharacterIndex += run.characterRun.numberOfCharacters;
+      fontRun.characterRun.characterIndex = nextCharacterIndex;
+      nextCharacterIndex += fontRun.characterRun.numberOfCharacters;
     }
   }
 

@@ -1398,8 +1398,8 @@ bool AnimatedImageVisual::DisplayNextFrame()
         if(mLoopCount >= 0 && mCurrentLoopIndex >= mLoopCount)
         {
           // This will stop timer
-          mActionStatus      = DevelAnimatedImageVisual::Action::STOP;
-          bool continueTimer = DisplayNextFrame();
+          mActionStatus          = DevelAnimatedImageVisual::Action::STOP;
+          bool continueNextTimer = DisplayNextFrame();
 
           // Naturally stopped animation. Send signal.
           if(mImpl->mEventObserver)
@@ -1407,7 +1407,7 @@ bool AnimatedImageVisual::DisplayNextFrame()
             mImpl->mEventObserver->NotifyVisualEvent(*this, DevelAnimatedImageVisual::Signal::ANIMATION_FINISHED);
           }
 
-          return continueTimer;
+          return continueNextTimer;
         }
       }
     }

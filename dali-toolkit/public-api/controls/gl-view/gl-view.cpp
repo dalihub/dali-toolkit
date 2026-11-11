@@ -61,11 +61,11 @@ UniquePtr<ToolkitGlesAddOn> gToolkitGlesAddon;
 
 GlView::GlView() = default;
 
-GlView::GlView(const GlView& GlView) = default;
+GlView::GlView(const GlView& glView) = default;
 
 GlView::GlView(GlView&& rhs) noexcept = default;
 
-GlView& GlView::operator=(const GlView& GlView) = default;
+GlView& GlView::operator=(const GlView& glView) = default;
 
 GlView& GlView::operator=(GlView&& rhs) noexcept = default;
 

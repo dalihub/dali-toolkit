@@ -43,24 +43,24 @@ namespace Text
  */
 struct MarkupProcessData
 {
-  MarkupProcessData(Vector<ColorRun>&                     colorRuns,
-                    Vector<FontDescriptionRun>&           fontRuns,
-                    Vector<EmbeddedItem>&                 items,
-                    Vector<Anchor>&                       anchors,
-                    Vector<UnderlinedCharacterRun>&       underlinedCharacterRuns,
-                    Vector<ColorRun>&                     backgroundColorRuns,
-                    Vector<StrikethroughCharacterRun>&    strikethroughCharacterRuns,
-                    Vector<BoundedParagraphRun>&          boundedParagraphRuns,
-                    Vector<CharacterSpacingCharacterRun>& characterSpacingCharacterRuns)
-  : colorRuns(colorRuns),
-    fontRuns(fontRuns),
-    items(items),
-    anchors(anchors),
-    underlinedCharacterRuns(underlinedCharacterRuns),
-    backgroundColorRuns(backgroundColorRuns),
-    strikethroughCharacterRuns(strikethroughCharacterRuns),
-    boundedParagraphRuns(boundedParagraphRuns),
-    characterSpacingCharacterRuns(characterSpacingCharacterRuns),
+  MarkupProcessData(Vector<ColorRun>&                     initColorRuns,
+                    Vector<FontDescriptionRun>&           initFontRuns,
+                    Vector<EmbeddedItem>&                 initItems,
+                    Vector<Anchor>&                       initAnchors,
+                    Vector<UnderlinedCharacterRun>&       initUnderlinedCharacterRuns,
+                    Vector<ColorRun>&                     initBackgroundColorRuns,
+                    Vector<StrikethroughCharacterRun>&    initStrikethroughCharacterRuns,
+                    Vector<BoundedParagraphRun>&          initBoundedParagraphRuns,
+                    Vector<CharacterSpacingCharacterRun>& initCharacterSpacingCharacterRuns)
+  : colorRuns(initColorRuns),
+    fontRuns(initFontRuns),
+    items(initItems),
+    anchors(initAnchors),
+    underlinedCharacterRuns(initUnderlinedCharacterRuns),
+    backgroundColorRuns(initBackgroundColorRuns),
+    strikethroughCharacterRuns(initStrikethroughCharacterRuns),
+    boundedParagraphRuns(initBoundedParagraphRuns),
+    characterSpacingCharacterRuns(initCharacterSpacingCharacterRuns),
     markupProcessedText()
   {
   }
@@ -80,10 +80,10 @@ struct MarkupProcessData
 
 struct MarkupPropertyData
 {
-  MarkupPropertyData(Vector4 anchorColor,
-                     Vector4 anchorClickedColor)
-  : anchorColor(anchorColor),
-    anchorClickedColor(anchorClickedColor)
+  MarkupPropertyData(Vector4 initAnchorColor,
+                     Vector4 initAnchorClickedColor)
+  : anchorColor(initAnchorColor),
+    anchorClickedColor(initAnchorClickedColor)
   {
   }
 

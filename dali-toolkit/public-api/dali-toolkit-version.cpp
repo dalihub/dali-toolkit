@@ -27,9 +27,9 @@ namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
-const unsigned int TOOLKIT_MAJOR_VERSION = 2;
-const unsigned int TOOLKIT_MINOR_VERSION = 5;
-const unsigned int TOOLKIT_MICRO_VERSION = 46;
+const unsigned int TOOLKIT_MAJOR_VERSION = 3;
+const unsigned int TOOLKIT_MINOR_VERSION = 0;
+const unsigned int TOOLKIT_MICRO_VERSION = 0;
 const char* const  TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
 
 #ifdef DEBUG_ENABLED

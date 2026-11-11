@@ -94,49 +94,49 @@ void Tooltip::SetProperties(const Property::Value& value)
       const Property::Map::SizeType count = properties->Count();
       for(Property::Map::SizeType position = 0; position < count; ++position)
       {
-        KeyValuePair     keyValue = properties->GetKeyValue(position);
-        Property::Key&   key      = keyValue.first;
-        Property::Value& value    = keyValue.second;
+        KeyValuePair     keyValue      = properties->GetKeyValue(position);
+        Property::Key&   key           = keyValue.first;
+        Property::Value& propertyValue = keyValue.second;
 
         if(key == Toolkit::Tooltip::Property::CONTENT || key == PROPERTY_CONTENT_NAME)
         {
-          SetContent(control, value);
+          SetContent(control, propertyValue);
         }
         else if(key == Toolkit::Tooltip::Property::LAYOUT || key == PROPERTY_LAYOUT_NAME)
         {
-          value.Get(mLayout);
+          propertyValue.Get(mLayout);
         }
         else if(key == Toolkit::Tooltip::Property::WAIT_TIME || key == PROPERTY_WAIT_TIME_NAME)
         {
           float waitTime = 0.0f;
-          if(value.Get(waitTime))
+          if(propertyValue.Get(waitTime))
           {
             mWaitTime = waitTime * MILLISECONDS_PER_SECOND;
           }
         }
         else if(key == Toolkit::Tooltip::Property::BACKGROUND || key == PROPERTY_BACKGROUND_NAME)
         {
-          SetBackground(value);
+          SetBackground(propertyValue);
         }
         else if(key == Toolkit::Tooltip::Property::TAIL || key == PROPERTY_TAIL_NAME)
         {
-          SetTail(value);
+          SetTail(propertyValue);
         }
         else if(key == Toolkit::Tooltip::Property::POSITION || key == PROPERTY_POSITION_NAME)
         {
-          Scripting::GetEnumerationProperty<Toolkit::Tooltip::Position::Type>(value, TOOLTIP_POSITION_TABLE, TOOLTIP_POSITION_TABLE_COUNT, mPositionType);
+          Scripting::GetEnumerationProperty<Toolkit::Tooltip::Position::Type>(propertyValue, TOOLTIP_POSITION_TABLE, TOOLTIP_POSITION_TABLE_COUNT, mPositionType);
         }
         else if(key == Toolkit::Tooltip::Property::HOVER_POINT_OFFSET || key == PROPERTY_HOVER_POINT_OFFSET_NAME)
         {
-          value.Get(mHoverPointOffset);
+          propertyValue.Get(mHoverPointOffset);
         }
         else if(key == Toolkit::Tooltip::Property::MOVEMENT_THRESHOLD || key == PROPERTY_MOVEMENT_THRESHOLD)
         {
-          value.Get(mMovementThreshold);
+          propertyValue.Get(mMovementThreshold);
         }
         else if(key == Toolkit::Tooltip::Property::DISAPPEAR_ON_MOVEMENT || key == PROPERTY_DISAPPEAR_ON_MOVEMENT)
         {
-          value.Get(mDisappearOnMovement);
+          propertyValue.Get(mDisappearOnMovement);
         }
       }
     }
@@ -234,7 +234,7 @@ void Tooltip::SetContent(Toolkit::Control& control, const Property::Value& value
     {
       mContentTextVisual.Merge(*map);
 
-      Property::Value* typeValue = map->Find(Toolkit::Visual::Property::TYPE, VISUAL_TYPE);
+      const Property::Value* typeValue = map->Find(Toolkit::Visual::Property::TYPE, VISUAL_TYPE);
       if(typeValue)
       {
         // Set to an invalid value so it definitely changes if set in Scripting::GetEnumerationProperty
@@ -310,21 +310,21 @@ void Tooltip::SetBackground(const Property::Value& value)
       const Property::Map::SizeType count = map->Count();
       for(Property::Map::SizeType position = 0; position < count; ++position)
       {
-        KeyValuePair     keyValue = map->GetKeyValue(position);
-        Property::Key&   key      = keyValue.first;
-        Property::Value& value    = keyValue.second;
+        KeyValuePair     keyValue      = map->GetKeyValue(position);
+        Property::Key&   key           = keyValue.first;
+        Property::Value& propertyValue = keyValue.second;
 
         if(key == Toolkit::Tooltip::Background::Property::VISUAL || key == PROPERTY_BACKGROUND_VISUAL)
         {
-          mBackgroundImage = ToStdString(value);
+          mBackgroundImage = ToStdString(propertyValue);
         }
         else if(key == Toolkit::Tooltip::Background::Property::BORDER || key == PROPERTY_BACKGROUND_BORDER)
         {
-          if(!GetExtents(value, mBackgroundBorder)) // If value exists and is Extents (or Vector4), just set mBackgroundBorder
+          if(!GetExtents(propertyValue, mBackgroundBorder)) // If value exists and is Extents (or Vector4), just set mBackgroundBorder
           {
             // Not a extents so try rect
             Rect<int32_t> rect;
-            if(value.Get(rect))
+            if(propertyValue.Get(rect))
             {
               mBackgroundBorder.start  = static_cast<int16_t>(rect.x);
               mBackgroundBorder.end    = static_cast<int16_t>(rect.y);
@@ -359,20 +359,20 @@ void Tooltip::SetTail(const Property::Value& value)
       const Property::Map::SizeType count = map.Count();
       for(Property::Map::SizeType position = 0; position < count; ++position)
       {
-        KeyValuePair     keyValue = map.GetKeyValue(position);
-        Property::Key&   key      = keyValue.first;
-        Property::Value& value    = keyValue.second;
+        KeyValuePair     keyValue      = map.GetKeyValue(position);
+        Property::Key&   key           = keyValue.first;
+        Property::Value& propertyValue = keyValue.second;
 
         // Set the values manually rather than merging so that we only have to deal with Property indices when creating the actual tooltip.
 
         if(key == Toolkit::Tooltip::Tail::Property::VISIBILITY || key == PROPERTY_TAIL_VISIBILITY)
         {
-          value.Get(mTailVisibility);
+          propertyValue.Get(mTailVisibility);
         }
         else if(key == Toolkit::Tooltip::Tail::Property::ABOVE_VISUAL || key == PROPERTY_TAIL_ABOVE_VISUAL)
         {
           std::string path;
-          if(GetStdString(value, path))
+          if(GetStdString(propertyValue, path))
           {
             mTailImages[Toolkit::Tooltip::Tail::Property::ABOVE_VISUAL] = ToPropertyValue(path);
           }
@@ -380,7 +380,7 @@ void Tooltip::SetTail(const Property::Value& value)
         else if(key == Toolkit::Tooltip::Tail::Property::BELOW_VISUAL || key == PROPERTY_TAIL_BELOW_VISUAL)
         {
           std::string path;
-          if(GetStdString(value, path))
+          if(GetStdString(propertyValue, path))
           {
             mTailImages[Toolkit::Tooltip::Tail::Property::BELOW_VISUAL] = ToPropertyValue(path);
           }

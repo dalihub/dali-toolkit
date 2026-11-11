@@ -22,7 +22,6 @@
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer-operations-devel.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
-#include <dali/devel-api/images/pixel-buffer-devel.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
@@ -57,19 +56,19 @@ uint64_t GetNanoseconds()
 #endif
 } // namespace
 
-LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+LoadingTask::LoadingTask(uint32_t initId, Dali::AnimatedImageLoading initAnimatedImageLoading, uint32_t initFrameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad initPreMultiplyOnLoad, CallbackBase* callback)
 : AsyncTask(callback),
   url(),
   encodedImageBuffer(),
-  id(id),
+  id(initId),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(),
   samplingMode(SamplingMode::BOX_THEN_LINEAR),
-  preMultiplyOnLoad(preMultiplyOnLoad),
+  preMultiplyOnLoad(initPreMultiplyOnLoad),
   maskPixelBuffer(),
   contentScale(1.0f),
-  animatedImageLoading(animatedImageLoading),
-  frameIndex(frameIndex),
+  animatedImageLoading(initAnimatedImageLoading),
+  frameIndex(initFrameIndex),
   orientationCorrection(),
   isMaskTask(false),
   cropToMask(false),
@@ -77,82 +76,82 @@ LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLo
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, ImageDimensions dimensions, SamplingMode::Type samplingMode, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
+LoadingTask::LoadingTask(uint32_t initId, Dali::AnimatedImageLoading initAnimatedImageLoading, uint32_t initFrameIndex, ImageDimensions initDimensions, SamplingMode::Type initSamplingMode, DevelAsyncImageLoader::PreMultiplyOnLoad initPreMultiplyOnLoad, bool initLoadPlanes, CallbackBase* callback)
 : AsyncTask(callback),
   url(),
   encodedImageBuffer(),
-  id(id),
+  id(initId),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
-  dimensions(dimensions),
-  samplingMode(samplingMode),
-  preMultiplyOnLoad(preMultiplyOnLoad),
+  dimensions(initDimensions),
+  samplingMode(initSamplingMode),
+  preMultiplyOnLoad(initPreMultiplyOnLoad),
   maskPixelBuffer(),
   contentScale(1.0f),
-  animatedImageLoading(animatedImageLoading),
-  frameIndex(frameIndex),
+  animatedImageLoading(initAnimatedImageLoading),
+  frameIndex(initFrameIndex),
   orientationCorrection(),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(loadPlanes)
+  loadPlanes(initLoadPlanes)
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
-: AsyncTask(callback, url.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
-  url(url),
+LoadingTask::LoadingTask(uint32_t initId, const VisualUrl& initUrl, ImageDimensions initDimensions, SamplingMode::Type initSamplingMode, bool initOrientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad initPreMultiplyOnLoad, bool initLoadPlanes, CallbackBase* callback)
+: AsyncTask(callback, initUrl.GetProtocolType() == VisualUrl::ProtocolType::REMOTE ? AsyncTask::PriorityType::LOW : AsyncTask::PriorityType::HIGH),
+  url(initUrl),
   encodedImageBuffer(),
-  id(id),
+  id(initId),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
-  dimensions(dimensions),
-  samplingMode(samplingMode),
-  preMultiplyOnLoad(preMultiplyOnLoad),
+  dimensions(initDimensions),
+  samplingMode(initSamplingMode),
+  preMultiplyOnLoad(initPreMultiplyOnLoad),
   maskPixelBuffer(),
   contentScale(1.0f),
   animatedImageLoading(),
   frameIndex(0u),
-  orientationCorrection(orientationCorrection),
+  orientationCorrection(initOrientationCorrection),
   isMaskTask(false),
   cropToMask(false),
-  loadPlanes(loadPlanes)
+  loadPlanes(initLoadPlanes)
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, const EncodedImageBuffer& encodedImageBuffer, ImageDimensions dimensions, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+LoadingTask::LoadingTask(uint32_t initId, const EncodedImageBuffer& initEncodedImageBuffer, ImageDimensions initDimensions, SamplingMode::Type initSamplingMode, bool initOrientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad initPreMultiplyOnLoad, CallbackBase* callback)
 : AsyncTask(callback),
   url(),
-  encodedImageBuffer(encodedImageBuffer),
-  id(id),
+  encodedImageBuffer(initEncodedImageBuffer),
+  id(initId),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
-  dimensions(dimensions),
-  samplingMode(samplingMode),
-  preMultiplyOnLoad(preMultiplyOnLoad),
+  dimensions(initDimensions),
+  samplingMode(initSamplingMode),
+  preMultiplyOnLoad(initPreMultiplyOnLoad),
   maskPixelBuffer(),
   contentScale(1.0f),
   animatedImageLoading(),
   frameIndex(0u),
-  orientationCorrection(orientationCorrection),
+  orientationCorrection(initOrientationCorrection),
   isMaskTask(false),
   cropToMask(false),
   loadPlanes(false)
 {
 }
 
-LoadingTask::LoadingTask(uint32_t id, PixelBuffer pixelBuffer, PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+LoadingTask::LoadingTask(uint32_t initId, PixelBuffer pixelBuffer, PixelBuffer initMaskPixelBuffer, float initContentScale, bool initCropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad initPreMultiplyOnLoad, CallbackBase* callback)
 : AsyncTask(callback),
   url(""),
   encodedImageBuffer(),
-  id(id),
+  id(initId),
   textureId(TextureManagerType::INVALID_TEXTURE_ID),
   dimensions(),
   samplingMode(),
-  preMultiplyOnLoad(preMultiplyOnLoad),
-  maskPixelBuffer(maskPixelBuffer),
-  contentScale(contentScale),
+  preMultiplyOnLoad(initPreMultiplyOnLoad),
+  maskPixelBuffer(initMaskPixelBuffer),
+  contentScale(initContentScale),
   animatedImageLoading(),
   frameIndex(0u),
   orientationCorrection(),
   isMaskTask(true),
-  cropToMask(cropToMask),
+  cropToMask(initCropToMask),
   loadPlanes(false)
 {
   pixelBuffers.push_back(pixelBuffer);
@@ -201,7 +200,7 @@ void LoadingTask::Process()
     if(!pixelBuffers.empty())
     {
       oss << "s:" << pixelBuffers[0].GetWidth() << "x" << pixelBuffers[0].GetHeight() << " ";
-      oss << "p:" << DevelPixelBuffer::IsAlphaPreMultiplied(pixelBuffers[0]) << " ";
+      oss << "p:" << pixelBuffers[0].IsAlphaPreMultiplied() << " ";
     }
     if(dimensions.GetWidth() > 0 || dimensions.GetHeight() > 0)
     {
@@ -278,9 +277,9 @@ void LoadingTask::MultiplyAlpha()
   }
 }
 
-void LoadingTask::SetTextureId(TextureManagerType::TextureId id)
+void LoadingTask::SetTextureId(TextureManagerType::TextureId newTextureId)
 {
-  textureId = id;
+  textureId = newTextureId;
 }
 
 } // namespace Internal

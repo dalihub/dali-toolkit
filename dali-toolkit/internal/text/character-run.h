@@ -38,9 +38,9 @@ struct CharacterRun
   {
   }
 
-  CharacterRun(CharacterIndex characterIndex, Length numberOfCharacters)
-  : characterIndex{characterIndex},
-    numberOfCharacters{numberOfCharacters}
+  CharacterRun(CharacterIndex initCharacterIndex, Length initNumberOfCharacters)
+  : characterIndex{initCharacterIndex},
+    numberOfCharacters{initNumberOfCharacters}
   {
   }
 

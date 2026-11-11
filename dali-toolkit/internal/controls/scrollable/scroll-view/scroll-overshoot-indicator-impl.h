@@ -36,9 +36,11 @@ class Scrollable;
 class ScrollOvershootEffect;
 class ScrollOvershootEffectGradient;
 class ScrollOvershootEffectRipple;
+class ScrollOvershootIndicator;
 typedef IntrusivePtr<ScrollOvershootEffect>         ScrollOvershootEffectPtr;
 typedef IntrusivePtr<ScrollOvershootEffectGradient> ScrollOvershootEffectGradientPtr;
 typedef IntrusivePtr<ScrollOvershootEffectRipple>   ScrollOvershootEffectRipplePtr;
+typedef IntrusivePtr<ScrollOvershootIndicator>      ScrollOvershootIndicatorPtr;
 
 class ScrollOvershootIndicator : public Dali::RefObject
 {
@@ -77,7 +79,7 @@ public:
    *
    * @return A pointer to the created ScrollOvershootIndicator.
    */
-  static ScrollOvershootIndicator* New();
+  static ScrollOvershootIndicatorPtr New();
 
   /**
    * Set the color of the overshoot effect.

@@ -616,9 +616,9 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, Dali::Vector<MeshDefinit
         // Find the max distance to normalize the deltas.
         const auto* const deltasBuffer = reinterpret_cast<const Vector3* const>(buffer.Data());
 
-        auto ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t geometryBufferIndex, uint32_t deltaIndex)
+        auto ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t vertexIndex, uint32_t deltaIndex)
         {
-          Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
+          Vector3& delta = geometryBufferV3[vertexIndex]         = deltasBuffer[deltaIndex];
           delta                                                  = deltasBuffer[deltaIndex];
           return Max(maxDistanceSquared, delta.LengthSquared());
         };
@@ -687,9 +687,9 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, Dali::Vector<MeshDefinit
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.Data());
-        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer](uint32_t geometryBufferIndex, uint32_t deltaIndex)
+        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer](uint32_t vertexIndex, uint32_t deltaIndex)
         {
-          Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
+          Vector3& delta = geometryBufferV3[vertexIndex] = deltasBuffer[deltaIndex];
           delta.x *= 0.5f;
           delta.y *= 0.5f;
           delta.z *= 0.5f;
@@ -762,9 +762,9 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, Dali::Vector<MeshDefinit
 
         // Calculate the difference with the original mesh, and translate to make all values positive.
         const Vector3* const deltasBuffer  = reinterpret_cast<const Vector3* const>(buffer.Data());
-        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer](uint32_t geometryBufferIndex, uint32_t deltaIndex)
+        auto                 ProcessVertex = [&geometryBufferV3, &deltasBuffer](uint32_t vertexIndex, uint32_t deltaIndex)
         {
-          Vector3& delta = geometryBufferV3[geometryBufferIndex] = deltasBuffer[deltaIndex];
+          Vector3& delta = geometryBufferV3[vertexIndex] = deltasBuffer[deltaIndex];
           delta.x *= 0.5f;
           delta.y *= 0.5f;
           delta.z *= 0.5f;
@@ -1407,12 +1407,12 @@ void MeshDefinition::Blob::ApplyMinMax(const Dali::Vector<float>& min, const Dal
   const auto numComponents = Max(min.Size(), max.Size());
 
   using ClampFn   = void (*)(const float*, const float*, uint32_t, float&);
-  ClampFn clampFn = min.Empty() ? (max.Empty() ? static_cast<ClampFn>(nullptr) : [](const float* min, const float* max, uint32_t i, float& value)
-  { value = Min(max[i], value); })
-                                : (max.Empty() ? [](const float* min, const float* max, uint32_t i, float& value)
-  { value = Max(min[i], value); }
-                                               : static_cast<ClampFn>([](const float* min, const float* max, uint32_t i, float& value)
-  { value = Min(Max(min[i], value), max[i]); }));
+  ClampFn clampFn = min.Empty() ? (max.Empty() ? static_cast<ClampFn>(nullptr) : [](const float* minValues, const float* maxValues, uint32_t i, float& value)
+  { value = Min(maxValues[i], value); })
+                                : (max.Empty() ? [](const float* minValues, const float* maxValues, uint32_t i, float& value)
+  { value = Max(minValues[i], value); }
+                                               : static_cast<ClampFn>([](const float* minValues, const float* maxValues, uint32_t i, float& value)
+  { value = Min(Max(minValues[i], value), maxValues[i]); }));
 
   if(!clampFn)
   {

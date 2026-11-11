@@ -76,7 +76,7 @@ ArcVisual::~ArcVisual()
 
 void ArcVisual::DoSetProperties(const Property::Map& propertyMap)
 {
-  Property::Value* thicknessValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::THICKNESS, THICKNESS_NAME);
+  const Property::Value* thicknessValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::THICKNESS, THICKNESS_NAME);
   if(thicknessValue)
   {
     if(!thicknessValue->Get(mThickness))
@@ -95,7 +95,7 @@ void ArcVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* startAngleValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME);
+  const Property::Value* startAngleValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::START_ANGLE, START_ANGLE_NAME);
   if(startAngleValue)
   {
     if(!startAngleValue->Get(mStartAngle))
@@ -111,7 +111,7 @@ void ArcVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* sweepAngleValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::SWEEP_ANGLE, SWEEP_ANGLE_NAME);
+  const Property::Value* sweepAngleValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::SWEEP_ANGLE, SWEEP_ANGLE_NAME);
   if(sweepAngleValue)
   {
     if(!sweepAngleValue->Get(mSweepAngle))
@@ -127,7 +127,7 @@ void ArcVisual::DoSetProperties(const Property::Map& propertyMap)
     }
   }
 
-  Property::Value* capValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::CAP, CAP_NAME);
+  const Property::Value* capValue = propertyMap.Find(Toolkit::DevelArcVisual::Property::CAP, CAP_NAME);
   if(capValue)
   {
     int capType = 0;

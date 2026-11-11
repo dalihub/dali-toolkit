@@ -90,14 +90,14 @@ public:
    * @brief Creates Ruler domain allowing a point to traverse between min and max extents.
    *
    * @SINCE_1_0.0
-   * @param[in] min Minimum extent (point cannot traverse less than this)
-   * @param[in] max Maximum extent (point cannot traverse greater than this)
-   * @param[in] enabled Whether domain has been enabled or not
+   * @param[in] initMin Minimum extent (point cannot traverse less than this)
+   * @param[in] initMax Maximum extent (point cannot traverse greater than this)
+   * @param[in] initEnabled Whether domain has been enabled or not
    */
-  explicit constexpr RulerDomain(float min, float max, bool enabled = true)
-  : min(min),
-    max(max),
-    enabled(enabled)
+  explicit constexpr RulerDomain(float initMin, float initMax, bool initEnabled = true)
+  : min(initMin),
+    max(initMax),
+    enabled(initEnabled)
   {
   }
 

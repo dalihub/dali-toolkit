@@ -771,7 +771,6 @@ void Control::AddTransitions(Dali::Animation&               animation,
   }
 
   // Setup a Transition from TransitionData.
-  using TransitionData                    = Internal::TransitionData;
   const TransitionData&    transitionData = Toolkit::GetImplementation(handle);
   TransitionData::Iterator end            = transitionData.End();
   for(TransitionData::Iterator iter = transitionData.Begin();
@@ -889,7 +888,7 @@ void Control::SetProperty(BaseObject* object, Property::Index index, const Prope
         const Property::Map*   map             = value.GetMap();
         if(map)
         {
-          Property::Value* value2 = map->Find("withTransitions");
+          const Property::Value* value2 = map->Find("withTransitions");
           if(value2)
           {
             withTransitions = value2->Get<bool>();
@@ -1627,7 +1626,6 @@ void Control::SetState(DevelControl::State newState, bool withTransitions)
       Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
       if(styleManager)
       {
-        using StylePtr          = Internal::StylePtr;
         const StylePtr stylePtr = GetImpl(styleManager).GetRecordedStyle(Toolkit::Control(mControlImpl.GetOwner()));
 
         if(stylePtr)
@@ -1663,7 +1661,6 @@ void Control::SetSubState(const std::string& subStateName, bool withTransitions)
       Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
       if(styleManager)
       {
-        using StylePtr          = Internal::StylePtr;
         const StylePtr stylePtr = GetImpl(styleManager).GetRecordedStyle(Toolkit::Control(mControlImpl.GetOwner()));
         if(stylePtr)
         {

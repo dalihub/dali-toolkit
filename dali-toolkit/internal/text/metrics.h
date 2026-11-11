@@ -43,17 +43,17 @@ public:
   /**
    * Create a new Metrics object
    */
-  static Metrics* New(TextAbstraction::FontClient& fontClient)
+  static MetricsPtr New(TextAbstraction::FontClient& fontClient)
   {
-    return new Metrics(fontClient);
+    return MetricsPtr(new Metrics(fontClient));
   }
 
   /**
    * Create a new Metrics object without font client.
    */
-  static Metrics* New()
+  static MetricsPtr New()
   {
-    return new Metrics();
+    return MetricsPtr(new Metrics());
   }
 
   /**
