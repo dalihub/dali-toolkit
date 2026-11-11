@@ -22,6 +22,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/devel-api/text-abstraction/shaping.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/font-run.h>
@@ -52,6 +53,7 @@ class VisualModel;
  * @param[out] glyphToCharacterMap Vector containing the first character in the logical model that each glyph relates to.
  * @param[out] charactersPerGlyph Vector containing the number of characters per glyph.
  * @param[out] newParagraphGlyphs Vector containing the indices to the new paragraph glyphs.
+ * @param[in] language A tag validated and normalized by TextAbstraction::NormalizeLanguageTag(), or empty for the system language.
  */
 void ShapeText(TextAbstraction::Shaping&    shaping,
                TextAbstraction::FontClient& fontClient,
@@ -65,7 +67,8 @@ void ShapeText(TextAbstraction::Shaping&    shaping,
                Vector<GlyphInfo>&           glyphs,
                Vector<CharacterIndex>&      glyphToCharacterMap,
                Vector<Length>&              charactersPerGlyph,
-               Vector<GlyphIndex>&          newParagraphGlyphs);
+               Vector<GlyphIndex>&          newParagraphGlyphs,
+               const std::string&           language = {});
 
 } // namespace Text
 

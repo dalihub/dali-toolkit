@@ -155,6 +155,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "removeFrontInset
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "removeBackInset",                  BOOLEAN,   REMOVE_BACK_INSET                   )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "fontVariations",                   MAP,       FONT_VARIATIONS                     )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "enableCursorInset",                BOOLEAN,   ENABLE_CURSOR_INSET                 )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextField, "textLanguage",                     STRING,    TEXT_LANGUAGE                       )
 
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextField, "textChanged",           SIGNAL_TEXT_CHANGED           )
