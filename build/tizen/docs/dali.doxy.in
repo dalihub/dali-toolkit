@@ -1176,11 +1176,11 @@ WARN_LOGFILE           = doxygen-errors.txt
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = @DOXYGEN_DOCS_DIR@/content \
-                         @prefix@/include/dali/doc/dali-core-doc.h \
-                         @prefix@/include/dali/doc/dali-adaptor-doc.h \
+                         @prefix@/include/@DALI_INCLUDE_SUBDIR@/dali/doc/dali-core-doc.h \
+                         @prefix@/include/@DALI_INCLUDE_SUBDIR@/dali/doc/dali-adaptor-doc.h \
                          ../../../doc/dali-toolkit-doc.h \
-                         @prefix@/include/dali/public-api \
-                         @prefix@/include/dali/devel-api \
+                         @prefix@/include/@DALI_INCLUDE_SUBDIR@/dali/public-api \
+                         @prefix@/include/@DALI_INCLUDE_SUBDIR@/dali/devel-api \
                          ../../../dali-toolkit/public-api \
                          ../../../dali-toolkit/devel-api \
                          ../../../dali-scene3d/public-api \

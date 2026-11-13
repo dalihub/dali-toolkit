@@ -8,5 +8,5 @@ Name: Chipmunk2D
 Description: Chipmunk2D Rigid Body Physics Library
 Version: ${apiversion}
 Requires:
-Libs: -L${libdir} -lchipmunk
+Libs: -L${libdir} -l@CHIPMUNK_LIB_NAME@
 Cflags: -I${includedir}

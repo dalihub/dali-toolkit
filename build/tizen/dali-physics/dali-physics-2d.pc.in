@@ -7,6 +7,6 @@ includedir=@DEV_INCLUDE_PATH@
 Name: DALi Engine Physics Library
 Description: Dali Physics 2D library
 Version: ${apiversion}
-Requires: chipmunk2d
+Requires: @CHIPMUNK_PC_NAME@
 Libs: -L${libdir} -l@name@-2d
 Cflags: -I${includedir}

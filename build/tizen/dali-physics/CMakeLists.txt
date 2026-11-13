@@ -71,6 +71,10 @@ if (ENABLE_PKG_CONFIGURE)
     set(PREFIX ${prefix})
     set(EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
     set(DEV_INCLUDE_PATH ${INCLUDE_DIR})
+    # The bundled third-party libraries carry the same prefix as the tools
+    # (see DALI_THIRD_PARTY_PREFIX in the toolkit CMakeLists.txt).
+    set(CHIPMUNK_PC_NAME ${DALI_THIRD_PARTY_PREFIX}chipmunk2d)
+    set(BULLET_PC_NAME ${DALI_THIRD_PARTY_PREFIX}bullet3)
 
     set(core_pkg_cfg_file_2d ${name}-2d.pc)
     configure_file(${CMAKE_CURRENT_LIST_DIR}/dali-physics-2d.pc.in ${core_pkg_cfg_file_2d} @ONLY)
@@ -151,6 +155,8 @@ IF (ENABLE_PKG_CONFIGURE)
     ${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file_2d}
     ${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file_3d}
     DESTINATION ${LIB_DIR}/pkgconfig )
+  dali_legacy_pkgconfig_alias(${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file_2d} dali2-physics-2d)
+  dali_legacy_pkgconfig_alias(${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file_3d} dali2-physics-3d)
 ENDIF()
 
 
@@ -251,6 +257,17 @@ ELSE()
   INSTALL( TARGETS ${name}-2d-gles DESTINATION ${LIB_DIR} )
   INSTALL( TARGETS ${name}-3d DESTINATION ${LIB_DIR} )
   INSTALL( TARGETS ${name}-3d-gles DESTINATION ${LIB_DIR} )
+ENDIF()
+
+# DALi 2.x names as links to the files above (DALI_LEGACY_ALIASES=ON only).
+dali_legacy_library_alias(${name}-2d dali2-physics-2d)
+dali_legacy_library_alias(${name}-2d-gles dali2-physics-2d-gles)
+dali_legacy_library_alias(${name}-3d dali2-physics-3d)
+dali_legacy_library_alias(${name}-3d-gles dali2-physics-3d-gles)
+dali_legacy_include_alias(dali-physics)
+IF( INSTALL_CMAKE_MODULES )
+  dali_legacy_cmake_package_alias(${name}-2d dali2-physics-2d)
+  dali_legacy_cmake_package_alias(${name}-3d dali2-physics-3d)
 ENDIF()
 
 # Install headers

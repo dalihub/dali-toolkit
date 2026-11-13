@@ -4,15 +4,25 @@ IF(POLICY CMP0177)
   CMAKE_POLICY(SET CMP0177 NEW) # install() DESTINATION paths are normalized.
 ENDIF()
 
-# API major version (Not DALi release version). It also names the libraries,
-# the pkg-config files and the CMake packages (dali<major>-toolkit, -scene3d,
-# ...), and selects dali<major>-core and dali<major>-adaptor.
-IF(NOT DALI_API_MAJOR)
-  SET(DALI_API_MAJOR 3)
-ENDIF()
+# API major version (Not DALi release version). It names the libraries, the
+# pkg-config files and the CMake packages (dali<major>-toolkit, -scene3d,
+# ...), selects dali<major>-core and dali<major>-adaptor, and fixes the
+# install layout (same rule as dali-core): include/dali<major>,
+# share/dali<major>, dali<major>-<tool>, the gettext domain, and the bundled
+# third-party libraries of dali-physics (dali<major>-bullet3,
+# dali<major>-chipmunk). The 2.x names are available as links through
+# DALI_LEGACY_ALIASES (see dali-legacy-aliases.cmake).
+SET(DALI_API_MAJOR 3)
 SET(name "dali${DALI_API_MAJOR}-toolkit")
 SET(core_name "dali${DALI_API_MAJOR}-core")
 SET(adaptor_name "dali${DALI_API_MAJOR}-adaptor")
+SET(DALI_INCLUDE_SUBDIR "dali${DALI_API_MAJOR}")
+SET(DALI_EXPORT_INCLUDE_DIR "include/${DALI_INCLUDE_SUBDIR}")
+SET(DALI_TOOL_PREFIX "dali${DALI_API_MAJOR}-")
+SET(DALI_DATA_DIR_NAME "dali${DALI_API_MAJOR}")
+SET(DALI_THIRD_PARTY_PREFIX "dali${DALI_API_MAJOR}-")
+SET(DALI_TOOLKIT_TEXT_DOMAIN "dali${DALI_API_MAJOR}-toolkit")
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/dali-legacy-aliases.cmake)
 
 SET(CMAKE_C_STANDARD 99)
 SET(CMAKE_CXX_STANDARD 17)
@@ -128,16 +138,25 @@ SET( toolkit_styles_base_dir ${STYLE_BASE_DIR} )
 SET( toolkit_styles_dir ${STYLE_DIR} )
 SET( toolkit_style_images_dir ${STYLE_DIR}/images )
 
-IF( DEFINED ENV{DALI_DATA_RW_DIR} )
-  SET( dataReadWriteDir $ENV{DALI_DATA_RW_DIR} )
+# The data directories come from -D (cached, so a re-run of cmake inside the
+# build directory keeps them even if the environment changed since) or,
+# failing that, from the environment.
+IF( NOT DALI_DATA_RW_DIR AND DEFINED ENV{DALI_DATA_RW_DIR} )
+  SET( DALI_DATA_RW_DIR $ENV{DALI_DATA_RW_DIR} )
+ENDIF()
+IF( DALI_DATA_RW_DIR )
+  SET( dataReadWriteDir ${DALI_DATA_RW_DIR} )
 ELSE()
-  SET( dataReadWriteDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
+  SET( dataReadWriteDir ${CMAKE_INSTALL_PREFIX}/share/${DALI_DATA_DIR_NAME}/ )
 ENDIF()
 
-IF( DEFINED ENV{DALI_DATA_RO_DIR} )
-  SET( dataReadOnlyDir $ENV{DALI_DATA_RO_DIR} )
+IF( NOT DALI_DATA_RO_DIR AND DEFINED ENV{DALI_DATA_RO_DIR} )
+  SET( DALI_DATA_RO_DIR $ENV{DALI_DATA_RO_DIR} )
+ENDIF()
+IF( DALI_DATA_RO_DIR )
+  SET( dataReadOnlyDir ${DALI_DATA_RO_DIR} )
 ELSE()
-  SET( dataReadOnlyDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
+  SET( dataReadOnlyDir ${CMAKE_INSTALL_PREFIX}/share/${DALI_DATA_DIR_NAME}/ )
 ENDIF()
 
 # Set up compiler definitions
@@ -157,6 +176,7 @@ ENDIF()
 IF( ENABLE_I18N )
   ADD_DEFINITIONS( "-DDGETTEXT_ENABLED" )
 ENDIF( ENABLE_I18N )
+ADD_DEFINITIONS( -DDALI_TOOLKIT_TEXT_DOMAIN="${DALI_TOOLKIT_TEXT_DOMAIN}" )
 
 IF( BUILD_PHYSICS )
   ADD_DEFINITIONS( "-DCP_USE_DOUBLES")
@@ -171,10 +191,10 @@ IF( WIN32 )
       SET( INSTALL_SHARE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share" )
     ENDIF()
 
-    ADD_DEFINITIONS( -DDALI_IMAGE_DIR=\"${INSTALL_SHARE_DIR}/dali/toolkit/images/\"
-                     -DDALI_SOUND_DIR=\"${INSTALL_SHARE_DIR}/dali/toolkit/sounds/\"
-                     -DDALI_STYLE_DIR=\"${INSTALL_SHARE_DIR}/dali/toolkit/styles/\"
-                     -DDALI_STYLE_IMAGE_DIR=\"${INSTALL_SHARE_DIR}/dali/toolkit/styles/images/\"
+    ADD_DEFINITIONS( -DDALI_IMAGE_DIR=\"${INSTALL_SHARE_DIR}/${DALI_DATA_DIR_NAME}/toolkit/images/\"
+                     -DDALI_SOUND_DIR=\"${INSTALL_SHARE_DIR}/${DALI_DATA_DIR_NAME}/toolkit/sounds/\"
+                     -DDALI_STYLE_DIR=\"${INSTALL_SHARE_DIR}/${DALI_DATA_DIR_NAME}/toolkit/styles/\"
+                     -DDALI_STYLE_IMAGE_DIR=\"${INSTALL_SHARE_DIR}/${DALI_DATA_DIR_NAME}/toolkit/styles/images/\"
                      -DDALI_DATA_READ_ONLY_DIR=\"${INSTALL_SHARE_DIR}/\" )
   ENDIF()
 ELSEIF( UNIX )
@@ -233,6 +253,7 @@ ENDIF()
 IF( NOT INCLUDE_DIR )
   SET( INCLUDE_DIR ${PREFIX}/include )
 ENDIF()
+SET( INCLUDE_DIR ${INCLUDE_DIR}/${DALI_INCLUDE_SUBDIR} )
 
 # Set up the lib dir
 SET( LIB_DIR $ENV{libdir} )
@@ -358,7 +379,7 @@ SET_PROPERTY(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
              "${GLES_ADDON_SHADER_GENERATED_DIR}"
              "${GLES_ADDON_DIR}/builtin-shader-extern-gen.h")
 
-SET(SHADER_GENERATOR_NAME dali-shader-generator)
+SET(SHADER_GENERATOR_NAME ${DALI_TOOL_PREFIX}shader-generator)
 SET(SHADER_GENERATOR_SOURCES ${ROOT_SRC_DIR}/dali-toolkit/shader-generator/shader-generator.cpp)
 
 IF( WIN32)
@@ -411,13 +432,29 @@ ADD_CUSTOM_COMMAND(OUTPUT ${GLES_ADDON_BUILT_IN_SHADER_GEN_CPP}
 OPTION(ENABLE_INVOKE_METHOD_WRAPPERS "Generate InvokeMethod wrappers for exported public API handle methods" ON)
 
 IF(ENABLE_INVOKE_METHOD_WRAPPERS)
-  FIND_PROGRAM(INVOKE_METHOD_GENERATOR
-               NAMES dali-invoke-method-generator dali-invoke-method-generator.py
-               PATHS ${BIN_DIR} $ENV{DESKTOP_PREFIX}/bin ${ROOT_SRC_DIR}/../dali-core/scripts)
+  # The installed dali-core publishes where its generator is (the name carries
+  # the API major): the CMake package sets <core>_INVOKE_METHOD_GENERATOR and
+  # the pkg-config file has an invoke_method_generator variable. Only a
+  # sibling dali-core source tree is accepted as a fallback.
+  SET(INVOKE_METHOD_GENERATOR_INSTALLED "")
+  IF(DEFINED ${core_name}_INVOKE_METHOD_GENERATOR)
+    SET(INVOKE_METHOD_GENERATOR_INSTALLED ${${core_name}_INVOKE_METHOD_GENERATOR})
+  ELSEIF(PKG_CONFIG_FOUND)
+    PKG_GET_VARIABLE(INVOKE_METHOD_GENERATOR_INSTALLED ${core_name} invoke_method_generator)
+  ENDIF()
+  IF(INVOKE_METHOD_GENERATOR_INSTALLED AND EXISTS ${INVOKE_METHOD_GENERATOR_INSTALLED})
+    SET(INVOKE_METHOD_GENERATOR ${INVOKE_METHOD_GENERATOR_INSTALLED})
+  ELSE()
+    FIND_PROGRAM(INVOKE_METHOD_GENERATOR
+                 NAMES dali-invoke-method-generator.py
+                 PATHS ${ROOT_SRC_DIR}/../dali-core/scripts
+                 NO_DEFAULT_PATH)
+  ENDIF()
 
   IF(NOT INVOKE_METHOD_GENERATOR)
-    MESSAGE(FATAL_ERROR "dali-invoke-method-generator not found. Build and install dali-core first.")
+    MESSAGE(FATAL_ERROR "${DALI_TOOL_PREFIX}invoke-method-generator not found. Build and install ${core_name} first.")
   ENDIF()
+  MESSAGE(STATUS "Invoke-method generator: ${INVOKE_METHOD_GENERATOR}")
 
   SET(INVOKE_METHOD_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated/invoke-method)
   SET(INVOKE_METHOD_PUBLIC_API_CPP ${INVOKE_METHOD_GENERATED_DIR}/public-api-invoke-methods.cpp)
@@ -850,6 +887,18 @@ TARGET_LINK_LIBRARIES(${TOOLKIT_GLES_NAME}
 )
 INSTALL(TARGETS ${TOOLKIT_GLES_NAME} DESTINATION ${LIB_DIR})
 
+# DALi 2.x names as links to the files above (DALI_LEGACY_ALIASES=ON only).
+dali_legacy_library_alias(${name} dali2-toolkit 2)
+dali_legacy_library_alias(${TOOLKIT_GLES_NAME} dali2-toolkit-gles)
+dali_legacy_include_alias(dali-toolkit)
+dali_legacy_alias(${CMAKE_INSTALL_PREFIX}/bin/dali-shader-generator ${SHADER_GENERATOR_NAME})
+IF( ENABLE_PKG_CONFIGURE )
+  dali_legacy_pkgconfig_alias(${CMAKE_CURRENT_BINARY_DIR}/${CORE_PKG_CFG_FILE} dali2-toolkit)
+ENDIF()
+IF( INSTALL_CMAKE_MODULES )
+  dali_legacy_cmake_package_alias(${name} dali2-toolkit)
+ENDIF()
+
 # Configuration Messages
 MESSAGE( STATUS "Configuration:\n" )
 MESSAGE( STATUS "Prefix:                        " ${PREFIX} )
@@ -868,6 +917,7 @@ MESSAGE( STATUS "Style Dir:                     " ${STYLE_DIR} )
 MESSAGE( STATUS "Style:                         " ${dali_style} )
 MESSAGE( STATUS "i18n:                          " ${ENABLE_I18N} )
 MESSAGE( STATUS "Use pkg configure:             " ${ENABLE_PKG_CONFIGURE} )
+MESSAGE( STATUS "Legacy (dali2) aliases:        " ${DALI_LEGACY_ALIASES} )
 MESSAGE( STATUS "Vector Based Text Rendering:   " ${ENABLE_VECTOR_BASED_TEXT_RENDERING} )
 MESSAGE( STATUS "Enable link test:              " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Configure automated tests:     " ${CONFIGURE_AUTOMATED_TESTS} )

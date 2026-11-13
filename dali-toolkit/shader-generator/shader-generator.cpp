@@ -200,6 +200,18 @@ public:
     mHeaderFileNames.emplace_back(headerFilename);
   }
 
+  /// @return true if both built-in files already exist
+  bool Exist() const
+  {
+    // Two statements rather than one && expression: with &&, the cleanup of the second path
+    // temporary adds a branch that only an exception can take, so branch coverage never reaches it.
+    if(!fs::exists(mHeaderFilePath))
+    {
+      return false;
+    }
+    return fs::exists(mSourceFilePath);
+  }
+
   // Generates the built in files.
   void Generate()
   {
@@ -325,7 +337,10 @@ int GenerateShaderSources(fs::path inDir, fs::path outDir, const bool generateBu
     }
   }
 
-  if(generateBuiltInFiles && shaderGenerated)
+  // A shader header is only rewritten when its source is newer, so the
+  // built-in files must also be (re)written when they are missing, not only
+  // when a header was generated.
+  if(generateBuiltInFiles && (shaderGenerated || !generator.Exist()))
   {
     generator.Generate();
   }

@@ -168,6 +168,13 @@ ELSE()
 	INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
 ENDIF()
 
+# DALi 2.x names as links to the files above (DALI_LEGACY_ALIASES=ON only).
+dali_legacy_library_alias(${name} dali2-scene3d)
+dali_legacy_include_alias(dali-scene3d)
+IF( INSTALL_CMAKE_MODULES )
+	dali_legacy_cmake_package_alias(${name} dali2-scene3d)
+ENDIF()
+
 # macro for installing headers by replacing prefix. (TODO, investigate
 # if there is a CMAKE way of doing this automatically)
 MACRO(INSTALL_HEADERS_WITH_DIRECTORY HEADER_LIST STRIP_PREFIX REPLACE_PREFIX)
@@ -195,4 +202,6 @@ if (ENABLE_PKG_CONFIGURE)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${integration_pkg_cfg_file}
 		DESTINATION ${LIB_DIR}/pkgconfig
 	)
+	dali_legacy_pkgconfig_alias(${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file} dali2-scene3d)
+	dali_legacy_pkgconfig_alias(${CMAKE_CURRENT_BINARY_DIR}/${integration_pkg_cfg_file} dali2-scene3d-integration)
 endif()

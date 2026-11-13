@@ -3,6 +3,7 @@ exec_prefix=@EXEC_PREFIX@
 apiversion=@DALI_TOOLKIT_VERSION@
 libdir=@LIB_DIR@
 includedir=@DEV_INCLUDE_PATH@
+shader_generator=${prefix}/bin/@DALI_TOOL_PREFIX@shader-generator
 
 Name: Dali 3D Engine Toolkit
 Description: Cross platform 3D Engine Toolkit
