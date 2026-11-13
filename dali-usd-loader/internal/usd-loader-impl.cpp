@@ -1077,7 +1077,6 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
   Vector3    position;
   Quaternion rotation;
   Vector3    scale;
-  Matrix     transformMatrix;
 
   // Handle transformation for non-skeleton mesh nodes
   bool isNonSkeletonMeshNode = prim.IsA<UsdGeomXformable>() && !prim.IsA<UsdSkelSkeleton>();

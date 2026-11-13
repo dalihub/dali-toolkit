@@ -37,7 +37,7 @@
 
 namespace DALI_NAMESPACE::Scene3D::Loader
 {
-class MaterialDefinition;
+struct MaterialDefinition;
 
 /**
  * @class UsdTextureConverter
