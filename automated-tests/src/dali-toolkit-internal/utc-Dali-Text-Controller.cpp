@@ -33,7 +33,6 @@
 #include <dali/integration-api/adaptor-framework/input-method-context-integ.h>
 #include <toolkit-text-utils.h>
 
-
 using namespace Dali;
 using namespace Toolkit;
 using namespace Text;
@@ -526,7 +525,7 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   DALI_TEST_CHECK(text.empty());
 
   // Test for invalid mime type paste.
-  Dali::Clipboard           clipboard = Dali::Clipboard::Get();
+  Dali::Clipboard     clipboard = Dali::Clipboard::Get();
   Dali::ClipboardData data("unknown/mime-type", "invalid mimi type");
   clipboard.SetData(data);
 
@@ -604,6 +603,28 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   button.DoAction("buttonClick", attributes);
 
   tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextControllerTextPopupSelect(void)
+{
+  tet_infoline(" UtcDaliTextControllerTextPopupSelect");
+  ToolkitTestApplication application;
+
+  ControllerPtr controller = Controller::New();
+  ConfigureTextField(controller);
+  controller->SetText("Hello world");
+  controller->Relayout(CONTROL_SIZE);
+
+  Controller::Impl& controllerImpl = Controller::Impl::GetImplementation(*controller.Get());
+  DALI_TEST_CHECK(controllerImpl.mEventData);
+  DALI_TEST_CHECK(controllerImpl.mEventData->mSelectionEnabled);
+  DALI_TEST_CHECK(controllerImpl.mEventData->mDecorator);
+
+  TextSelectionPopupCallbackInterface& callbackInterface = *controller;
+  callbackInterface.TextPopupButtonTouched(TextSelectionPopup::SELECT);
+  controller->Relayout(CONTROL_SIZE);
+
   END_TEST;
 }
 
@@ -755,7 +776,7 @@ int UtcDaliTextControllerSetGetTapLongPressAction(void)
 int UtcDaliTextControllerSetGetLineSpacingProperty(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto controller = Controller::New();
+  auto                   controller = Controller::New();
   ConfigureTextLabel(controller);
   TextAbstraction::FontClient::Get().SetDpi(96u, 96u);
   controller->SetDefaultFontSize(12.f, Controller::POINT_SIZE);

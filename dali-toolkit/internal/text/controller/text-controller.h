@@ -50,7 +50,7 @@ class RenderingController;
 /**
  * @brief Text selection operations .
  */
-enum SelectionType
+enum class SelectionType
 {
   INTERACTIVE = 0x0000, ///< Select the word where the cursor is located.
   ALL         = 0x0001, ///< Select the whole text.
