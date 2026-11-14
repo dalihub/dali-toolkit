@@ -58,12 +58,10 @@ class CacheImpl;
 
 static std::shared_ptr<CacheImpl> gCacheImpl{nullptr};
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
 // Map to track URL for each PixelData (used for GPU memory profiling)
 // Access must be protected with mutex since it can be modified by worker threads
 static std::unordered_map<std::size_t, std::string> gPixelDataUrlMap;
 static std::mutex                                   gPixelDataUrlMutex;
-#endif
 
 #ifdef DEBUG_ENABLED
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_IMAGE_RESOURCE_LOADER");
@@ -173,15 +171,16 @@ Dali::PixelData CreatePixelDataFromImageInfo(const ImageInformation& info, bool 
   if(pixelBuffer)
   {
     pixelData = Dali::DevelPixelBuffer::Convert(pixelBuffer, releasePixelData);
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-    // Store URL mapping for this PixelData (called from worker thread)
-    if(DALI_LIKELY(!!gCacheImpl) && DALI_LIKELY(pixelData) && SupportPixelDataCache(pixelData))
+    if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
     {
-      std::size_t                 pixelDataKey = reinterpret_cast<std::size_t>(static_cast<void*>(pixelData.GetObjectPtr()));
-      std::lock_guard<std::mutex> lock(gPixelDataUrlMutex);
-      gPixelDataUrlMap[pixelDataKey] = info.mUrl;
+      // Store URL mapping for this PixelData (called from worker thread)
+      if(DALI_LIKELY(!!gCacheImpl) && DALI_LIKELY(pixelData) && SupportPixelDataCache(pixelData))
+      {
+        std::size_t                 pixelDataKey = reinterpret_cast<std::size_t>(static_cast<void*>(pixelData.GetObjectPtr()));
+        std::lock_guard<std::mutex> lock(gPixelDataUrlMutex);
+        gPixelDataUrlMap[pixelDataKey] = info.mUrl;
+      }
     }
-#endif
   }
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_MODEL_LOAD_IMAGE_FROM_FILE", [&](std::ostringstream& oss)
   {
@@ -201,27 +200,30 @@ Dali::Texture CreateTextureFromPixelData(const Dali::PixelData& pixelData, bool 
   if(pixelData)
   {
     texture = Dali::Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-    // Retrieve URL for this PixelData (called from main thread)
-    bool        found          = false;
-    std::string textureContext = "(Texture from raw buffer)";
-    std::size_t pixelDataKey   = reinterpret_cast<std::size_t>(static_cast<void*>(pixelData.GetObjectPtr()));
+    if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
     {
-      std::lock_guard<std::mutex> lock(gPixelDataUrlMutex);
-      auto                        it = gPixelDataUrlMap.find(pixelDataKey);
-      if(it != gPixelDataUrlMap.end())
+      // Retrieve URL for this PixelData (called from main thread)
+      bool        found          = false;
+      std::string textureContext = "(Texture from raw buffer)";
+      std::size_t pixelDataKey   = reinterpret_cast<std::size_t>(static_cast<void*>(pixelData.GetObjectPtr()));
       {
-        textureContext = it->second;
-        found          = true;
+        std::lock_guard<std::mutex> lock(gPixelDataUrlMutex);
+        auto                        it = gPixelDataUrlMap.find(pixelDataKey);
+        if(it != gPixelDataUrlMap.end())
+        {
+          textureContext = it->second;
+          found          = true;
+        }
       }
+      Dali::Integration::TextureUploadWithContent(texture,
+                                                  pixelData,
+                                                  Dali::Integration::ToDaliString(textureContext),
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(found ? Dali::Integration::TextureContextTypeHint::SCENE3D_STANDARD_IMAGE : Dali::Integration::TextureContextTypeHint::SCENE3D_BUFFER_IMAGE));
     }
-    Dali::Integration::TextureUploadWithContent(texture,
-                                                pixelData,
-                                                Dali::Integration::ToDaliString(textureContext),
-                                                static_cast<Dali::Integration::TextureContextTypeHint::Type>(found ? Dali::Integration::TextureContextTypeHint::SCENE3D_STANDARD_IMAGE : Dali::Integration::TextureContextTypeHint::SCENE3D_BUFFER_IMAGE));
-#else
-    texture.Upload(pixelData, 0, 0, 0, 0, pixelData.GetWidth(), pixelData.GetHeight());
-#endif
+    else
+    {
+      texture.Upload(pixelData, 0, 0, 0, 0, pixelData.GetWidth(), pixelData.GetHeight());
+    }
     if(mipmapRequired)
     {
       texture.GenerateMipmaps();
@@ -233,15 +235,16 @@ Dali::Texture CreateTextureFromPixelData(const Dali::PixelData& pixelData, bool 
 // Check function whether we can collect given data as garbage, or not.
 bool PixelDataCacheCollectable(const ImageInformation& info, const Dali::PixelData& pixelData)
 {
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-  // Clean up URL mapping when PixelData is being garbage collected
-  if(pixelData.GetBaseObject().ReferenceCount() <= 1)
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
   {
-    std::size_t                 pixelDataKey = reinterpret_cast<std::size_t>(static_cast<void*>(pixelData.GetObjectPtr()));
-    std::lock_guard<std::mutex> lock(gPixelDataUrlMutex);
-    gPixelDataUrlMap.erase(pixelDataKey);
+    // Clean up URL mapping when PixelData is being garbage collected
+    if(pixelData.GetBaseObject().ReferenceCount() <= 1)
+    {
+      std::size_t                 pixelDataKey = reinterpret_cast<std::size_t>(static_cast<void*>(pixelData.GetObjectPtr()));
+      std::lock_guard<std::mutex> lock(gPixelDataUrlMutex);
+      gPixelDataUrlMap.erase(pixelDataKey);
+    }
   }
-#endif
   return pixelData.GetBaseObject().ReferenceCount() <= 1;
 }
 
@@ -595,14 +598,17 @@ Dali::Texture GetEmptyTextureWhiteRGB()
   {
     Dali::PixelData emptyPixelData = GetEmptyPixelDataWhiteRGB();
     gEmptyTextureWhiteRGB          = Texture::New(TextureType::TEXTURE_2D, emptyPixelData.GetPixelFormat(), emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-    Dali::Integration::TextureUploadWithContent(gEmptyTextureWhiteRGB,
-                                                emptyPixelData,
-                                                "Scene3D::EmptyTextureWhiteRGB",
-                                                static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_DEFAULT_WHITE));
-#else
-    gEmptyTextureWhiteRGB.Upload(emptyPixelData, 0, 0, 0, 0, emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
-#endif
+    if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+    {
+      Dali::Integration::TextureUploadWithContent(gEmptyTextureWhiteRGB,
+                                                  emptyPixelData,
+                                                  "Scene3D::EmptyTextureWhiteRGB",
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_DEFAULT_WHITE));
+    }
+    else
+    {
+      gEmptyTextureWhiteRGB.Upload(emptyPixelData, 0, 0, 0, 0, emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
+    }
   }
   return gEmptyTextureWhiteRGB;
 }
@@ -615,21 +621,24 @@ Dali::Texture GetEmptyCubeTextureWhiteRGB()
     gEmptyCubeTextureWhiteRGB      = Texture::New(TextureType::TEXTURE_CUBE, emptyPixelData.GetPixelFormat(), emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
     for(size_t iSide = 0u; iSide < 6; ++iSide)
     {
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-      if(iSide == 0u)
+      if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
       {
-        Dali::Integration::TextureUploadWithContent(gEmptyCubeTextureWhiteRGB,
-                                                    emptyPixelData,
-                                                    "Scene3D::EmptyCubeTextureWhiteRGB",
-                                                    static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_DEFAULT_WHITE_CUBE));
+        if(iSide == 0u)
+        {
+          Dali::Integration::TextureUploadWithContent(gEmptyCubeTextureWhiteRGB,
+                                                      emptyPixelData,
+                                                      "Scene3D::EmptyCubeTextureWhiteRGB",
+                                                      static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_DEFAULT_WHITE_CUBE));
+        }
+        else
+        {
+          gEmptyCubeTextureWhiteRGB.Upload(emptyPixelData, CubeMapLayer::POSITIVE_X + iSide, 0u, 0u, 0u, emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
+        }
       }
       else
       {
         gEmptyCubeTextureWhiteRGB.Upload(emptyPixelData, CubeMapLayer::POSITIVE_X + iSide, 0u, 0u, 0u, emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
       }
-#else
-      gEmptyCubeTextureWhiteRGB.Upload(emptyPixelData, CubeMapLayer::POSITIVE_X + iSide, 0u, 0u, 0u, emptyPixelData.GetWidth(), emptyPixelData.GetHeight());
-#endif
     }
   }
   return gEmptyCubeTextureWhiteRGB;
@@ -641,14 +650,17 @@ Dali::Texture GetDefaultBrdfTexture()
   {
     Dali::PixelData brdfPixelData = GetDefaultBrdfPixelData();
     gDefaultBrdfTexture           = Texture::New(TextureType::TEXTURE_2D, brdfPixelData.GetPixelFormat(), brdfPixelData.GetWidth(), brdfPixelData.GetHeight());
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-    Dali::Integration::TextureUploadWithContent(gDefaultBrdfTexture,
-                                                brdfPixelData,
-                                                "Scene3D::DefaultBrdfTexture",
-                                                static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_DEFAULT_BRDF));
-#else
-    gDefaultBrdfTexture.Upload(brdfPixelData, 0, 0, 0, 0, brdfPixelData.GetWidth(), brdfPixelData.GetHeight());
-#endif
+    if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+    {
+      Dali::Integration::TextureUploadWithContent(gDefaultBrdfTexture,
+                                                  brdfPixelData,
+                                                  "Scene3D::DefaultBrdfTexture",
+                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_DEFAULT_BRDF));
+    }
+    else
+    {
+      gDefaultBrdfTexture.Upload(brdfPixelData, 0, 0, 0, 0, brdfPixelData.GetWidth(), brdfPixelData.GetHeight());
+    }
   }
   return gDefaultBrdfTexture;
 }

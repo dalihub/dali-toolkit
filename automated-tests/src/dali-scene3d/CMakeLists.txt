@@ -27,6 +27,7 @@ SET(TC_SOURCES
   utc-Dali-MotionPropertyIndex.cpp
   utc-Dali-MotionTransformIndex.cpp
   utc-Dali-MotionValue.cpp
+  utc-Dali-Scene3DGpuMemoryProfile.cpp
   utc-Dali-SceneView.cpp
   utc-Dali-MatrixStack.cpp
   utc-Dali-MeshDefinition.cpp

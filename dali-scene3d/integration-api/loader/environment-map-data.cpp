@@ -55,22 +55,25 @@ Texture EnvironmentMapData::GetTexture()
             auto& side = mPixelData[iSide];
             for(uint32_t iMipLevel = 0u, iEndMipLevel = mPixelData[0].Count(); iMipLevel < iEndMipLevel; ++iMipLevel)
             {
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-              if(iSide == 0u && iMipLevel == 0u)
+              if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
               {
-                // Their is no good way to get url here. Just notify it is environment image.
-                Dali::Integration::TextureUploadWithContent(mEnvironmentMapTexture,
-                                                            side[iMipLevel],
-                                                            "Scene3D::EnvironmentMapData(CUBEMAP)",
-                                                            static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_ENVIRONMENT_CUBEMAP));
+                if(iSide == 0u && iMipLevel == 0u)
+                {
+                  // Their is no good way to get url here. Just notify it is environment image.
+                  Dali::Integration::TextureUploadWithContent(mEnvironmentMapTexture,
+                                                              side[iMipLevel],
+                                                              "Scene3D::EnvironmentMapData(CUBEMAP)",
+                                                              static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_ENVIRONMENT_CUBEMAP));
+                }
+                else
+                {
+                  mEnvironmentMapTexture.Upload(side[iMipLevel], CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
+                }
               }
               else
               {
                 mEnvironmentMapTexture.Upload(side[iMipLevel], CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
               }
-#else
-              mEnvironmentMapTexture.Upload(side[iMipLevel], CubeMapLayer::POSITIVE_X + iSide, iMipLevel, 0u, 0u, side[iMipLevel].GetWidth(), side[iMipLevel].GetHeight());
-#endif
             }
           }
         }
@@ -79,15 +82,18 @@ Texture EnvironmentMapData::GetTexture()
     else
     {
       mEnvironmentMapTexture = Texture::New(TextureType::TEXTURE_2D, mPixelData[0][0].GetPixelFormat(), mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-      // Their is no good way to get url here. Just notify it is environment image.
-      Dali::Integration::TextureUploadWithContent(mEnvironmentMapTexture,
-                                                  mPixelData[0][0],
-                                                  "Scene3D::EnvironmentMapData(EQUIRECTANGULAR)",
-                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_ENVIRONMENT_EQUIRECTANGULAR));
-#else
-      mEnvironmentMapTexture.Upload(mPixelData[0][0], 0, 0, 0, 0, mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
-#endif
+      if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+      {
+        // Their is no good way to get url here. Just notify it is environment image.
+        Dali::Integration::TextureUploadWithContent(mEnvironmentMapTexture,
+                                                    mPixelData[0][0],
+                                                    "Scene3D::EnvironmentMapData(EQUIRECTANGULAR)",
+                                                    static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_ENVIRONMENT_EQUIRECTANGULAR));
+      }
+      else
+      {
+        mEnvironmentMapTexture.Upload(mPixelData[0][0], 0, 0, 0, 0, mPixelData[0][0].GetWidth(), mPixelData[0][0].GetHeight());
+      }
     }
 
     // If mipmap is not defined explicitly, use GenerateMipmaps.

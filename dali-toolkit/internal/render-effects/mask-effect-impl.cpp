@@ -309,17 +309,18 @@ void MaskEffectImpl::CreateFrameBuffers(const ImageDimensions size)
   mMaskSourceFrameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
   mMaskSourceTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, width, height);
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
   {
-    std::ostringstream oss;
-    oss.imbue(std::locale::classic());
-    oss << "MaskEffect m:" << mMaskMode << " once: " << mTargetMaskOnce << "/" << mSourceMaskOnce << " r:" << mReverseMaskDirection;
-    std::string prefix = oss.str();
+    {
+      std::ostringstream oss;
+      oss.imbue(std::locale::classic());
+      oss << "MaskEffect m:" << mMaskMode << " once: " << mTargetMaskOnce << "/" << mSourceMaskOnce << " r:" << mReverseMaskDirection;
+      std::string prefix = oss.str();
 
-    Dali::Integration::TextureUploadWithContent(mMaskTargetTexture, Dali::PixelData(), ToDaliString(prefix + "(T)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
-    Dali::Integration::TextureUploadWithContent(mMaskSourceTexture, Dali::PixelData(), ToDaliString(prefix + "(S)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+      Dali::Integration::TextureUploadWithContent(mMaskTargetTexture, Dali::PixelData(), ToDaliString(prefix + "(T)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+      Dali::Integration::TextureUploadWithContent(mMaskSourceTexture, Dali::PixelData(), ToDaliString(prefix + "(S)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+    }
   }
-#endif
 
   mMaskTargetFrameBuffer.AttachColorTexture(mMaskTargetTexture);
   mMaskSourceFrameBuffer.AttachColorTexture(mMaskSourceTexture);

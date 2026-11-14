@@ -55,11 +55,14 @@ Dali::Toolkit::ImageUrl GenerateUrl(Dali::PixelData pixelData, bool preMultiplie
 {
   Texture                 texture  = Texture::New(TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
   Dali::Toolkit::ImageUrl imageUrl = Dali::Toolkit::ImageUrl::New(texture, preMultiplied);
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-  Dali::Integration::TextureUploadWithContent(texture, pixelData, imageUrl.GetUrl(), Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE);
-#else
-  texture.Upload(pixelData);
-#endif
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+  {
+    Dali::Integration::TextureUploadWithContent(texture, pixelData, imageUrl.GetUrl(), Dali::Integration::TextureContextTypeHint::EXTERNAL_IMAGE);
+  }
+  else
+  {
+    texture.Upload(pixelData);
+  }
   return imageUrl;
 }
 

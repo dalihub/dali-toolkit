@@ -611,27 +611,28 @@ void BackgroundBlurEffectImpl::CreateFrameBuffers(const ImageDimensions inputSiz
   mBlurredOutputFrameBuffer = FrameBuffer::New(downsampledWidth, downsampledHeight, FrameBuffer::Attachment::NONE);
   Texture sourceTexture     = Texture::New(TextureType::TEXTURE_2D, Dali::Pixel::RGBA8888, downsampledWidth, downsampledHeight);
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
   {
-    std::ostringstream oss;
-    oss.imbue(std::locale::classic());
-    oss << "BackgroundBlurEffect r:" << mBlurRadius << " d:" << mDownscaleFactor << " once: " << mBlurOnce;
-    std::string prefix = oss.str();
+    {
+      std::ostringstream oss;
+      oss.imbue(std::locale::classic());
+      oss << "BackgroundBlurEffect r:" << mBlurRadius << " d:" << mDownscaleFactor << " once: " << mBlurOnce;
+      std::string prefix = oss.str();
 
-    Dali::Integration::TextureUploadWithContent(inputBackgroundTexture, Dali::PixelData(), ToDaliString(prefix + "(1)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
-    if(useIntermediateDownsample)
-    {
-      Dali::Integration::TextureUploadWithContent(downsampledBackgroundTexture, Dali::PixelData(), ToDaliString(prefix + "(2)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
-      Dali::Integration::TextureUploadWithContent(temporaryTexture, Dali::PixelData(), ToDaliString(prefix + "(3)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
-      Dali::Integration::TextureUploadWithContent(sourceTexture, Dali::PixelData(), ToDaliString(prefix + "(4)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
-    }
-    else
-    {
-      Dali::Integration::TextureUploadWithContent(temporaryTexture, Dali::PixelData(), ToDaliString(prefix + "(2)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
-      Dali::Integration::TextureUploadWithContent(sourceTexture, Dali::PixelData(), ToDaliString(prefix + "(3)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+      Dali::Integration::TextureUploadWithContent(inputBackgroundTexture, Dali::PixelData(), ToDaliString(prefix + "(1)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+      if(useIntermediateDownsample)
+      {
+        Dali::Integration::TextureUploadWithContent(downsampledBackgroundTexture, Dali::PixelData(), ToDaliString(prefix + "(2)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+        Dali::Integration::TextureUploadWithContent(temporaryTexture, Dali::PixelData(), ToDaliString(prefix + "(3)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+        Dali::Integration::TextureUploadWithContent(sourceTexture, Dali::PixelData(), ToDaliString(prefix + "(4)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+      }
+      else
+      {
+        Dali::Integration::TextureUploadWithContent(temporaryTexture, Dali::PixelData(), ToDaliString(prefix + "(2)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+        Dali::Integration::TextureUploadWithContent(sourceTexture, Dali::PixelData(), ToDaliString(prefix + "(3)"), Dali::Integration::TextureContextTypeHint::FBO_ATTACHED_COLOR_TEXTURE, true);
+      }
     }
   }
-#endif
 
   mInputBackgroundFrameBuffer.AttachColorTexture(inputBackgroundTexture);
   if(useIntermediateDownsample)

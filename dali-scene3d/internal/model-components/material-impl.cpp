@@ -852,14 +852,17 @@ void Material::TextureLoadComplete(uint32_t loadedTaskId, PixelData pixelData)
     if(pixelData)
     {
       textureInformation.mTexture = Texture::New(Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight());
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-      Dali::Integration::TextureUploadWithContent(textureInformation.mTexture,
-                                                  pixelData,
-                                                  ToDaliString(textureInformation.mUrl),
-                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_MATERIAL_IMAGE));
-#else
-      textureInformation.mTexture.Upload(pixelData);
-#endif
+      if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+      {
+        Dali::Integration::TextureUploadWithContent(textureInformation.mTexture,
+                                                    pixelData,
+                                                    ToDaliString(textureInformation.mUrl),
+                                                    static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_MATERIAL_IMAGE));
+      }
+      else
+      {
+        textureInformation.mTexture.Upload(pixelData);
+      }
     }
     textureInformation.mLoadingTaskId = INVALID_INDEX;
     break;

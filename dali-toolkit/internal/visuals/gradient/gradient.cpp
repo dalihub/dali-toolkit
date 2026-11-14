@@ -261,11 +261,14 @@ Dali::Texture Gradient::GenerateLookupTexture()
   }
 
   Texture texture = Texture::New(TextureType::TEXTURE_2D, pixelFormat, resolution, 1u);
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-  Dali::Integration::TextureUploadWithContent(texture, pixelData, "gradient", Dali::Integration::TextureContextTypeHint::GRADIENT_TEXTURE);
-#else
-  texture.Upload(pixelData);
-#endif
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+  {
+    Dali::Integration::TextureUploadWithContent(texture, pixelData, "gradient", Dali::Integration::TextureContextTypeHint::GRADIENT_TEXTURE);
+  }
+  else
+  {
+    texture.Upload(pixelData);
+  }
 
   return texture;
 }

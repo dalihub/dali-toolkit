@@ -2004,15 +2004,18 @@ void TextLabel::SetUpAutoScrolling(const Size& contentSize, const Size& originSi
   PixelData           data       = typesetter->Render(verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, isHorizontal, Pixel::RGBA8888, originSize);
   Texture             texture    = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
   {
-    std::string text;
-    mController->GetText(text);
-    Dali::Integration::TextureUploadWithContent(texture, data, ToDaliString(std::move(text)), Dali::Integration::TextureContextTypeHint::TEXT_SCROLL);
+    {
+      std::string text;
+      mController->GetText(text);
+      Dali::Integration::TextureUploadWithContent(texture, data, ToDaliString(std::move(text)), Dali::Integration::TextureContextTypeHint::TEXT_SCROLL);
+    }
   }
-#else
-  texture.Upload(data);
-#endif
+  else
+  {
+    texture.Upload(data);
+  }
 
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, texture);
@@ -2062,15 +2065,18 @@ void TextLabel::AsyncSetupAutoScroll(Text::AsyncTextRenderInfo renderInfo)
   PixelData data         = renderInfo.autoScrollPixelData;
   Texture   texture      = Texture::New(Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(), data.GetWidth(), data.GetHeight());
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
   {
-    std::string text;
-    mController->GetText(text);
-    Dali::Integration::TextureUploadWithContent(texture, data, ToDaliString(std::move(text)), Dali::Integration::TextureContextTypeHint::TEXT_SCROLL);
+    {
+      std::string text;
+      mController->GetText(text);
+      Dali::Integration::TextureUploadWithContent(texture, data, ToDaliString(std::move(text)), Dali::Integration::TextureContextTypeHint::TEXT_SCROLL);
+    }
   }
-#else
-  texture.Upload(data);
-#endif
+  else
+  {
+    texture.Upload(data);
+  }
 
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture(0u, texture);

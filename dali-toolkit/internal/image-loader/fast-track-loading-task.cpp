@@ -35,9 +35,7 @@
 #include <thread>
 #endif
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
 #include <unordered_map>
-#endif
 
 using Dali::Integration::ToDaliString;
 
@@ -142,15 +140,16 @@ void FastTrackLoadingTask::OnComplete(AsyncTaskPtr task)
       Dali::Integration::SetTextureSize(mTextures[index], mImageInformations[index].width, mImageInformations[index].height);
       Dali::Integration::SetTexturePixelFormat(mTextures[index], mImageInformations[index].format);
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-      // Call Upload API, only for add informations of GPU memory usage.
-      std::string content = mUrl.GetUrl();
-      if(index > 0u || (index == 0u && mPlanesLoaded))
+      if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
       {
-        content += std::string("(") + ("YUVA"[index]) + ")";
+        // Call Upload API, only for add informations of GPU memory usage.
+        std::string content = mUrl.GetUrl();
+        if(index > 0u || (index == 0u && mPlanesLoaded))
+        {
+          content += std::string("(") + ("YUVA"[index]) + ")";
+        }
+        Dali::Integration::TextureUploadWithContent(mTextures[index], Dali::PixelData(), ToDaliString(content), Dali::Integration::TextureContextTypeHint::FAST_TRACK_IMAGE, true);
       }
-      Dali::Integration::TextureUploadWithContent(mTextures[index], Dali::PixelData(), ToDaliString(content), Dali::Integration::TextureContextTypeHint::FAST_TRACK_IMAGE, true);
-#endif
     }
     if(mLoadPlanesAvaliable && !mPlanesLoaded)
     {

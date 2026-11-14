@@ -618,8 +618,8 @@ void CalculateGltf2BlendShapes(uint8_t* geometryBuffer, Dali::Vector<MeshDefinit
 
         auto ProcessVertex = [&geometryBufferV3, &deltasBuffer, &maxDistanceSquared](uint32_t vertexIndex, uint32_t deltaIndex)
         {
-          Vector3& delta = geometryBufferV3[vertexIndex]         = deltasBuffer[deltaIndex];
-          delta                                                  = deltasBuffer[deltaIndex];
+          Vector3& delta = geometryBufferV3[vertexIndex] = deltasBuffer[deltaIndex];
+          delta                                          = deltasBuffer[deltaIndex];
           return Max(maxDistanceSquared, delta.LengthSquared());
         };
 
@@ -1609,14 +1609,17 @@ MeshGeometry MeshDefinition::Load(RawData&& raw) const
                                                      raw.mBlendShapeData.GetPixelFormat(),
                                                      raw.mBlendShapeData.GetWidth(),
                                                      raw.mBlendShapeData.GetHeight());
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-      Dali::Integration::TextureUploadWithContent(meshGeometry.blendShapeGeometry,
-                                                  raw.mBlendShapeData,
-                                                  "Scene3D::BlendShapeData",
-                                                  static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_BLENDSHAPE_DATA));
-#else
-      meshGeometry.blendShapeGeometry.Upload(raw.mBlendShapeData);
-#endif
+      if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+      {
+        Dali::Integration::TextureUploadWithContent(meshGeometry.blendShapeGeometry,
+                                                    raw.mBlendShapeData,
+                                                    "Scene3D::BlendShapeData",
+                                                    static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::SCENE3D_BLENDSHAPE_DATA));
+      }
+      else
+      {
+        meshGeometry.blendShapeGeometry.Upload(raw.mBlendShapeData);
+      }
     }
   }
 

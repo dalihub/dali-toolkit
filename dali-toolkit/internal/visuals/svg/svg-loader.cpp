@@ -73,15 +73,18 @@ Debug::Filter* gSvgLoaderLogFilter = Debug::Filter::New(Debug::NoLogging, false,
  * @param[in] pixelData The rasterized pixel data.
  * @param[out] rasterizeInfo The rasterize info.
  */
-void SetTextureSetToRasterizeInfo(const Dali::PixelData rasterizedPixelData, SvgLoader::SvgRasterizeInfo& rasterizeInfo)
+void SetTextureSetToRasterizeInfo(const Dali::PixelData rasterizedPixelData, SvgLoader::SvgRasterizeInfo& rasterizeInfo, const VisualUrl* imageUrl)
 {
   // Convert pixelData to texture.
   Dali::Texture texture = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight());
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-  Dali::Integration::TextureUploadWithContent(texture, rasterizedPixelData, ToDaliString(rasterizeInfo.mImageUrl.GetUrl()), Dali::Integration::TextureContextTypeHint::SVG_IMAGE);
-#else
-  texture.Upload(rasterizedPixelData);
-#endif
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+  {
+    Dali::Integration::TextureUploadWithContent(texture, rasterizedPixelData, ToDaliString(imageUrl->GetUrl()), Dali::Integration::TextureContextTypeHint::SVG_IMAGE);
+  }
+  else
+  {
+    texture.Upload(rasterizedPixelData);
+  }
 
   rasterizeInfo.mTextureSet = TextureSet::New();
   rasterizeInfo.mTextureSet.SetTexture(0u, texture);
@@ -266,27 +269,17 @@ SvgLoader::SvgRasterizeId SvgLoader::Rasterize(SvgLoadId loadId, uint32_t width,
   {
     // Increase loadId reference first
     // It would be decreased at rasterizate removal.
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-    VisualUrl imageUrl;
-#endif
     {
       auto loadCacheIndex = GetCacheIndexFromLoadCacheById(loadId);
       DALI_ASSERT_ALWAYS(loadCacheIndex != SvgLoader::INVALID_SVG_CACHE_INDEX && "Invalid cache index");
       ++mLoadCache[loadCacheIndex].mReferenceCount;
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-      imageUrl = mLoadCache[loadCacheIndex].mImageUrl;
-#endif
       DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u observer=%p ) Increase loadId loadState:%s, refCount=%d\n", loadId, width, height, svgObserver, GET_LOAD_STATE_STRING(mLoadCache[loadCacheIndex].mLoadState), static_cast<int>(mLoadCache[loadCacheIndex].mReferenceCount));
     }
 
     rasterizeId = GenerateUniqueSvgRasterizeId();
     cacheIndex  = static_cast<SvgCacheIndex>(mRasterizeCache.size());
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-    mRasterizeCache.push_back(SvgRasterizeInfo(rasterizeId, loadId, width, height, std::move(imageUrl)));
-#else
     mRasterizeCache.push_back(SvgRasterizeInfo(rasterizeId, loadId, width, height));
-#endif
     DALI_LOG_INFO(gSvgLoaderLogFilter, Debug::General, "SvgLoader::Rasterize( loadId=%d Size=%ux%u observer=%p ) New cached index:%d rasterizeId@%d\n", loadId, width, height, svgObserver, cacheIndex, rasterizeId);
   }
   else
@@ -888,7 +881,10 @@ void SvgLoader::RasterizeSynchronously(SvgLoader::SvgRasterizeInfo& rasterizeInf
   }
   else if(rasterizeInfo.mRasterizeState != RasterizeState::UPLOADED) ///< Check it to avoid duplicate Upload call.
   {
-    SetTextureSetToRasterizeInfo(rasterizedPixelData, rasterizeInfo);
+    SetTextureSetToRasterizeInfo(rasterizedPixelData, rasterizeInfo,
+                                 DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled())
+                                   ? &mLoadCache[GetCacheIndexFromLoadCacheById(rasterizeInfo.mLoadId)].mImageUrl
+                                   : nullptr);
   }
 
   if(svgObserver)
@@ -1127,7 +1123,10 @@ void SvgLoader::AsyncRasterizeComplete(SvgTaskPtr task)
     }
     else if(rasterizeInfo.mRasterizeState != RasterizeState::UPLOADED) ///< Check it to avoid duplicate Upload call. (e.g. sync rasterize)
     {
-      SetTextureSetToRasterizeInfo(rasterizedPixelData, rasterizeInfo);
+      SetTextureSetToRasterizeInfo(rasterizedPixelData, rasterizeInfo,
+                                   DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled())
+                                     ? &mLoadCache[GetCacheIndexFromLoadCacheById(rasterizeInfo.mLoadId)].mImageUrl
+                                     : nullptr);
     }
 
     // Note : rasterizeInfo can be invalidated after this call (as the mRasterizeCache may be modified)

@@ -20,6 +20,7 @@ SET(TC_SOURCES
   utc-Dali-FlexContainer.cpp
   utc-Dali-FlexNode.cpp
   utc-Dali-GaussianBlurView.cpp
+  utc-Dali-GpuMemoryProfile.cpp
   utc-Dali-ImageUrlUtils.cpp
   utc-Dali-ImageView.cpp
   utc-Dali-ImageVisual.cpp

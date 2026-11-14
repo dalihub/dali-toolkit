@@ -108,13 +108,11 @@ const int NAME_INDEX_MATCH_TABLE_SIZE = sizeof(NAME_INDEX_MATCH_TABLE) / sizeof(
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VECTOR_ANIMATION");
 #endif
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
 Dali::PixelData GetDummyRGBAPixelData()
 {
   static Dali::PixelData pixelDataRGBA = PixelData::New(new uint8_t[4]{0x00, 0x00, 0x00, 0x00}, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
   return pixelDataRGBA;
 }
-#endif
 } // unnamed namespace
 
 AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New(VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties)
@@ -797,13 +795,14 @@ void AnimatedVectorImageVisual::OnResourceReady(VectorAnimationTask::ResourceSta
           {
             useNativeImage = DevelTexture::IsNative(texture);
 
-#if defined(GPU_MEMORY_PROFILE_ENABLED)
-            if(useNativeImage)
+            if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
             {
-              // Call Upload API, only for add informations of GPU memory usage.
-              Dali::Integration::TextureUploadWithContent(texture, GetDummyRGBAPixelData(), ToDaliString(mImageUrl.GetUrl()), Dali::Integration::TextureContextTypeHint::NATIVE_LOTTIE_IMAGE, true);
+              if(useNativeImage)
+              {
+                // Call Upload API, only for add informations of GPU memory usage.
+                Dali::Integration::TextureUploadWithContent(texture, GetDummyRGBAPixelData(), ToDaliString(mImageUrl.GetUrl()), Dali::Integration::TextureContextTypeHint::NATIVE_LOTTIE_IMAGE, true);
+              }
             }
-#endif
 
             if(mUseNativeImage != useNativeImage)
             {

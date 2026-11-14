@@ -68,10 +68,6 @@ See the README.md in dali-toolkit/automated-tests.
 
          $ gbs build -A [TARGET_ARCH] --define "%enable_debug 1"
 
-### GPU PROFILE Builds
-
-         $ gbs build -A [TARGET_ARCH] --define "%enable_gpu_memory_profile 1"
-
 
 ## 3. Building for MS Windows
 
@@ -119,7 +115,6 @@ vcpkg-script folder in the windows-dependencies repository.
     - INSTALL_CMAKE_MODULES      ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
     - ENABLE_DEBUG               ---> Whether to build with debug enabled.
     - USE_DEFAULT_RESOURCE_DIR   ---> Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR
-    - ENABLE_GPU_MEMORY_PROFILE  ---> Whether to build with GPU memory profiler enabled.
     - DALI_LEGACY_ALIASES        ---> Whether to also install the DALi 2.x names (dali2-toolkit.dll, the dali2-toolkit package, include/dali-toolkit, ...) as copies of the dali3 files. ON by default on Windows, where applications still load the 2.x names.
 
 ## 4. Building for MacOS
