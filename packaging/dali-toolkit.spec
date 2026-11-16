@@ -383,6 +383,10 @@ Development components for dali-usd-loader.
 # Build
 ##############################
 %build
+# Keep shadow diagnostics enabled independently of the build server policy.
+export CFLAGS="${CFLAGS:-%optflags} -Werror=shadow"
+export CXXFLAGS="${CXXFLAGS:-%optflags} -Werror=shadow"
+
 # PO
 {
 cd %{_builddir}/%{name}-%{version}/dali-toolkit/po

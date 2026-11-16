@@ -92,6 +92,9 @@ set(prefix_include_dir "${prefix}/include")
 
 include_directories(BEFORE
   ${repo_root_dir}
+)
+
+include_directories(BEFORE SYSTEM
   "${repo_root_dir}/dali-physics/third-party/bullet3/src"
   "${repo_root_dir}/dali-physics/third-party/chipmunk2d/include"
 )
@@ -112,7 +115,7 @@ TARGET_LINK_LIBRARIES("${name}-2d"
   dali${DALI_API_MAJOR}-toolkit
   chipmunk
   ${COVERAGE})
-TARGET_COMPILE_OPTIONS("${name}-2d" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/chipmunk2d/include")
+TARGET_INCLUDE_DIRECTORIES("${name}-2d" SYSTEM PRIVATE "${repo_root_dir}/dali-physics/third-party/chipmunk2d/include")
 
 ADD_LIBRARY("${name}-2d-gles" SHARED ${physics2d_gles_src_files})
 TARGET_LINK_LIBRARIES("${name}-2d-gles"
@@ -122,7 +125,7 @@ TARGET_LINK_LIBRARIES("${name}-2d-gles"
   dali${DALI_API_MAJOR}-toolkit
   chipmunk
   ${COVERAGE})
-TARGET_COMPILE_OPTIONS("${name}-2d-gles" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/chipmunk2d/include")
+TARGET_INCLUDE_DIRECTORIES("${name}-2d-gles" SYSTEM PRIVATE "${repo_root_dir}/dali-physics/third-party/chipmunk2d/include")
 
 ADD_LIBRARY("${name}-3d" SHARED ${physics3d_src_files})
 TARGET_LINK_LIBRARIES("${name}-3d"
@@ -131,7 +134,7 @@ TARGET_LINK_LIBRARIES("${name}-3d"
   dali${DALI_API_MAJOR}-toolkit
   bullet3
   ${COVERAGE})
-TARGET_COMPILE_OPTIONS("${name}-3d" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/bullet3/src")
+TARGET_INCLUDE_DIRECTORIES("${name}-3d" SYSTEM PRIVATE "${repo_root_dir}/dali-physics/third-party/bullet3/src")
 
 ADD_LIBRARY("${name}-3d-gles" SHARED ${physics3d_gles_src_files})
 TARGET_LINK_LIBRARIES("${name}-3d-gles"
@@ -141,7 +144,7 @@ TARGET_LINK_LIBRARIES("${name}-3d-gles"
   dali${DALI_API_MAJOR}-toolkit
   bullet3
   ${COVERAGE})
-TARGET_COMPILE_OPTIONS("${name}-3d-gles" PUBLIC "-I${repo_root_dir}/dali-physics/third-party/bullet3/src")
+TARGET_INCLUDE_DIRECTORIES("${name}-3d-gles" SYSTEM PRIVATE "${repo_root_dir}/dali-physics/third-party/bullet3/src")
 
 IF (ENABLE_PKG_CONFIGURE)
   INSTALL(FILES
