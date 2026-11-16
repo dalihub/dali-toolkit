@@ -75,7 +75,7 @@ public:
    * @param[in] itemId The ID of the released item
    * @param[in] actor The actor that represents the released item
    */
-  virtual void ItemReleased(unsigned int itemId, Actor actor) {};
+  virtual void ItemReleased([[maybe_unused]] unsigned int itemId, [[maybe_unused]] Actor actor) {};
 
   /**
    * @brief Retrieves the extension for this control.

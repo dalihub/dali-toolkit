@@ -776,10 +776,10 @@ public: // API for derived classes to override
    * @note This method do not handle Actor properties.
    * And the size and order of the sourceProperties and destinationProperties must be synchronized.
    */
-  virtual void OnCreateTransitions(Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
-                                   Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
-                                   Dali::Toolkit::Control                                                source,
-                                   Dali::Toolkit::Control                                                destination)
+  virtual void OnCreateTransitions([[maybe_unused]] Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& sourceProperties,
+                                   [[maybe_unused]] Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& destinationProperties,
+                                   [[maybe_unused]] Dali::Toolkit::Control                                                source,
+                                   [[maybe_unused]] Dali::Toolkit::Control                                                destination)
   {
   }
 
@@ -787,7 +787,7 @@ public: // API for derived classes to override
    * @brief Update visual properties.
    * @param[in] properties Property list to be used to update visual properties of this Control.
    */
-  virtual void OnUpdateVisualProperties(const Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& properties)
+  virtual void OnUpdateVisualProperties([[maybe_unused]] const Dali::Vector<Dali::Pair<Dali::Property::Index, Dali::Property::Map>>& properties)
   {
   }
 
