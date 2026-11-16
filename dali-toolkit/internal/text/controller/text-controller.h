@@ -898,6 +898,22 @@ public: // Update.
 
 public: // Default style & Input style
   /**
+   * @brief Sets a BCP 47 shaping language, or clears the override with empty.
+   *
+   * @param[in] language The language tag.
+   * @return True on success; invalid input preserves the previous setting.
+   */
+  bool SetTextLanguage(const std::string& language);
+
+  /**
+   * @brief Gets the authored shaping language.
+   *
+   * @return A copy of the lowercase language tag, or empty for the system path.
+   * @note The returned string is independent of later language changes and the controller's lifetime.
+   */
+  std::string GetTextLanguage() const;
+
+  /**
    * @brief Set the default font family.
    *
    * @param[in] defaultFontFamily The default font family.
@@ -2483,7 +2499,7 @@ protected: // Inherit from Dali::Integration::Processor
     return "Text::Controller";
   }
 
-private: // Private contructors & copy operator.
+private:
   /**
    * @brief Private constructor.
    */
@@ -2507,11 +2523,12 @@ private: // Private contructors & copy operator.
              EditableControlInterface*   editableControlInterface,
              SelectableControlInterface* selectableControlInterface,
              AnchorControlInterface*     anchorControlInterface);
-
+  // Private contructors & copy operator.
   Controller(const Controller& handle)            = delete;
   Controller& operator=(const Controller& handle) = delete;
 
-protected: // Destructor.
+protected:
+  // Destructor.
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */

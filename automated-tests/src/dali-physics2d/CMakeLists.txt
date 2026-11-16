@@ -64,7 +64,7 @@ PKG_CHECK_MODULES(${PKG_NAME} REQUIRED
   dali3-adaptor
   dali3-toolkit
   dali3-physics-2d
-  chipmunk2d
+  dali3-chipmunk2d
 )
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED)

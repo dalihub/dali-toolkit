@@ -57,10 +57,9 @@ ScrollOvershootIndicator::~ScrollOvershootIndicator()
 {
 }
 
-ScrollOvershootIndicator* ScrollOvershootIndicator::New()
+ScrollOvershootIndicatorPtr ScrollOvershootIndicator::New()
 {
-  ScrollOvershootIndicator* scrollOvershootPtr = new ScrollOvershootIndicator();
-  return scrollOvershootPtr;
+  return ScrollOvershootIndicatorPtr(new ScrollOvershootIndicator());
 }
 
 void ScrollOvershootIndicator::AttachToScrollable(Scrollable& scrollable)

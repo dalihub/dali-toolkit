@@ -19,6 +19,7 @@
 
 // CLASS HEADER
 #include <dali-toolkit/internal/particle-system/particle-list-impl.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/quaternion.h>
@@ -33,15 +34,35 @@ namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 class Particle : public Dali::BaseObject
 {
 public:
-  ~Particle() = default;
+  /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL Particle* NewForBaseHandle(Internal::ParticleList& ownerList, uint32_t index)
+  {
+    return new Particle(ownerList, index);
+  }
 
-  Particle(Internal::ParticleList& ownerList, uint32_t index);
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<Particle> New(Internal::ParticleList& ownerList, uint32_t index)
+  {
+    return Dali::IntrusivePtr<Particle>(new Particle(ownerList, index));
+  }
 
   void* Get(ParticleStreamTypeFlagBit streamBit);
 
   void* GetByIndex(uint32_t streamIndex);
 
   [[nodiscard]] uint32_t GetIndex() const;
+
+protected:
+  ~Particle() = default;
+
+  Particle(Internal::ParticleList& ownerList, uint32_t index);
 
 private:
   Internal::ParticleList& mOwnerList;

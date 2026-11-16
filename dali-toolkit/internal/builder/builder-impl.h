@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task.h>
@@ -71,7 +72,24 @@ class Replacement;
 class Builder : public Dali::BaseObject
 {
 public:
-  Builder();
+  /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL Builder* NewForBaseHandle()
+  {
+    return new Builder();
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<Builder> New()
+  {
+    return Dali::IntrusivePtr<Builder>(new Builder());
+  }
 
   /**
    * @copydoc Toolkit::Builder::LoadFromString
@@ -233,6 +251,7 @@ public:
   void EmitQuitSignal();
 
 protected:
+  Builder();
   ~Builder() override;
 
 private:
@@ -251,8 +270,6 @@ private:
   } PathConstrainerEntry;
   typedef std::vector<PathConstrainerEntry> PathConstrainerLut;
   typedef std::map<const std::string, Path> PathLut;
-
-private:
   // Undefined
   Builder(const Builder&);
 

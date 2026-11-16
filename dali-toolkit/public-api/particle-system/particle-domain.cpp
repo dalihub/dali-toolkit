@@ -25,7 +25,7 @@ namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 ParticleDomain ParticleDomain::New()
 {
-  return {new Internal::ParticleDomain()};
+  return {Internal::ParticleDomain::NewForBaseHandle()};
 }
 
 ParticleDomain::ParticleDomain(Internal::ParticleDomain* impl)

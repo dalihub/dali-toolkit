@@ -60,7 +60,11 @@ namespace Internal
 namespace
 {
 #if defined(__GLIBC__)
-#define GET_LOCALE_TEXT(string) dgettext("dali-toolkit", string)
+// The gettext domain carries the API major (dali3-toolkit); the build defines it.
+#ifndef DALI_TOOLKIT_TEXT_DOMAIN
+#define DALI_TOOLKIT_TEXT_DOMAIN "dali-toolkit"
+#endif
+#define GET_LOCALE_TEXT(string) dgettext(DALI_TOOLKIT_TEXT_DOMAIN, string)
 
 const char* IDS_LTR("IDS_LTR");
 const char* RTL_DIRECTION("RTL");

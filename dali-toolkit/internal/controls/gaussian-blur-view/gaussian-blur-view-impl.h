@@ -43,21 +43,6 @@ class GaussianBlurView : public ControlImpl
 {
 public:
   /**
-   * @copydoc Dali::Toolkit::GaussianBlurView::GaussianBlurView
-   */
-  GaussianBlurView();
-
-  /**
-   * @copydoc Dali::Toolkit::GaussianBlurView::GaussianBlurView
-   */
-  GaussianBlurView(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale, bool blurUserImage);
-
-  /**
-   * @copydoc Dali::Toolkit::GaussianBlurView::~GaussianBlurView
-   */
-  virtual ~GaussianBlurView();
-
-  /**
    * @copydoc Dali::Toolkit::GaussianBlurView::New
    */
   static Dali::Toolkit::GaussianBlurView New();
@@ -85,6 +70,22 @@ public:
   void                                                     CreateRenderTasks();
   void                                                     RemoveRenderTasks();
   Dali::Toolkit::GaussianBlurView::GaussianBlurViewSignal& FinishedSignal();
+
+protected:
+  /**
+   * @copydoc Dali::Toolkit::GaussianBlurView::GaussianBlurView
+   */
+  GaussianBlurView();
+
+  /**
+   * @copydoc Dali::Toolkit::GaussianBlurView::GaussianBlurView
+   */
+  GaussianBlurView(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat, const float downsampleWidthScale, const float downsampleHeightScale, bool blurUserImage);
+
+  /**
+   * @copydoc Dali::Toolkit::GaussianBlurView::~GaussianBlurView
+   */
+  virtual ~GaussianBlurView();
 
 private:
   void OnInitialize() override;
@@ -186,8 +187,6 @@ private:
   Dali::Toolkit::GaussianBlurView::GaussianBlurViewSignal mFinishedSignal; ///< Signal emitted when blur has completed.
 
   bool mActivated : 1;
-
-private:
   // Undefined copy constructor.
   GaussianBlurView(const GaussianBlurView&);
 

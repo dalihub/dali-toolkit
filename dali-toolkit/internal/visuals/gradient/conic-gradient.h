@@ -19,6 +19,8 @@
  */
 
 #include <dali-toolkit/internal/visuals/gradient/gradient.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <utility>
 
 #include <dali/public-api/math/vector2.h>
 
@@ -36,17 +38,12 @@ class ConicGradient : public Gradient
 {
 public:
   /**
-   * Contructor.
-   * @param[in] center The point around which the conic gradient rotates.
-   * @param[in] startAngle The initial angle from which the gradient begins.
-   * @param[in] oldGradient Previous gradient feature, to copy old variables.
+   * @brief Creates a reference-counted implementation.
    */
-  ConicGradient(const Vector2& center, Dali::Radian startAngle, IntrusivePtr<Gradient> oldGradient);
-
-  /**
-   * Destructor.
-   */
-  virtual ~ConicGradient();
+  static Dali::IntrusivePtr<ConicGradient> New(const Vector2& center, Dali::Radian startAngle, IntrusivePtr<Gradient> oldGradient)
+  {
+    return Dali::IntrusivePtr<ConicGradient>(new ConicGradient(center, startAngle, std::move(oldGradient)));
+  }
 
   /**
    * Get the center of the conic gradient.
@@ -59,6 +56,20 @@ public:
    * @return The start angle of the conic gradient.
    */
   Dali::Radian GetStartAngle() const;
+
+protected:
+  /**
+   * Contructor.
+   * @param[in] center The point around which the conic gradient rotates.
+   * @param[in] startAngle The initial angle from which the gradient begins.
+   * @param[in] oldGradient Previous gradient feature, to copy old variables.
+   */
+  ConicGradient(const Vector2& center, Dali::Radian startAngle, IntrusivePtr<Gradient> oldGradient);
+
+  /**
+   * Destructor.
+   */
+  virtual ~ConicGradient();
 
 private:
   // Undefined

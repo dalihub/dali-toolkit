@@ -18,11 +18,11 @@
 // Enable debug log for test coverage
 #define DEBUG_ENABLED 1
 
-#include <dali-scene3d/internal/loader/gltf2-loader-impl.h>
 #include <dali-scene3d/integration-api/loader/load-result.h>
 #include <dali-scene3d/integration-api/loader/resource-bundle.h>
 #include <dali-scene3d/integration-api/loader/scene-definition.h>
 #include <dali-scene3d/integration-api/loader/shader-manager.h>
+#include <dali-scene3d/internal/loader/gltf2-loader-impl.h>
 #include <dali-test-suite-utils.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/integration-api/string-utils.h>
@@ -186,7 +186,8 @@ int UtcDaliGltfLoaderSuccess1(void)
   imageMetadataGroundTruth["AnimatedCube_BaseColor.png"]         = ImageMetadata{ImageDimensions(256, 256), Dali::SamplingMode::BOX_THEN_NEAREST};
   imageMetadataGroundTruth["AnimatedCube_MetallicRoughness.png"] = ImageMetadata{ImageDimensions(256, 256), Dali::SamplingMode::NEAREST};
 
-  ctx.metaData.mImageMetadata.ForEach([&](const Dali::String& key, const ImageMetadata& value) {
+  ctx.metaData.mImageMetadata.ForEach([&](const Dali::String& key, const ImageMetadata& value)
+  {
     auto it = imageMetadataGroundTruth.find(std::string(key.CStr()));
     DALI_TEST_CHECK(it != imageMetadataGroundTruth.end());
     if(it != imageMetadataGroundTruth.end())
@@ -218,18 +219,19 @@ int UtcDaliGltfLoaderSuccess1(void)
 
   auto& materials = ctx.resources.mMaterials;
   DALI_TEST_EQUAL(2u, materials.Size());
-  
+
   // Helper function to create a TextureStage
-  auto makeTextureStage = [](uint32_t semantic, const char* uri, SamplerFlags::Type samplerFlags, ImageDimensions dims, SamplingMode::Type samplingMode) {
+  auto makeTextureStage = [](uint32_t semantic, const char* uri, SamplerFlags::Type samplerFlags, ImageDimensions dims, SamplingMode::Type samplingMode)
+  {
     MaterialDefinition::TextureStage stage;
-    stage.mSemantic = semantic;
-    stage.mTexture.mImageUri = uri;
-    stage.mTexture.mSamplerFlags = samplerFlags;
+    stage.mSemantic                    = semantic;
+    stage.mTexture.mImageUri           = uri;
+    stage.mTexture.mSamplerFlags       = samplerFlags;
     stage.mTexture.mMinImageDimensions = dims;
-    stage.mTexture.mSamplingMode = samplingMode;
+    stage.mTexture.mSamplingMode       = samplingMode;
     return stage;
   };
-  
+
   // Helper function to create MaterialDefinition with texture stages
   auto makeMaterial = [&](uint32_t flags, Index envIdx, const Vector4& color, float metallic, float roughness,
                           const Vector4& baseColorFactor, float normalScale, float occlusionStrength,
@@ -238,42 +240,43 @@ int UtcDaliGltfLoaderSuccess1(void)
                           bool needAlbedo, bool needMetallicRoughness, bool needMetallic, bool needRoughness,
                           bool needNormal, bool doubleSided, Scene3D::Material::AlphaModeType alphaMode,
                           bool isOpaque, bool isMask, bool shadowAvailable,
-                          std::vector<std::pair<uint32_t, std::tuple<const char*, SamplerFlags::Type, ImageDimensions, SamplingMode::Type>>> textureStages) {
+                          std::vector<std::pair<uint32_t, std::tuple<const char*, SamplerFlags::Type, ImageDimensions, SamplingMode::Type>>> textureStages)
+  {
     MaterialDefinition m;
-    m.mFlags = flags;
-    m.mEnvironmentIdx = envIdx;
-    m.mColor = color;
-    m.mMetallic = metallic;
-    m.mRoughness = roughness;
-    m.mBaseColorFactor = baseColorFactor;
-    m.mNormalScale = normalScale;
-    m.mOcclusionStrength = occlusionStrength;
-    m.mEmissiveFactor = emissiveFactor;
-    m.mIor = ior;
-    m.mDielectricSpecular = dielectricSpecular;
-    m.mSpecularFactor = specularFactor;
-    m.mSpecularColorFactor = specularColorFactor;
-    m.mNeedAlbedoTexture = needAlbedo;
+    m.mFlags                        = flags;
+    m.mEnvironmentIdx               = envIdx;
+    m.mColor                        = color;
+    m.mMetallic                     = metallic;
+    m.mRoughness                    = roughness;
+    m.mBaseColorFactor              = baseColorFactor;
+    m.mNormalScale                  = normalScale;
+    m.mOcclusionStrength            = occlusionStrength;
+    m.mEmissiveFactor               = emissiveFactor;
+    m.mIor                          = ior;
+    m.mDielectricSpecular           = dielectricSpecular;
+    m.mSpecularFactor               = specularFactor;
+    m.mSpecularColorFactor          = specularColorFactor;
+    m.mNeedAlbedoTexture            = needAlbedo;
     m.mNeedMetallicRoughnessTexture = needMetallicRoughness;
-    m.mNeedMetallicTexture = needMetallic;
-    m.mNeedRoughnessTexture = needRoughness;
-    m.mNeedNormalTexture = needNormal;
-    m.mDoubleSided = doubleSided;
-    m.mAlphaModeType = alphaMode;
-    m.mIsOpaque = isOpaque;
-    m.mIsMask = isMask;
-    m.mShadowAvailable = shadowAvailable;
+    m.mNeedMetallicTexture          = needMetallic;
+    m.mNeedRoughnessTexture         = needRoughness;
+    m.mNeedNormalTexture            = needNormal;
+    m.mDoubleSided                  = doubleSided;
+    m.mAlphaModeType                = alphaMode;
+    m.mIsOpaque                     = isOpaque;
+    m.mIsMask                       = isMask;
+    m.mShadowAvailable              = shadowAvailable;
     for(auto& ts : textureStages)
     {
       m.mTextureStages.PushBack(makeTextureStage(ts.first, std::get<0>(ts.second), std::get<1>(ts.second), std::get<2>(ts.second), std::get<3>(ts.second)));
     }
     return m;
   };
-  
+
   const auto sampler1 = SamplerFlags::Encode(FilterMode::LINEAR_MIPMAP_LINEAR, FilterMode::LINEAR, WrapMode::CLAMP_TO_EDGE, WrapMode::REPEAT);
   const auto sampler2 = SamplerFlags::Encode(FilterMode::NEAREST_MIPMAP_LINEAR, FilterMode::NEAREST, WrapMode::CLAMP_TO_EDGE, WrapMode::MIRRORED_REPEAT);
-  const auto dims = ImageDimensions(256, 256);
-  
+  const auto dims     = ImageDimensions(256, 256);
+
   std::vector<MaterialDefinition> materialGroundTruth;
   materialGroundTruth.push_back(makeMaterial(
     MaterialDefinition::ALBEDO | MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION |
@@ -290,7 +293,7 @@ int UtcDaliGltfLoaderSuccess1(void)
       {MaterialDefinition::SPECULAR, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
       {MaterialDefinition::SPECULAR_COLOR, {"AnimatedCube_BaseColor.png", sampler1, dims, SamplingMode::BOX_THEN_NEAREST}},
     }));
-  
+
   materialGroundTruth.push_back(makeMaterial(
     MaterialDefinition::ALBEDO | MaterialDefinition::METALLIC | MaterialDefinition::ROUGHNESS |
       MaterialDefinition::EMISSIVE | MaterialDefinition::OCCLUSION | MaterialDefinition::NORMAL |
@@ -580,7 +583,7 @@ int UtcDaliGltfLoaderMRendererTest(void)
 
   DALI_TEST_EQUAL(scene.GetNodeCount(), 1u);
 
-  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  Scene3D::Loader::ShaderManagerPtr shaderManager = Scene3D::Loader::ShaderManager::New();
   ViewProjection                    viewProjection;
   Transforms                        xforms{
     MatrixStack{},
@@ -639,7 +642,7 @@ int UtcDaliGltfLoaderAnimationLoadingTest(void)
   auto& roots = scene.GetRoots();
   DALI_TEST_EQUAL(roots.Size(), 1u);
 
-  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  Scene3D::Loader::ShaderManagerPtr shaderManager = Scene3D::Loader::ShaderManager::New();
   ViewProjection                    viewProjection;
   Transforms                        xforms{
     MatrixStack{},
@@ -690,7 +693,7 @@ int UtcDaliGltfLoaderImageFromBufferView(void)
   auto& roots = scene.GetRoots();
   DALI_TEST_EQUAL(roots.Size(), 1u);
 
-  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  Scene3D::Loader::ShaderManagerPtr shaderManager = Scene3D::Loader::ShaderManager::New();
   ViewProjection                    viewProjection;
   Transforms                        xforms{
     MatrixStack{},
@@ -741,7 +744,7 @@ int UtcDaliGltfLoaderUint8Indices(void)
   auto& roots = scene.GetRoots();
   DALI_TEST_EQUAL(roots.Size(), 1u);
 
-  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  Scene3D::Loader::ShaderManagerPtr shaderManager = Scene3D::Loader::ShaderManager::New();
   ViewProjection                    viewProjection;
   Transforms                        xforms{
     MatrixStack{},
@@ -800,7 +803,7 @@ int UtcDaliGltfLoaderQuantizedMesh(void)
   auto& roots = scene.GetRoots();
   DALI_TEST_EQUAL(roots.Size(), 1u);
 
-  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  Scene3D::Loader::ShaderManagerPtr shaderManager = Scene3D::Loader::ShaderManager::New();
   ViewProjection                    viewProjection;
   Transforms                        xforms{
     MatrixStack{},

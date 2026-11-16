@@ -85,9 +85,8 @@ private:
    * @brief Private destructor.
    */
   ~Tooltip();
-
-  Tooltip(const Tooltip&);            ///< Undefined
-  Tooltip& operator=(const Tooltip&); ///< ///< Undefined
+  Tooltip(const Tooltip&)            = delete;
+  Tooltip& operator=(const Tooltip&) = delete;
 
   /**
    * @brief Sets the content of the tooltip.

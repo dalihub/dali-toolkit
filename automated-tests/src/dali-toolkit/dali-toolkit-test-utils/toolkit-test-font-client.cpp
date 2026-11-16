@@ -465,6 +465,10 @@ Shaping Shaping::Get()
   service.Register(key, shaping);
   return shaping;
 }
+Length Shaping::ShapeWithLanguage(FontClient& client, const Character* text, Length count, FontId id, Script script, const std::string&)
+{
+  return Shape(client, text, count, id, script);
+}
 Length Shaping::Shape(FontClient& client, const Character* const text, Length count, FontId id, Script)
 {
   auto& state = ShapeState(*this);

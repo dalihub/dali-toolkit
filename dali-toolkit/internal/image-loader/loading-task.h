@@ -29,6 +29,7 @@
 #include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 #include <dali/public-api/adaptor-framework/encoded-image-buffer.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/object/ref-object.h>
 
@@ -47,6 +48,109 @@ using LoadingTaskPtr = IntrusivePtr<LoadingTask>;
 class LoadingTask : public AsyncTask
 {
 public:
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<LoadingTask> New(uint32_t id, PixelBuffer pixelBuffer, PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<LoadingTask>(new LoadingTask(id, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad, callback));
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<LoadingTask> New(uint32_t id, const EncodedImageBuffer& encodedImageBuffer, ImageDimensions dimensions, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<LoadingTask>(new LoadingTask(id, encodedImageBuffer, dimensions, samplingMode, orientationCorrection, preMultiplyOnLoad, callback));
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<LoadingTask> New(uint32_t id, const VisualUrl& url, ImageDimensions dimensions, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<LoadingTask>(new LoadingTask(id, url, dimensions, samplingMode, orientationCorrection, preMultiplyOnLoad, loadPlanes, callback));
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<LoadingTask> New(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, Dali::ImageDimensions dimensions, Dali::SamplingMode::Type samplingMode, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadPlanes, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<LoadingTask>(new LoadingTask(id, animatedImageLoading, frameIndex, dimensions, samplingMode, preMultiplyOnLoad, loadPlanes, callback));
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<LoadingTask> New(uint32_t id, Dali::AnimatedImageLoading animatedImageLoading, uint32_t frameIndex, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<LoadingTask>(new LoadingTask(id, animatedImageLoading, frameIndex, preMultiplyOnLoad, callback));
+  }
+
+  /**
+   * @brief Set the Texture Id
+   */
+  void SetTextureId(TextureManagerType::TextureId id);
+
+public: // Implementation of AsyncTask
+  /**
+   * @copydoc Dali::AsyncTask::Process()
+   */
+  void Process() override;
+
+  /**
+   * @copydoc Dali::AsyncTask::GetTaskName()
+   */
+  Dali::StringView GetTaskName() const override
+  {
+    return "LoadingTask";
+  }
+
+private:
+  // Undefined
+  LoadingTask(const LoadingTask& queue);
+
+  // Undefined
+  LoadingTask& operator=(const LoadingTask& queue);
+
+  /**
+   * Load the image
+   */
+  void Load();
+
+  /**
+   * Apply mask
+   */
+  void ApplyMask();
+
+  /**
+   * Multiply alpha
+   */
+  void MultiplyAlpha();
+
+public:
+  std::vector<PixelBuffer> pixelBuffers{}; ///< pixelBuffer handle after successful load
+  ///< or pixelBuffer to be masked image in the mask task
+  VisualUrl                                url;                ///< url of the image to load
+  EncodedImageBuffer                       encodedImageBuffer; ///< encoded buffer of the image to load
+  uint32_t                                 id;                 ///< The unique id associated with this task.
+  TextureManagerType::TextureId            textureId;          ///< textureId for loading
+  ImageDimensions                          dimensions;         ///< dimensions to load
+  SamplingMode::Type                       samplingMode;       ///< sampling options
+  DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad;  ///< if the image's color should be multiplied by it's alpha
+
+  PixelBuffer                maskPixelBuffer; ///< pixelBuffer of mask image
+  float                      contentScale;    ///< The factor to scale the content
+  Dali::AnimatedImageLoading animatedImageLoading;
+  uint32_t                   frameIndex;
+
+  bool orientationCorrection : 1; ///< if orientation correction is needed
+  bool isMaskTask : 1;            ///< whether this task is for mask or not
+  bool cropToMask : 1;            ///< Whether to crop the content to the mask size
+  bool loadPlanes : 1;            ///< Whether to load image planes
+
+protected:
   /**
    * Constructor.
    * @param [in] id of the task
@@ -104,24 +208,6 @@ public:
   /**
    * Constructor.
    * @param [in] id of the task
-   * @param [in] encodedImageBuffer The encoded buffer of the image to load.
-   * @param [in] size The width and height to fit the loaded image to, 0.0 means whole image
-   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
-   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
-   * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
-   * @param [in] callback The callback that is called when the operation is completed.
-   */
-  LoadingTask(uint32_t                                 id,
-              const EncodedImageBuffer&                encodedImageBuffer,
-              ImageDimensions                          dimensions,
-              SamplingMode::Type                       samplingMode,
-              bool                                     orientationCorrection,
-              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
-              CallbackBase*                            callback);
-
-  /**
-   * Constructor.
-   * @param [in] id of the task
    * @param [in] pixelBuffer of the to be masked image
    * @param [in] maskPixelBuffer of the mask image
    * @param [in] contentScale The factor to scale the content
@@ -143,66 +229,22 @@ public:
   ~LoadingTask() override;
 
   /**
-   * @brief Set the Texture Id
+   * Constructor.
+   * @param [in] id of the task
+   * @param [in] encodedImageBuffer The encoded buffer of the image to load.
+   * @param [in] size The width and height to fit the loaded image to, 0.0 means whole image
+   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
+   * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
+   * @param [in] callback The callback that is called when the operation is completed.
    */
-  void SetTextureId(TextureManagerType::TextureId id);
-
-public: // Implementation of AsyncTask
-  /**
-   * @copydoc Dali::AsyncTask::Process()
-   */
-  void Process() override;
-
-  /**
-   * @copydoc Dali::AsyncTask::GetTaskName()
-   */
-  Dali::StringView GetTaskName() const override
-  {
-    return "LoadingTask";
-  }
-
-private:
-  // Undefined
-  LoadingTask(const LoadingTask& queue);
-
-  // Undefined
-  LoadingTask& operator=(const LoadingTask& queue);
-
-  /**
-   * Load the image
-   */
-  void Load();
-
-  /**
-   * Apply mask
-   */
-  void ApplyMask();
-
-  /**
-   * Multiply alpha
-   */
-  void MultiplyAlpha();
-
-public:
-  std::vector<PixelBuffer> pixelBuffers{};                     ///< pixelBuffer handle after successful load
-                                                               ///< or pixelBuffer to be masked image in the mask task
-  VisualUrl                                url;                ///< url of the image to load
-  EncodedImageBuffer                       encodedImageBuffer; ///< encoded buffer of the image to load
-  uint32_t                                 id;                 ///< The unique id associated with this task.
-  TextureManagerType::TextureId            textureId;          ///< textureId for loading
-  ImageDimensions                          dimensions;         ///< dimensions to load
-  SamplingMode::Type                       samplingMode;       ///< sampling options
-  DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad;  ///< if the image's color should be multiplied by it's alpha
-
-  PixelBuffer                maskPixelBuffer; ///< pixelBuffer of mask image
-  float                      contentScale;    ///< The factor to scale the content
-  Dali::AnimatedImageLoading animatedImageLoading;
-  uint32_t                   frameIndex;
-
-  bool orientationCorrection : 1; ///< if orientation correction is needed
-  bool isMaskTask : 1;            ///< whether this task is for mask or not
-  bool cropToMask : 1;            ///< Whether to crop the content to the mask size
-  bool loadPlanes : 1;            ///< Whether to load image planes
+  LoadingTask(uint32_t                                 id,
+              const EncodedImageBuffer&                encodedImageBuffer,
+              ImageDimensions                          dimensions,
+              SamplingMode::Type                       samplingMode,
+              bool                                     orientationCorrection,
+              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+              CallbackBase*                            callback);
 };
 
 } // namespace Internal

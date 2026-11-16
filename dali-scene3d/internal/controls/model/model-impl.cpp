@@ -222,7 +222,7 @@ Model::Model(const std::string& modelUrl, const std::string& resourceDirectoryUr
   mModelUrl(modelUrl),
   mResourceDirectoryUrl(resourceDirectoryUrl),
   mModelRoot(),
-  mShaderManager(new Scene3D::Loader::ShaderManager()),
+  mShaderManager(Scene3D::Loader::ShaderManager::New()),
   mNaturalSize(Vector3::ZERO),
   mModelPivot(Pivot::CENTER),
   mSceneIblScaleFactor(1.0f),
@@ -439,7 +439,7 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
     if(isOnScene && mIblDiffuseDirty)
     {
       ResetResourceTask(mIblDiffuseLoadTask);
-      mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblDiffuseLoadComplete));
+      mIblDiffuseLoadTask = EnvironmentMapLoadTask::New(mDiffuseIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblDiffuseLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblDiffuseLoadTask);
       mIblDiffuseDirty = false;
 
@@ -450,7 +450,7 @@ void Model::SetImageBasedLightSource(const std::string& diffuseUrl, const std::s
     if(isOnScene && mIblSpecularDirty)
     {
       ResetResourceTask(mIblSpecularLoadTask);
-      mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblSpecularLoadComplete));
+      mIblSpecularLoadTask = EnvironmentMapLoadTask::New(mSpecularIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &Model::OnIblSpecularLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblSpecularLoadTask);
       mIblSpecularDirty = false;
 
@@ -866,7 +866,7 @@ void Model::OnSceneConnection(int depth)
   Scene3D::SceneView parentSceneView = mParentSceneView.GetHandle();
   if(!parentSceneView)
   {
-    mShaderManager = new Dali::Scene3D::Loader::ShaderManager();
+    mShaderManager = Dali::Scene3D::Loader::ShaderManager::New();
     ModelNodeTreeUtility::UpdateShaderRecursively(mModelRoot, mShaderManager);
   }
 
@@ -877,7 +877,7 @@ void Model::OnSceneConnection(int depth)
     {
       ModelCacheManager::Get().ReferenceModelCache(mModelUrl);
     }
-    mModelLoadTask = new ModelLoadTask(mModelUrl, mResourceDirectoryUrl, MakeCallback(this, &Model::OnModelLoadComplete));
+    mModelLoadTask = ModelLoadTask::New(mModelUrl, mResourceDirectoryUrl, MakeCallback(this, &Model::OnModelLoadComplete));
     Dali::AsyncTaskManager::Get().AddTask(mModelLoadTask);
   }
 

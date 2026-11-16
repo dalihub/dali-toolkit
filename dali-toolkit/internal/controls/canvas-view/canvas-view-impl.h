@@ -45,17 +45,8 @@ class CanvasView : public ControlImpl, public Integration::Processor
 {
 public:
   /**
-   * Construct a new CanvasView.
-   */
-  CanvasView(const Vector2& viewBox);
-
-  /**
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  virtual ~CanvasView();
 
 public:
-  /**
    * Create a new CanvasView.
    * @return A smart-pointer to the newly allocated CanvasView.
    */
@@ -193,6 +184,17 @@ public:
    * @param[in] task CanvasRendererRasterizingTaskPtr
    */
   void ApplyRasterizedImage(CanvasRendererRasterizingTaskPtr task);
+
+protected:
+  /**
+   * Construct a new CanvasView.
+   */
+  CanvasView(const Vector2& viewBox);
+
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~CanvasView();
 
 private:
   CanvasView(const CanvasView&)            = delete;

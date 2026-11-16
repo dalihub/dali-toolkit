@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/animation/path-constrainer.h>
 #include <dali/public-api/animation/linear-constrainer.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
@@ -39,14 +40,23 @@ class ScrollViewPagePathEffect : public ScrollViewEffect
 {
 public:
   /**
-   * Constructor
-   * @param[in] path Pages will follow this path
-   * @param[in] forward Vector in page local space which will be aligned with tangent of the path
-   * @param[in] inputPropertyIndex index of the property in the scrollview used to drivce the path
-   * @param[in] viewPageSize size of a page in the scrollview
-   * @param[in] pageCount total number of pages in the scrollview
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  ScrollViewPagePathEffect(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount);
+  static DALI_INTERNAL ScrollViewPagePathEffect* NewForBaseHandle(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount)
+  {
+    return new ScrollViewPagePathEffect(path, forward, inputPropertyIndex, viewPageSize, pageCount);
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<ScrollViewPagePathEffect> New(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount)
+  {
+    return Dali::IntrusivePtr<ScrollViewPagePathEffect>(new ScrollViewPagePathEffect(path, forward, inputPropertyIndex, viewPageSize, pageCount));
+  }
 
 public:
   /**
@@ -66,6 +76,16 @@ public:
   void OnDetach(Toolkit::ScrollView& scrollView) override;
 
 protected:
+  /**
+   * Constructor
+   * @param[in] path Pages will follow this path
+   * @param[in] forward Vector in page local space which will be aligned with tangent of the path
+   * @param[in] inputPropertyIndex index of the property in the scrollview used to drivce the path
+   * @param[in] viewPageSize size of a page in the scrollview
+   * @param[in] pageCount total number of pages in the scrollview
+   */
+  ScrollViewPagePathEffect(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount);
+
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */

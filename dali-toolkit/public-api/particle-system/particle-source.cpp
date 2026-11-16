@@ -23,7 +23,7 @@ namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 
 ParticleSource ParticleSource::New(UniquePtr<ParticleSourceInterface>&& sourceUpdater)
 {
-  return {new Internal::ParticleSource(std::move(sourceUpdater))};
+  return {Internal::ParticleSource::NewForBaseHandle(std::move(sourceUpdater))};
 }
 
 ParticleSource::ParticleSource(Internal::ParticleSource* impl)

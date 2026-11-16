@@ -60,13 +60,6 @@ public:
   static const int CONTROL_BEHAVIOUR_FLAG_COUNT = Log<LAST_CONTROL_BEHAVIOUR_FLAG - 1>::value + 1; ///< Total count of flags
 
   /**
-   * @brief Control constructor
-   *
-   * @param[in] behaviourFlags Behavioural flags from CustomControlBehaviour enum
-   */
-  ControlWrapper(CustomControlBehaviour behaviourFlags);
-
-  /**
    * Create a new ControlWrapper.
    *
    * @param[in] typeName The name of the type that is registered with this control
@@ -172,6 +165,13 @@ public:
 
 protected:
   /**
+   * @brief Control constructor
+   *
+   * @param[in] behaviourFlags Behavioural flags from CustomControlBehaviour enum
+   */
+  ControlWrapper(CustomControlBehaviour behaviourFlags);
+
+  /**
    * Protected Destructor
    * A reference counted object may only be deleted by calling Unreference()
    */
@@ -184,6 +184,7 @@ private:
 
   /// Undefined.
   DALI_INTERNAL ControlWrapper& operator=(const ControlWrapper& rhs);
+
   /// @endcond
 };
 

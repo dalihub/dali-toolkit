@@ -63,7 +63,7 @@ PKG_CHECK_MODULES(${PKG_NAME} REQUIRED
   dali3-adaptor
   dali3-toolkit
   dali3-physics-3d
-  bullet3
+  dali3-bullet3
 )
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED)

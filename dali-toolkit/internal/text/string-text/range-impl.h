@@ -53,13 +53,6 @@ public:
    */
   static Dali::Toolkit::Text::Range New(uint32_t startIndex, uint32_t endIndex);
 
-  /**
-   * @brief Destructor
-   *
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~Range();
-
 protected:
   /**
    * @brief Constructs a new Range.
@@ -85,12 +78,18 @@ public: //Methods
    * @copydoc Dali::Toolkit::Text::Range::GetNumberOfIndices()
    */
   uint32_t GetNumberOfIndices() const;
-
-public:
   Range(const Range&)            = delete; ///< Deleted copy constructor
   Range(Range&&)                 = delete; ///< Deleted move constructor
   Range& operator=(const Range&) = delete; ///< Deleted copy assignment operator
   Range& operator=(Range&&)      = delete; ///< Deleted move assignment operator
+
+protected:
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~Range();
 
 private:
   // Data

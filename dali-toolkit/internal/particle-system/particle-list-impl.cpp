@@ -163,7 +163,7 @@ ParticleSystem::Particle ParticleList::NewParticle(float lifetime)
 
     // Add particle
     // TODO : Could we use a pool allocator here?
-    mParticles.PushBack(new Internal::Particle(*this, newIndex));
+    mParticles.PushBack(ParticleSystem::Particle(Internal::Particle::NewForBaseHandle(*this, newIndex)));
 
     // Set particle lifetime
     auto& particle = mParticles.Back();

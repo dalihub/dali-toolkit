@@ -50,11 +50,6 @@ public:
   static Dali::Toolkit::GlView New(Dali::Toolkit::GlView::ColorFormat colorFormat);
 
   /**
-   * Construct a new GlView.
-   */
-  GlView(Dali::Toolkit::GlView::ColorFormat colorFormat);
-
-  /**
    * @copydoc Dali::Toolkit::GlView::RegisterGlCallbacks()
    */
   void RegisterGlCallbacks(std::unique_ptr<CallbackBase> initCallback, std::unique_ptr<CallbackBase> renderFrameCallback, std::unique_ptr<CallbackBase> terminateCallback) override;
@@ -97,6 +92,12 @@ public:
    */
   void Terminate() override;
 
+protected:
+  /**
+   * Construct a new GlView.
+   */
+  GlView(Dali::Toolkit::GlView::ColorFormat colorFormat);
+
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -117,8 +118,6 @@ private: // From Control
    * @copydoc Toolkit::Control::OnSizeSet()
    */
   void OnSizeSet(const Vector3& targetSize) override;
-
-private:
   // Undefined copy constructor and assignment operators
   GlView(const GlView& GlView);
   GlView& operator=(const GlView& GlView);

@@ -333,6 +333,27 @@ enum Type
    * VERTICAL   : Vertical scrolling of text, only valid when multi-line.
    */
   AUTO_SCROLL_DIRECTION,
+
+  /**
+   * @brief Specifies the language used to select language-specific glyph forms.
+   * @details Name "textLanguage", type Property::STRING.
+   *
+   * Some fonts provide different glyph forms for the same Unicode characters
+   * depending on the language, for example Russian and Bulgarian Cyrillic text.
+   * Accepts an ASCII BCP 47 language tag, such as "bg" (Bulgarian), "ru" (Russian)
+   * or "sr-Cyrl" (Serbian Cyrillic).
+   * Subtags use hyphens. Tags are case-insensitive and limited to 255 bytes.
+   * Reading this property returns the tag normalized to lowercase.
+   * Invalid input leaves the previous value unchanged.
+   *
+   * @note An empty string ("") removes the override and uses the system language.
+   * This is the default. Reading the property then returns "", not the system language.
+   * @note This property does not affect font selection, font fallback or layout direction.
+   * @note Async requests retain the language captured when requested, as for text and
+   * font properties. ASYNC_MANUAL and async size computation require new explicit
+   * requests to use a changed language.
+   */
+  TEXT_LANGUAGE,
 };
 
 } // namespace Property

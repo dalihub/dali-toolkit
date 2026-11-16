@@ -65,7 +65,12 @@ bool HasAccessibilityState(uint32_t states, Accessibility::State state)
 
 constexpr const char* ATTR_IMG_SRC_KEY = "imgSrc";
 
-std::string GetLocaleText(std::string string, const char* domain = "dali-toolkit")
+// The gettext domain carries the API major (dali3-toolkit); the build defines it.
+#ifndef DALI_TOOLKIT_TEXT_DOMAIN
+#define DALI_TOOLKIT_TEXT_DOMAIN "dali-toolkit"
+#endif
+
+std::string GetLocaleText(std::string string, const char* domain = DALI_TOOLKIT_TEXT_DOMAIN)
 {
 #ifdef DGETTEXT_ENABLED
   /*TODO: currently non-localized string is used as a key for translation lookup. In case the lookup key formatting is forced

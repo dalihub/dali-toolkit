@@ -137,6 +137,7 @@ public:
   float GetStartOffset() const;
 
 private:
+  Gradient(const Gradient& gradient) = delete;
   /**
    * Estimate the resolution of the lookup texture.
    * Note: Only call this function after the gradient stops are sorted in order.
@@ -155,11 +156,8 @@ protected:
    */
   virtual ~Gradient();
 
-  // Undefined
-  Gradient(const Gradient& gradient);
-
-  // Undefined
-  Gradient& operator=(const Gradient& handle);
+private:
+  Gradient& operator=(const Gradient& handle) = delete;
 
 protected:
   Vector<GradientStop>                        mGradientStops;

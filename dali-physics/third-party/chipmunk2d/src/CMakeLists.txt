@@ -13,6 +13,21 @@ message("Configuring Chipmunk2D version ${CHIPMUNK_VERSION}")
 set(prefix ${CMAKE_INSTALL_PREFIX})
 option(ENABLE_PKG_CONFIGURE "Use pkgconfig" ON)
 
+# Installed names. DALi passes DALI_THIRD_PARTY_PREFIX ("dali3-" for API
+# major 3, empty for 2) and INCLUDE_DIR so that a chipmunk bundled with one
+# DALi major never shares a file with the one bundled with another:
+# lib<prefix>chipmunk.so, <prefix>chipmunk2d.pc, <includedir>/chipmunk.
+if(NOT DEFINED DALI_THIRD_PARTY_PREFIX)
+    set(DALI_THIRD_PARTY_PREFIX "")
+endif()
+set(CHIPMUNK_LIB_NAME ${DALI_THIRD_PARTY_PREFIX}chipmunk)
+set(CHIPMUNK_PC_NAME ${DALI_THIRD_PARTY_PREFIX}chipmunk2d)
+if(INCLUDE_DIR)
+    set(CHIPMUNK_INCLUDE_INSTALL_DIR ${INCLUDE_DIR}/chipmunk)
+else()
+    set(CHIPMUNK_INCLUDE_INSTALL_DIR include/chipmunk)
+endif()
+
 if(ENABLE_PKG_CONFIGURE)
     find_package(PkgConfig REQUIRED)
 
@@ -31,8 +46,8 @@ if(ENABLE_PKG_CONFIGURE)
     set(EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
     set(DEV_INCLUDE_PATH ${INCLUDE_DIR})
 
-    set(chipmunk_pkg_cfg_file chipmunk2d.pc)
-    configure_file(${CMAKE_CURRENT_LIST_DIR}/${chipmunk_pkg_cfg_file}.in ${chipmunk_pkg_cfg_file} @ONLY)
+    set(chipmunk_pkg_cfg_file ${CHIPMUNK_PC_NAME}.pc)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/chipmunk2d.pc.in ${chipmunk_pkg_cfg_file} @ONLY)
 endif(ENABLE_PKG_CONFIGURE)
 
 if(ANDROID)
@@ -56,6 +71,7 @@ if(BUILD_SHARED)
   endif(MSVC)
   # set the lib's version number
   # But avoid on Android because symlinks to version numbered .so's don't work with Android's Java-side loadLibrary.
+  set_target_properties(chipmunk PROPERTIES OUTPUT_NAME ${CHIPMUNK_LIB_NAME})
   if(NOT ANDROID)
     set_target_properties(chipmunk PROPERTIES
       SOVERSION ${CHIPMUNK_VERSION_MAJOR}
@@ -74,6 +90,19 @@ if(BUILD_SHARED)
                            LIBRARY DESTINATION ${LIB_INSTALL_DIR}
                            ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
                            )
+  # DALi 2.x shipped this library as libchipmunk with chipmunk2d.pc and
+  # include/chipmunk; DALI_LEGACY_ALIASES=ON adds those names as links.
+  if(COMMAND dali_legacy_library_alias)
+    if(ANDROID)
+      dali_legacy_library_alias(chipmunk chipmunk)
+    else()
+      dali_legacy_library_alias(chipmunk chipmunk ${CHIPMUNK_VERSION_MAJOR})
+    endif()
+    dali_legacy_include_alias(chipmunk)
+    if(ENABLE_PKG_CONFIGURE)
+      dali_legacy_pkgconfig_alias(${CMAKE_CURRENT_BINARY_DIR}/${chipmunk_pkg_cfg_file} chipmunk2d)
+    endif()
+  endif()
 endif(BUILD_SHARED)
 
 if(BUILD_STATIC)
@@ -85,8 +114,8 @@ if(BUILD_STATIC)
     set_source_files_properties(${chipmunk_source_files} PROPERTIES LANGUAGE CXX)
     set_target_properties(chipmunk_static PROPERTIES LINKER_LANGUAGE CXX)
   endif(MSVC)
-  # Sets chipmunk_static to output "libchipmunk.a" not "libchipmunk_static.a"
-  set_target_properties(chipmunk_static PROPERTIES OUTPUT_NAME chipmunk)
+  # Sets chipmunk_static to output "lib<prefix>chipmunk.a" not "libchipmunk_static.a"
+  set_target_properties(chipmunk_static PROPERTIES OUTPUT_NAME ${CHIPMUNK_LIB_NAME})
   target_compile_options(chipmunk PRIVATE -fvisibility=default)
   target_link_libraries(chipmunk m ${COVERAGE})
   if(ANDROID)
@@ -99,22 +128,22 @@ endif(BUILD_STATIC)
 
 if(BUILD_SHARED OR INSTALL_STATIC)
   # FIXME: change to PUBLIC_HEADER to allow building frameworks
-  install(FILES ${chipmunk_public_header} DESTINATION include/chipmunk)
-  install(FILES ${chipmunk_constraint_header} DESTINATION include/chipmunk/constraints)
+  install(FILES ${chipmunk_public_header} DESTINATION ${CHIPMUNK_INCLUDE_INSTALL_DIR})
+  install(FILES ${chipmunk_constraint_header} DESTINATION ${CHIPMUNK_INCLUDE_INSTALL_DIR}/constraints)
 
   if(INSTALL_CMAKE_MODULES)
     install(
       EXPORT chipmunk-targets
       NAMESPACE chipmunk::
-      FILE chipmunk-targets.cmake
-      DESTINATION share/chipmunk
+      FILE ${CHIPMUNK_LIB_NAME}-targets.cmake
+      DESTINATION share/${CHIPMUNK_LIB_NAME}
     )
 
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/chipmunk-config.cmake "
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${CHIPMUNK_LIB_NAME}-config.cmake "
       include(CMakeFindDependencyMacro)
-      include(\${CMAKE_CURRENT_LIST_DIR}/chipmunk-targets.cmake)
+      include(\${CMAKE_CURRENT_LIST_DIR}/${CHIPMUNK_LIB_NAME}-targets.cmake)
     ")
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/chipmunk-config.cmake DESTINATION share/chipmunk)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CHIPMUNK_LIB_NAME}-config.cmake DESTINATION share/${CHIPMUNK_LIB_NAME})
   endif()
 endif(BUILD_SHARED OR INSTALL_STATIC)
 

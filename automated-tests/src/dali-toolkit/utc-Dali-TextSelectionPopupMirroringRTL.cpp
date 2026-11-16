@@ -90,8 +90,8 @@ int UtcDaliToolkitTextSelectionPopupMirroringRTL(void)
   ToolkitTestApplication application;
 
   setlocale(LC_ALL, "ar_AE.UTF-8");
-  textdomain("dali-toolkit");
-  bindtextdomain("dali-toolkit", DEFAULT_LOCALE_DIR);
+  textdomain(DALI_TOOLKIT_TEXT_DOMAIN);
+  bindtextdomain(DALI_TOOLKIT_TEXT_DOMAIN, DEFAULT_LOCALE_DIR);
 
   TextSelectionPopup textSelectionPopup = TextSelectionPopup::New(NULL);
 

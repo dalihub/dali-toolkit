@@ -12,15 +12,16 @@ GPU memory consumption, CPU RAM used and details of texture atlases created.
 
 ## Viewing Resource Logs
 
-dalireslog.sh is installed as part of the DALi Adaptor package and can be found in the adaptors/tizen/scripts folder.
+dali3-reslog.sh is installed as part of the DALi Adaptor package (its source is adaptors/scripts/dalireslog.sh in dali-adaptor;
+the installed name carries the DALi API major, so a dali2 adaptor installs it as dalireslog.sh).
 The script shows a summary of memory used by resources.
 USAGE:
-./dalireslog.sh [FILE]
+./dali3-reslog.sh [FILE]
 if FILE isn't specified, the script will try to use dlogutil.
 
 ### Example:
 ~~~{.bash}
-sh-4.1$ ./dalireslog.sh
+sh-4.1$ ./dali3-reslog.sh
 
 **On a separate terminal:**
 
@@ -32,7 +33,7 @@ jon-doe\@ws-1234$ DALI_ENABLE_LOG=RESOURCE_LOG blind-effect.example 2>/home/SERI
 
 **On a separate terminal:**
 
-dalireslog.sh ~/log.txt
+dali3-reslog.sh ~/log.txt
 
 ~~~
 

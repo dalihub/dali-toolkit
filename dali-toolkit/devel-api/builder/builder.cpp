@@ -39,7 +39,7 @@ Builder::~Builder()
 
 Builder Builder::New(void)
 {
-  return Builder(new Internal::Builder());
+  return Builder(Internal::Builder::NewForBaseHandle());
 }
 
 Builder::Builder(Internal::Builder* impl)

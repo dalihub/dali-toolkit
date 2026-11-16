@@ -88,6 +88,14 @@ void TextField::PropertyHandler::SetProperty(Toolkit::TextField textField, Prope
       }
       break;
     }
+    case Toolkit::DevelTextField::Property::TEXT_LANGUAGE:
+    {
+      if(value.GetType() == Property::STRING)
+      {
+        impl.mController->SetTextLanguage(ToStdString(value));
+      }
+      break;
+    }
     case Toolkit::TextField::Property::TEXT:
     {
       const std::string text = ToStdString(value);
@@ -757,6 +765,11 @@ Property::Value TextField::PropertyHandler::GetProperty(Toolkit::TextField textF
     case Toolkit::DevelTextField::Property::RENDERING_BACKEND:
     {
       value = impl.mRenderingBackend;
+      break;
+    }
+    case Toolkit::DevelTextField::Property::TEXT_LANGUAGE:
+    {
+      value = ToPropertyValue(impl.mController->GetTextLanguage());
       break;
     }
     case Toolkit::TextField::Property::TEXT:

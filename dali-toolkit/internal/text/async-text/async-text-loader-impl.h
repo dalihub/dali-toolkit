@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
@@ -48,14 +49,12 @@ class AsyncTextLoader : public BaseObject
 {
 public:
   /**
-   * Constructor
+   * @brief Creates a reference-counted implementation.
    */
-  AsyncTextLoader();
-
-  /**
-   * Destructor
-   */
-  ~AsyncTextLoader();
+  static Dali::IntrusivePtr<AsyncTextLoader> New()
+  {
+    return Dali::IntrusivePtr<AsyncTextLoader>(new AsyncTextLoader());
+  }
 
   /**
    * @copydoc Dali::AsyncTextLoader::SetLocale()
@@ -138,6 +137,17 @@ public:
    */
   AsyncTextRenderInfo GetHeightForWidth(AsyncTextParameters& parameters);
 
+protected:
+  /**
+   * Constructor
+   */
+  AsyncTextLoader();
+
+  /**
+   * Destructor
+   */
+  ~AsyncTextLoader();
+
 private:
   // Worker thread
   /**
@@ -204,7 +214,6 @@ private:
    * private method
    */
 
-private:
   // Undefined copy constructor.
   AsyncTextLoader(const AsyncTextLoader&);
 

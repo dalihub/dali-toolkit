@@ -49,8 +49,13 @@ typedef IntrusivePtr<ShaderManager> ShaderManagerPtr;
 class DALI_SCENE3D_API ShaderManager : public RefObject
 {
 public:
-  ShaderManager();
-  ~ShaderManager();
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<ShaderManager> New()
+  {
+    return Dali::IntrusivePtr<ShaderManager>(new ShaderManager());
+  }
 
   /**
    * @brief Produces a Dali::Shader for the input materialDefinition and meshDefinition.
@@ -124,6 +129,10 @@ public:
    */
   void UpdateShadowUniform(Scene3D::Light light);
 
+protected:
+  ShaderManager();
+  ~ShaderManager();
+
 private:
   /// @cond internal
   /**
@@ -154,8 +163,11 @@ private:
    * @param[in] uniformBlock UniformBlock that the constraint will be applied.
    */
   DALI_INTERNAL void SetShadowConstraintToUniformBlock();
+  ShaderManager(const ShaderManager&)            = delete;
+  ShaderManager& operator=(const ShaderManager&) = delete;
 
   /// @endcond
+
 private:
   struct Impl;
   UniquePtr<Impl> mImpl;

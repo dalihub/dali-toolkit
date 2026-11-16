@@ -58,14 +58,6 @@ public:
   static Dali::Toolkit::GlView New(GlView::BackendMode backendMode);
 
   /**
-   * @brief Constructor creates GlView interface object using DrawableView implementation
-   *
-   * @param[in] backendMode Backend mode to be used. Only DIRECT_RENDERING and DIRECT_RENDERING_THREADED
-   *                        are accepted.
-   */
-  explicit DrawableView(GlView::BackendMode backendMode);
-
-  /**
    * @copydoc Dali::Toolkit::GlView::RegisterGlCallbacks()
    */
   void RegisterGlCallbacks(std::unique_ptr<CallbackBase> initCallback, std::unique_ptr<CallbackBase> renderFrameCallback, std::unique_ptr<CallbackBase> terminateCallback) override;
@@ -105,6 +97,15 @@ public:
    */
   void Terminate() override;
 
+protected:
+  /**
+   * @brief Constructor creates GlView interface object using DrawableView implementation
+   *
+   * @param[in] backendMode Backend mode to be used. Only DIRECT_RENDERING and DIRECT_RENDERING_THREADED
+   *                        are accepted.
+   */
+  explicit DrawableView(GlView::BackendMode backendMode);
+
 private: // From Control
   /**
    * @copydoc Toolkit::Control::OnInitialize()
@@ -125,8 +126,6 @@ private: // From Control
    * @copydoc Toolkit::Control::OnSizeSet()
    */
   void OnSizeSet(const Vector3& targetSize) override;
-
-private:
   // Undefined copy constructor and assignment operators
   DrawableView(const DrawableView& GlView);
   DrawableView& operator=(const DrawableView& GlView);

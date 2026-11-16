@@ -43,6 +43,24 @@ typedef const Spannable*        SpannableConstPtr;
 class Spannable : public Spanned
 {
 public:
+  // Removed constructors and assignment operators
+
+  Spannable(const Spannable&)            = delete; ///< Deleted copy constructor
+  Spannable(Spannable&&)                 = delete; ///< Deleted move constructor
+  Spannable& operator=(const Spannable&) = delete; ///< Deleted copy assignment operator
+  Spannable& operator=(Spannable&&)      = delete; ///< Deleted move assignment operator
+public:                                            //Methods
+  /**
+   * @copydoc Dali::Toolkit::Text::Spannable::AttachSpan()
+   */
+  virtual bool AttachSpan(const Dali::Toolkit::Text::BaseSpan& styleSpan, const Dali::Toolkit::Text::Range& range) = 0;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::Spannable::DetachSpan()
+   */
+  virtual bool DetachSpan(const Dali::Toolkit::Text::BaseSpan& styleSpan) = 0;
+
+protected:
   /**
    * This constructor is only used by derived classes.
    */
@@ -54,25 +72,6 @@ public:
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~Spannable() = 0;
-
-  // Removed constructors and assignment operators
-public:
-  Spannable(const Spannable&)            = delete; ///< Deleted copy constructor
-  Spannable(Spannable&&)                 = delete; ///< Deleted move constructor
-  Spannable& operator=(const Spannable&) = delete; ///< Deleted copy assignment operator
-  Spannable& operator=(Spannable&&)      = delete; ///< Deleted move assignment operator
-
-public: //Methods
-  /**
-   * @copydoc Dali::Toolkit::Text::Spannable::AttachSpan()
-   */
-  virtual bool AttachSpan(const Dali::Toolkit::Text::BaseSpan& styleSpan, const Dali::Toolkit::Text::Range& range) = 0;
-
-  /**
-   * @copydoc Dali::Toolkit::Text::Spannable::DetachSpan()
-   */
-  virtual bool DetachSpan(const Dali::Toolkit::Text::BaseSpan& styleSpan) = 0;
-
 }; // class Spannable
 
 } // namespace Internal

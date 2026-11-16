@@ -39,6 +39,22 @@ using namespace Toolkit;
 
 namespace
 {
+class TestCanvasView : public Dali::Toolkit::Internal::CanvasView
+{
+public:
+  static Dali::IntrusivePtr<TestCanvasView> New(const Vector2& viewBox)
+  {
+    return Dali::IntrusivePtr<TestCanvasView>(new TestCanvasView(viewBox));
+  }
+
+protected:
+  explicit TestCanvasView(const Vector2& viewBox)
+  : Dali::Toolkit::Internal::CanvasView(viewBox)
+  {
+  }
+
+  ~TestCanvasView() override = default;
+};
 } // namespace
 
 void utc_dali_toolkit_canvasview_startup(void)
@@ -299,16 +315,16 @@ int UtcDaliCanvasViewRasterizeTaskP(void)
 {
   ToolkitTestApplication application;
 
-  Dali::Toolkit::Internal::CanvasView* dummyInternalCanvasView = new Dali::Toolkit::Internal::CanvasView(Vector2(100, 100));
+  auto dummyInternalCanvasView = TestCanvasView::New(Vector2(100, 100));
   DALI_TEST_CHECK(dummyInternalCanvasView);
 
   Dali::CanvasRenderer dummyCanvasRenderer = Dali::CanvasRenderer::New(Vector2(100, 100));
   DALI_TEST_CHECK(dummyCanvasRenderer);
 
-  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
+  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = Dali::Toolkit::Internal::CanvasRendererRasterizingTask::New(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
   DALI_TEST_CHECK(task);
 
-  delete dummyInternalCanvasView;
+  dummyInternalCanvasView.Reset();
 
   END_TEST;
 }
@@ -317,16 +333,16 @@ int UtcDaliCanvasViewRasterizeTaskAddTaskP(void)
 {
   ToolkitTestApplication application;
 
-  Dali::Toolkit::Internal::CanvasView* dummyInternalCanvasView = new Dali::Toolkit::Internal::CanvasView(Vector2(100, 100));
+  auto dummyInternalCanvasView = TestCanvasView::New(Vector2(100, 100));
   DALI_TEST_CHECK(dummyInternalCanvasView);
 
   Dali::CanvasRenderer dummyCanvasRenderer = Dali::CanvasRenderer::New(Vector2(100, 100));
   DALI_TEST_CHECK(dummyCanvasRenderer);
 
-  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
+  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = Dali::Toolkit::Internal::CanvasRendererRasterizingTask::New(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
   DALI_TEST_CHECK(task);
 
-  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task2 = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
+  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task2 = Dali::Toolkit::Internal::CanvasRendererRasterizingTask::New(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
   DALI_TEST_CHECK(task2);
 
   Dali::AsyncTaskManager asyncTaskManager = Dali::AsyncTaskManager::Get();
@@ -335,7 +351,7 @@ int UtcDaliCanvasViewRasterizeTaskAddTaskP(void)
   asyncTaskManager.AddTask(task);
   asyncTaskManager.AddTask(task2);
 
-  delete dummyInternalCanvasView;
+  dummyInternalCanvasView.Reset();
 
   END_TEST;
 }
@@ -344,13 +360,13 @@ int UtcDaliCanvasViewRasterizeTaskAddRemoveTaskP(void)
 {
   ToolkitTestApplication application;
 
-  Dali::Toolkit::Internal::CanvasView* dummyInternalCanvasView = new Dali::Toolkit::Internal::CanvasView(Vector2(100, 100));
+  auto dummyInternalCanvasView = TestCanvasView::New(Vector2(100, 100));
   DALI_TEST_CHECK(dummyInternalCanvasView);
 
   Dali::CanvasRenderer dummyCanvasRenderer = Dali::CanvasRenderer::New(Vector2(100, 100));
   DALI_TEST_CHECK(dummyCanvasRenderer);
 
-  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
+  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = Dali::Toolkit::Internal::CanvasRendererRasterizingTask::New(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
   DALI_TEST_CHECK(task);
 
   Dali::AsyncTaskManager asyncTaskManager = Dali::AsyncTaskManager::Get();
@@ -360,7 +376,7 @@ int UtcDaliCanvasViewRasterizeTaskAddRemoveTaskP(void)
 
   asyncTaskManager.RemoveTask(task);
 
-  delete dummyInternalCanvasView;
+  dummyInternalCanvasView.Reset();
 
   END_TEST;
 }
@@ -376,7 +392,7 @@ int UtcDaliCanvasViewRasterizeThreadRasterizationCompletedSignalP(void)
   Dali::CanvasRenderer dummyCanvasRenderer = Dali::CanvasRenderer::New(Vector2(100, 100));
   DALI_TEST_CHECK(dummyCanvasRenderer);
 
-  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = new Dali::Toolkit::Internal::CanvasRendererRasterizingTask(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
+  IntrusivePtr<Dali::Toolkit::Internal::CanvasRendererRasterizingTask> task = Dali::Toolkit::Internal::CanvasRendererRasterizingTask::New(dummyCanvasRenderer, MakeCallback(rasteriztionCompleted));
   DALI_TEST_CHECK(task);
 
   Dali::AsyncTaskManager asyncTaskManager = Dali::AsyncTaskManager::Get();

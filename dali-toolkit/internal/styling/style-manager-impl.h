@@ -21,6 +21,7 @@
 #include <dali/devel-api/adaptor-framework/style-monitor.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/weak-handle.h>
@@ -48,16 +49,30 @@ class StyleManager : public Dali::BaseObject, public ConnectionTracker
 {
 public:
   /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL StyleManager* NewForBaseHandle()
+  {
+    return new StyleManager();
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<StyleManager> New()
+  {
+    return Dali::IntrusivePtr<StyleManager>(new StyleManager());
+  }
+
+  /**
    * Singleton access
    *
    * @return The StyleManager object
    */
   static Toolkit::StyleManager Get();
-
-  /**
-   * Construct a new StyleManager.
-   */
-  StyleManager();
 
 protected:
   /**
@@ -166,6 +181,12 @@ public:
    * It should not be exposed in the public API
    */
   Toolkit::DevelStyleManager::BrokenImageChangedSignalType& BrokenImageChangedSignal();
+
+protected:
+  /**
+   * Construct a new StyleManager.
+   */
+  StyleManager();
 
 private:
   typedef std::vector<std::string> StringList;

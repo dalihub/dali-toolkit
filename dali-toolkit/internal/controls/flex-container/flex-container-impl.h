@@ -50,12 +50,6 @@ public:
 
   typedef std::vector<FlexItemNode> FlexItemNodeContainer;
 
-public:
-  /**
-   * Construct a new FlexContainer.
-   */
-  FlexContainer();
-
   /**
    * Create a new FlexContainer.
    * @return A smart-pointer to the newly allocated FlexContainer.
@@ -160,6 +154,12 @@ public:
    */
   static Property::Value GetProperty(BaseObject* object, Property::Index index);
 
+protected:
+  /**
+   * Construct a new FlexContainer.
+   */
+  FlexContainer();
+
 private: // From Control
   /**
    * @copydoc Control::OnInitialize()
@@ -218,8 +218,6 @@ private: // Implementation
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~FlexContainer();
-
-private:
   // Undefined copy constructor and assignment operators
   FlexContainer(const FlexContainer&);
   FlexContainer& operator=(const FlexContainer& rhs);

@@ -40,14 +40,43 @@ namespace DALI_NAMESPACE::Scene3D::Internal
 {
 class ModelCacheManager::Impl : public Dali::BaseObject
 {
+private:
+  struct ModelCache
+  {
+    Dali::Scene3D::Loader::ResourceBundle  resources{}; ///< The bundle to store resources in.
+    Dali::Scene3D::Loader::SceneDefinition scene{};     ///< The scene definition to populate.
+    Dali::Scene3D::Loader::SceneMetadata   metaData{};  ///< The metadata of the scene.
+
+    Dali::Vector<Dali::Scene3D::Loader::AnimationDefinition>      animationDefinitions{};      ///< The list of animation definitions, in lexicographical order of their names.
+    Dali::Vector<Dali::Scene3D::Loader::AnimationGroupDefinition> amimationGroupDefinitions{}; ///< The list of animation group definitions, in lexicographical order of their names.
+    Dali::Vector<Dali::Scene3D::Loader::CameraParameters>         cameraParameters{};          ///< The camera parameters that were loaded from the scene.
+    Dali::Vector<Dali::Scene3D::Loader::LightParameters>          lights{};                    ///< The light parameters that were loaded from the scene.
+
+    uint32_t   refCount{0};      ///< The reference count of this model cache.
+    std::mutex loadSceneMutex{}; ///< The mutex instance used to synchronise the loading of the scene for the same model in different threads.
+
+    bool isSceneLoaded{false};  ///< Whether the scene of the model has been loaded.
+    bool isSceneLoading{false}; ///< Whether the scene loading of the model is in progress.
+  };
+
+  // Note : We should use some container that the element memory pointer is not changed due to LoadResult and loadSceneMutex validation.
+  using ModelResourceCache = std::map<std::string, ModelCache>;
+
 public:
   /**
-   * @brief Constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  Impl()
+  static DALI_INTERNAL Impl* NewForBaseHandle()
   {
-    // Try to create ResourceLoader here, to ensure that we create it on main thread.
-    Dali::Scene3D::Internal::ImageResourceLoader::EnsureResourceLoaderCreated();
+    return new Impl();
+  }
+
+  static Dali::IntrusivePtr<Impl> New()
+  {
+    return Dali::IntrusivePtr<Impl>(new Impl());
   }
 
   Dali::Scene3D::Loader::LoadResult GetModelLoadResult(std::string modelUri)
@@ -133,6 +162,15 @@ public:
 
 protected:
   /**
+   * @brief Constructor
+   */
+  Impl()
+  {
+    // Try to create ResourceLoader here, to ensure that we create it on main thread.
+    Dali::Scene3D::Internal::ImageResourceLoader::EnsureResourceLoaderCreated();
+  }
+
+  /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~Impl()
@@ -152,28 +190,6 @@ private:
     ModelCache&             cache = mModelCache[modelUri];
     return cache.loadSceneMutex;
   }
-
-private:
-  struct ModelCache
-  {
-    Dali::Scene3D::Loader::ResourceBundle  resources{}; ///< The bundle to store resources in.
-    Dali::Scene3D::Loader::SceneDefinition scene{};     ///< The scene definition to populate.
-    Dali::Scene3D::Loader::SceneMetadata   metaData{};  ///< The metadata of the scene.
-
-    Dali::Vector<Dali::Scene3D::Loader::AnimationDefinition>      animationDefinitions{};      ///< The list of animation definitions, in lexicographical order of their names.
-    Dali::Vector<Dali::Scene3D::Loader::AnimationGroupDefinition> amimationGroupDefinitions{}; ///< The list of animation group definitions, in lexicographical order of their names.
-    Dali::Vector<Dali::Scene3D::Loader::CameraParameters>         cameraParameters{};          ///< The camera parameters that were loaded from the scene.
-    Dali::Vector<Dali::Scene3D::Loader::LightParameters>          lights{};                    ///< The light parameters that were loaded from the scene.
-
-    uint32_t   refCount{0};      ///< The reference count of this model cache.
-    std::mutex loadSceneMutex{}; ///< The mutex instance used to synchronise the loading of the scene for the same model in different threads.
-
-    bool isSceneLoaded{false};  ///< Whether the scene of the model has been loaded.
-    bool isSceneLoading{false}; ///< Whether the scene loading of the model is in progress.
-  };
-
-  // Note : We should use some container that the element memory pointer is not changed due to LoadResult and loadSceneMutex validation.
-  using ModelResourceCache = std::map<std::string, ModelCache>;
   ModelResourceCache mModelCache;
 
   Dali::Mutex mModelCacheMutex;
@@ -201,7 +217,7 @@ ModelCacheManager ModelCacheManager::Get()
     if(!manager)
     {
       // If not, create the ModelCacheManager and register it as a singleton
-      manager = ModelCacheManager(new ModelCacheManager::Impl());
+      manager = ModelCacheManager(ModelCacheManager::Impl::NewForBaseHandle());
       singletonService.Register(gSingletonTypeInfoId, manager);
     }
   }

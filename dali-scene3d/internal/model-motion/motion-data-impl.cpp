@@ -125,28 +125,28 @@ float MotionData::GetDuration() const
 void MotionData::LoadBvh(const std::string& path, bool useRootTranslationOnly, const Vector3& scale, bool synchronousLoad)
 {
   CancelMotionDataLoad();
-  mMotionDataLoadTask = new MotionDataLoadTask(path, useRootTranslationOnly, scale, MakeCallback(this, &MotionData::OnLoadCompleted));
+  mMotionDataLoadTask = MotionDataLoadTask::New(path, useRootTranslationOnly, scale, MakeCallback(this, &MotionData::OnLoadCompleted));
   RequestMotionDataLoad(synchronousLoad);
 }
 
 void MotionData::LoadBvhFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, bool useRootTranslationOnly, const Vector3& scale, bool synchronousLoad)
 {
   CancelMotionDataLoad();
-  mMotionDataLoadTask = new MotionDataLoadTask(rawBuffer, rawBufferLength, useRootTranslationOnly, scale, MakeCallback(this, &MotionData::OnLoadCompleted));
+  mMotionDataLoadTask = MotionDataLoadTask::New(rawBuffer, rawBufferLength, useRootTranslationOnly, scale, MakeCallback(this, &MotionData::OnLoadCompleted));
   RequestMotionDataLoad(synchronousLoad);
 }
 
 void MotionData::LoadFacialAnimation(const std::string& url, bool synchronousLoad)
 {
   CancelMotionDataLoad();
-  mMotionDataLoadTask = new MotionDataLoadTask(url, MakeCallback(this, &MotionData::OnLoadCompleted));
+  mMotionDataLoadTask = MotionDataLoadTask::New(url, MakeCallback(this, &MotionData::OnLoadCompleted));
   RequestMotionDataLoad(synchronousLoad);
 }
 
 void MotionData::LoadFacialAnimationFromBuffer(const uint8_t* rawBuffer, int rawBufferLength, bool synchronousLoad)
 {
   CancelMotionDataLoad();
-  mMotionDataLoadTask = new MotionDataLoadTask(rawBuffer, rawBufferLength, MakeCallback(this, &MotionData::OnLoadCompleted));
+  mMotionDataLoadTask = MotionDataLoadTask::New(rawBuffer, rawBufferLength, MakeCallback(this, &MotionData::OnLoadCompleted));
   RequestMotionDataLoad(synchronousLoad);
 }
 

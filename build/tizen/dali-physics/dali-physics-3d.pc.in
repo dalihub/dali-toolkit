@@ -7,6 +7,6 @@ includedir=@DEV_INCLUDE_PATH@
 Name: DALi Engine Physics Library
 Description: Dali Physics 3D library
 Version: ${apiversion}
-Requires: bullet3
+Requires: @BULLET_PC_NAME@
 Libs: -L${libdir} -l@name@-3d
 Cflags: -I${includedir}

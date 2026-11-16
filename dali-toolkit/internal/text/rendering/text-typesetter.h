@@ -186,12 +186,8 @@ private:
    * @param[in] model Pointer to the text's data model.
    */
   Typesetter(const ModelInterface* const model);
-
-  // Declared private and left undefined to avoid copies.
-  Typesetter(const Typesetter& handle);
-
-  // Declared private and left undefined to avoid copies.
-  Typesetter& operator=(const Typesetter& handle);
+  Typesetter(const Typesetter& handle)            = delete;
+  Typesetter& operator=(const Typesetter& handle) = delete;
 
   /**
    * @brief Apply markup underline tags.

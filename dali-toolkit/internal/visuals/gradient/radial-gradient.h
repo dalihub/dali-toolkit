@@ -19,6 +19,8 @@
  */
 
 #include <dali-toolkit/internal/visuals/gradient/gradient.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <utility>
 
 #include <dali/public-api/math/vector2.h>
 
@@ -36,17 +38,12 @@ class RadialGradient : public Gradient
 {
 public:
   /**
-   * Contructor.
-   * @param[in] center The center of the gradient circle onto which the 0% gradient stop is mapped.
-   * @param[in] radius The radius of the outmost circle onto which the 100% gradient stop is mapped.
-   * @param[in] oldGradient Previous gradient feature, to copy old variables.
+   * @brief Creates a reference-counted implementation.
    */
-  RadialGradient(const Vector2& center, float radius, IntrusivePtr<Gradient> oldGradient);
-
-  /**
-   * Destructor.
-   */
-  virtual ~RadialGradient();
+  static Dali::IntrusivePtr<RadialGradient> New(const Vector2& center, float radius, IntrusivePtr<Gradient> oldGradient)
+  {
+    return Dali::IntrusivePtr<RadialGradient>(new RadialGradient(center, radius, std::move(oldGradient)));
+  }
 
   /**
    * Set the center and radius of the outermost circle for the radial gradient.
@@ -66,6 +63,20 @@ public:
    * @return The radius of the outmost gradient circle.
    */
   float GetRadius() const;
+
+protected:
+  /**
+   * Contructor.
+   * @param[in] center The center of the gradient circle onto which the 0% gradient stop is mapped.
+   * @param[in] radius The radius of the outmost circle onto which the 100% gradient stop is mapped.
+   * @param[in] oldGradient Previous gradient feature, to copy old variables.
+   */
+  RadialGradient(const Vector2& center, float radius, IntrusivePtr<Gradient> oldGradient);
+
+  /**
+   * Destructor.
+   */
+  virtual ~RadialGradient();
 
 private:
   // Undefined

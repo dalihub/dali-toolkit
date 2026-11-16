@@ -84,6 +84,9 @@ set(prefix_include_dir "${prefix}/include")
 
 include_directories(BEFORE
   ${repo_root_dir}
+)
+
+include_directories(BEFORE SYSTEM
   ${USD_ROOT_DIR}/include
 )
 
@@ -111,6 +114,7 @@ IF (ENABLE_PKG_CONFIGURE)
   INSTALL(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file}
     DESTINATION ${LIB_DIR}/pkgconfig )
+  dali_legacy_pkgconfig_alias(${CMAKE_CURRENT_BINARY_DIR}/${core_pkg_cfg_file} dali2-usd-loader)
 ENDIF()
 
 IF( INSTALL_CMAKE_MODULES )
@@ -153,4 +157,10 @@ ELSE()
   MESSAGE(STATUS "Installing libs")
   INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
 
+ENDIF()
+
+# DALi 2.x names as links to the files above (DALI_LEGACY_ALIASES=ON only).
+dali_legacy_library_alias(${name} dali2-usd-loader)
+IF( INSTALL_CMAKE_MODULES )
+  dali_legacy_cmake_package_alias(${name} dali2-usd-loader)
 ENDIF()

@@ -36,8 +36,6 @@ namespace Internal
 class MediaView : public ControlImpl
 {
 public:
-  MediaView();
-  ~MediaView() override;
   static Toolkit::MediaView            New();
   Dali::Integration::MediaViewBackend& Backend()
   {
@@ -48,6 +46,10 @@ public:
   {
     return *mBackend;
   }
+
+protected:
+  MediaView();
+  ~MediaView() override;
 
 private:
   /**

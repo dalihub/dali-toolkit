@@ -18,8 +18,10 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/base-object.h>
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/particle-system/particle-source.h>
@@ -31,13 +33,33 @@ class ParticleEmitter;
 class ParticleSource : public Dali::BaseObject
 {
 public:
-  ~ParticleSource() override = default;
+  /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL ParticleSource* NewForBaseHandle(UniquePtr<ParticleSourceInterface>&& sourceUpdater)
+  {
+    return new ParticleSource(std::move(sourceUpdater));
+  }
 
-  explicit ParticleSource(UniquePtr<ParticleSourceInterface>&& sourceUpdater);
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<ParticleSource> New(UniquePtr<ParticleSourceInterface>&& sourceUpdater)
+  {
+    return Dali::IntrusivePtr<ParticleSource>(new ParticleSource(std::move(sourceUpdater)));
+  }
 
   void Update(ParticleSystem::ParticleList& list, uint32_t count);
 
   [[nodiscard]] ParticleSourceInterface& GetUpdater();
+
+protected:
+  ~ParticleSource() override = default;
+
+  explicit ParticleSource(UniquePtr<ParticleSourceInterface>&& sourceUpdater);
 
 private:
   UniquePtr<ParticleSourceInterface> mUpdater;

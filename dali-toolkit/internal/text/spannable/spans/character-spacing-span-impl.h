@@ -48,25 +48,11 @@ public:
    * @brief Creates a new CharacterSpacingSpan object.
    */
   static Dali::Toolkit::Text::CharacterSpacingSpan New(const float& value);
-
-  /**
-   * Default Constructor
-   */
-  CharacterSpacingSpan();
-
   CharacterSpacingSpan(const CharacterSpacingSpan&)            = delete; ///< Deleted copy constructor
   CharacterSpacingSpan(CharacterSpacingSpan&&)                 = delete; ///< Deleted move constructor
   CharacterSpacingSpan& operator=(const CharacterSpacingSpan&) = delete; ///< Deleted copy assignment operator
   CharacterSpacingSpan& operator=(CharacterSpacingSpan&&)      = delete; ///< Deleted move assignment operator
-
-  /**
-   * @brief Destructor
-   *
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~CharacterSpacingSpan() override;
-
-public: //Methods
+public:                                                                  //Methods
   /**
    * @copydoc Dali::Toolkit::Text::CharacterSpacingSpan::GetCharacterSpacing()
    */
@@ -90,6 +76,19 @@ public: //Methods for internal only
    * @copydoc Dali::Toolkit::Text::BaseSpan::CreateStyleCharacterRun
    */
   void CreateStyleCharacterRun(IntrusivePtr<LogicalModel>& logicalModel, const Dali::Toolkit::Text::Range& range) const override;
+
+protected:
+  /**
+   * Default Constructor
+   */
+  CharacterSpacingSpan();
+
+  /**
+   * @brief Destructor
+   *
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~CharacterSpacingSpan() override;
 
 private:
   struct Impl;

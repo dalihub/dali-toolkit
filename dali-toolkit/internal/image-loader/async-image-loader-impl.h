@@ -50,11 +50,6 @@ class AsyncImageLoader : public BaseObject, public ConnectionTracker
 {
 public:
   /**
-   * Constructor
-   */
-  AsyncImageLoader();
-
-  /**
    * @copydoc Toolkit::AsyncImageLoader::New()
    */
   static IntrusivePtr<AsyncImageLoader> New();
@@ -157,6 +152,11 @@ public:
   void ProcessLoadedImage(LoadingTaskPtr task);
 
 protected:
+  /**
+   * Constructor
+   */
+  AsyncImageLoader();
+
   /**
    * Destructor
    */
