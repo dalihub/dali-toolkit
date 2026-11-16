@@ -406,7 +406,7 @@ protected:
    * @SINCE_2_5.27
    * @param[in] properties The properties the layout.
    */
-  virtual void OnLayoutPropertiesSet(const Property::Map& properties)
+  virtual void OnLayoutPropertiesSet([[maybe_unused]] const Property::Map& properties)
   {
   }
 
