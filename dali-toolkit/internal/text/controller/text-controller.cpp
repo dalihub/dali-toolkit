@@ -20,12 +20,14 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali/devel-api/text-abstraction/shaping.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/clipboard-integ.h>
 #include <dali/integration-api/debug.h>
 #include <memory.h>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
@@ -678,6 +680,65 @@ void Controller::CopyStringToClipboard(const std::string& source)
 void Controller::SendSelectionToClipboard(bool deleteAfterSending)
 {
   mImpl->SendSelectionToClipboard(deleteAfterSending);
+}
+
+bool Controller::SetTextLanguage(const std::string& language)
+{
+  if(language == mImpl->GetTextLanguage())
+  {
+    return true;
+  }
+  std::string normalized;
+  if(!TextAbstraction::NormalizeLanguageTag(language, normalized))
+  {
+    return false;
+  }
+  if(mImpl->GetTextLanguage() != normalized)
+  {
+    if(normalized.empty())
+    {
+      mImpl->mTextLanguage.reset();
+    }
+    else if(mImpl->mTextLanguage)
+    {
+      *mImpl->mTextLanguage = std::move(normalized);
+    }
+    else
+    {
+      mImpl->mTextLanguage = std::make_unique<std::string>(std::move(normalized));
+    }
+    UpdateCursorPosition(mImpl->mEventData);
+    if(mImpl->mEventData && EventData::IsEditingState(mImpl->mEventData->mState))
+    {
+      mImpl->mEventData->mUpdateGrabHandlePosition  = true;
+      mImpl->mEventData->mUpdateCursorHookPosition  = true;
+      mImpl->mEventData->mScrollAfterUpdatePosition = true;
+    }
+    if(mImpl->mEventData && mImpl->mEventData->mState == EventData::SELECTING)
+    {
+      mImpl->mEventData->mUpdateLeftSelectionPosition  = true;
+      mImpl->mEventData->mUpdateRightSelectionPosition = true;
+      mImpl->mEventData->mUpdateHighlightBox           = true;
+    }
+
+    // Keep validated font runs and pending edit deltas. Edit notifications may
+    // change the language before the updater has finished recording an edit.
+    mImpl->mTextUpdateInfo.mCharacterIndex     = 0u;
+    mImpl->mTextUpdateInfo.mClearAll           = true;
+    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
+    mImpl->mRecalculateNaturalSize             = true;
+    mImpl->mRecalculateLayoutSize              = true;
+    // BIDI_INFO also rebuilds mirrored characters used by the shaper.
+    mImpl->mOperationsPending = static_cast<OperationsMask>(mImpl->mOperationsPending |
+                                                            SHAPE_TEXT | BIDI_INFO | GET_GLYPH_METRICS | LAYOUT | UPDATE_LAYOUT_SIZE | REORDER | ALIGN | COLOR);
+    RequestRelayout();
+  }
+  return true;
+}
+
+std::string Controller::GetTextLanguage() const
+{
+  return mImpl->GetTextLanguage();
 }
 
 void Controller::SetDefaultFontFamily(const std::string& defaultFontFamily)

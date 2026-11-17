@@ -58,6 +58,23 @@ void utc_dali_toolkit_control_wrapper_cleanup(void)
 
 namespace
 {
+class TestControlWrapper : public Toolkit::Internal::ControlWrapper
+{
+public:
+  static IntrusivePtr<TestControlWrapper> New(CustomControlBehaviour behaviour)
+  {
+    return IntrusivePtr<TestControlWrapper>(new TestControlWrapper(behaviour));
+  }
+
+protected:
+  explicit TestControlWrapper(CustomControlBehaviour behaviour)
+  : Toolkit::Internal::ControlWrapper(behaviour)
+  {
+  }
+
+  ~TestControlWrapper() override = default;
+};
+
 bool gOnRelayout = false;
 
 static bool gKeyInputFocusCallBackCalled;
@@ -278,8 +295,8 @@ int UtcDaliControlWrapperConstructor(void)
 {
   ToolkitTestApplication application; // Exceptions require ToolkitTestApplication
 
-  Toolkit::Internal::ControlWrapper* controlWrapperImpl = new Toolkit::Internal::ControlWrapper(Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT);
-  ControlWrapper                     controlWrapper;
+  auto           controlWrapperImpl = TestControlWrapper::New(Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT);
+  ControlWrapper controlWrapper;
 
   DALI_TEST_CHECK(!ControlWrapper::DownCast(controlWrapper));
 
@@ -298,7 +315,7 @@ int UtcDaliControlWrapperDestructor(void)
 {
   ToolkitTestApplication application;
 
-  ControlWrapper control = ControlWrapper::New(customControlTypeName, *(new Toolkit::Internal::ControlWrapper(Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT)));
+  ControlWrapper control = ControlWrapper::New(customControlTypeName, *(TestControlWrapper::New(Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT)));
 
   ControlWrapper control2(control);
 

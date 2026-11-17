@@ -46,7 +46,7 @@ void ScrollBase::BindActor(Actor child)
 {
   FindAndUnbindActor(child);
 
-  ActorInfoPtr actorInfo(new ActorInfo(child));
+  ActorInfoPtr actorInfo(ActorInfo::New(child));
   mBoundActors.push_back(actorInfo);
 
   // Apply all our constraints to this new child.

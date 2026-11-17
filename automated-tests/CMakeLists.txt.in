@@ -8,6 +8,7 @@ SET(SCRIPT_DIR ${CMAKE_SOURCE_DIR}/scripts)
 
 
 ADD_DEFINITIONS(-DDALI_STYLE_DIR="@dataReadOnlyDir@/toolkit/styles/")
+ADD_DEFINITIONS(-DDALI_TOOLKIT_TEXT_DOMAIN="@DALI_TOOLKIT_TEXT_DOMAIN@")
 
 # Macro checks if the module is available and sets user variable
 MACRO( CHECK_MODULE_AND_SET PKG_VAR PKG_LIB_REQUIREMENTS VAR_TO_SET )
@@ -25,7 +26,7 @@ CHECK_MODULE_AND_SET(ELDBUS eldbus>=${ELDBUS_REQUIRED} ELDBUS_AVAILABLE)
 
 INCLUDE_DIRECTORIES(
   src/common
-  @PREFIX@/include/dali/integration-api/adaptor-framework
+  @PREFIX@/include/@DALI_INCLUDE_SUBDIR@/dali/integration-api/adaptor-framework
 )
 
 # Ignore some warning options
@@ -65,7 +66,7 @@ FOREACH(PO_FILE ${PO_FILES})
         GET_FILENAME_COMPONENT(lang ${ABS_PO_FILE} NAME_WE)
         MESSAGE("lang : ${lang}")
         FILE(MAKE_DIRECTORY ${MO_FILES_DIR}/${lang}/LC_MESSAGES)
-        SET(MO_FILE ${MO_FILES_DIR}/${lang}/LC_MESSAGES/dali-toolkit.mo)
+        SET(MO_FILE ${MO_FILES_DIR}/${lang}/LC_MESSAGES/@DALI_TOOLKIT_TEXT_DOMAIN@.mo)
         MESSAGE("MO_FILE : ${MO_FILE}")
         ADD_CUSTOM_COMMAND(OUTPUT ${MO_FILE}
                            COMMAND ${MSGFMT} -o ${MO_FILE} ${ABS_PO_FILE}

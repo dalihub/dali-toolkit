@@ -222,7 +222,7 @@ int UtcDaliUsdLoaderSuccess1(void)
   DALI_TEST_EQUAL(0u, resources.mShaders.Size());
   DALI_TEST_EQUAL(0u, resources.mSkeletons.Size());
 
-  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  Scene3D::Loader::ShaderManagerPtr shaderManager = Scene3D::Loader::ShaderManager::New();
   ViewProjection                    viewProjection;
   Transforms                        xforms{
     MatrixStack{},
@@ -463,7 +463,7 @@ int UtcDaliUsdLoaderAnimation01(void)
   DALI_TEST_EQUAL(1, ctx.animations[0].GetPropertyAt(2).mKeyFrames.GetBaseObject().ReferenceCount());
   DALI_TEST_EQUAL(Property::Type::VECTOR3, ctx.animations[0].GetPropertyAt(2).mKeyFrames.GetType());
 
-  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  Scene3D::Loader::ShaderManagerPtr shaderManager = Scene3D::Loader::ShaderManager::New();
   ViewProjection                    viewProjection;
   Transforms                        xforms{
     MatrixStack{},
@@ -583,7 +583,7 @@ int UtcDaliUsdLoaderAnimation02(void)
   DALI_TEST_EQUAL(1, ctx.animations[0].GetPropertyAt(2).mKeyFrames.GetBaseObject().ReferenceCount());
   DALI_TEST_EQUAL(Property::Type::VECTOR3, ctx.animations[0].GetPropertyAt(2).mKeyFrames.GetType());
 
-  Scene3D::Loader::ShaderManagerPtr shaderManager = new Scene3D::Loader::ShaderManager();
+  Scene3D::Loader::ShaderManagerPtr shaderManager = Scene3D::Loader::ShaderManager::New();
   ViewProjection                    viewProjection;
   Transforms                        xforms{
     MatrixStack{},

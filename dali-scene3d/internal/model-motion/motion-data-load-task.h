@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // INTERNAL INCLUDES
 #include <dali-scene3d/integration-api/loader/animation-definition.h>
@@ -49,7 +50,58 @@ public:
     FACIAL_BUFFER,
   };
 
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<MotionDataLoadTask> New(const uint8_t* rawBuffer, int rawBufferLength, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<MotionDataLoadTask>(new MotionDataLoadTask(rawBuffer, rawBufferLength, callback));
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<MotionDataLoadTask> New(const std::string& url, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<MotionDataLoadTask>(new MotionDataLoadTask(url, callback));
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<MotionDataLoadTask> New(const uint8_t* rawBuffer, int rawBufferLength, bool useRootTranslationOnly, const Vector3& scale, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<MotionDataLoadTask>(new MotionDataLoadTask(rawBuffer, rawBufferLength, useRootTranslationOnly, scale, callback));
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<MotionDataLoadTask> New(const std::string& path, bool useRootTranslationOnly, const Vector3& scale, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<MotionDataLoadTask>(new MotionDataLoadTask(path, useRootTranslationOnly, scale, callback));
+  }
+
+public: // Implementation of AsyncTask
+  /**
+   * @copydoc Dali::AsyncTask::Process()
+   */
+  void Process() override;
+
+  /**
+   * @copydoc Dali::AsyncTask::GetTaskName()
+   */
+  Dali::StringView GetTaskName() const override
+  {
+    return Dali::StringView("MotionDataLoadTask");
+  }
+
 public:
+  const Scene3D::Loader::AnimationDefinition& GetAnimationDefinition() const;
+
+  LoadMethod GetLoadMethod() const;
+
+protected:
   /**
    * Constructor for load bvh from file.
    */
@@ -74,25 +126,6 @@ public:
    * Destructor.
    */
   ~MotionDataLoadTask();
-
-public: // Implementation of AsyncTask
-  /**
-   * @copydoc Dali::AsyncTask::Process()
-   */
-  void Process() override;
-
-  /**
-   * @copydoc Dali::AsyncTask::GetTaskName()
-   */
-  Dali::StringView GetTaskName() const override
-  {
-    return Dali::StringView("MotionDataLoadTask");
-  }
-
-public:
-  const Scene3D::Loader::AnimationDefinition& GetAnimationDefinition() const;
-
-  LoadMethod GetLoadMethod() const;
 
 private:
   // Undefined

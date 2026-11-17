@@ -23,6 +23,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/adaptor-framework/clipboard-integ.h>
 #include <dali/public-api/rendering/shader.h>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/styling/style-manager-devel.h>
@@ -1009,6 +1010,14 @@ public:
   void ClearFontData();
 
   /**
+   * @brief Gets the internal shaping language without copying.
+   *
+   * @return A reference to the lowercase language tag, or empty for the system path.
+   * @note The reference is valid until the language changes or the controller is destroyed.
+   */
+  const std::string& GetTextLanguage() const;
+
+  /**
    * @brief Helper to clear text's style data.
    */
   void ClearStyleData();
@@ -1095,6 +1104,7 @@ public:
   SelectableControlInterface*  mSelectableControlInterface; ///< Reference to the selectable text controller.
   AnchorControlInterface*      mAnchorControlInterface;     ///< Reference to the anchor controller.
   ModelPtr                     mModel;                      ///< Pointer to the text's model.
+  std::unique_ptr<std::string> mTextLanguage;               ///< Allocated only for an authored shaping language.
   FontDefaults*                mFontDefaults;               ///< Avoid allocating this when the user does not specify a font.
   UnderlineDefaults*           mUnderlineDefaults;          ///< Avoid allocating this when the user does not specify underline parameters.
   ShadowDefaults*              mShadowDefaults;             ///< Avoid allocating this when the user does not specify shadow parameters.

@@ -71,11 +71,9 @@ protected:
   virtual ~Renderer();
 
 private:
-  // Undefined
-  Renderer(const Renderer& handle);
+  Renderer(const Renderer& handle) = delete;
 
-  // Undefined
-  Renderer& operator=(const Renderer& handle);
+  Renderer& operator=(const Renderer& handle) = delete;
 };
 
 } // namespace Text

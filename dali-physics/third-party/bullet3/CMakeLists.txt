@@ -71,6 +71,25 @@ set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 include(CPack)
 
+# Installed names. DALi passes DALI_THIRD_PARTY_PREFIX ("dali3-" for API
+# major 3, empty for 2) and INCLUDE_DIR so that a bullet3 bundled with one
+# DALi major never shares a file with the one bundled with another:
+# lib<prefix>bullet3.so, <prefix>bullet3.pc, <includedir>/bullet.
+if(NOT DEFINED DALI_THIRD_PARTY_PREFIX)
+    set(DALI_THIRD_PARTY_PREFIX "")
+endif()
+set(BULLET3_LIB_NAME ${DALI_THIRD_PARTY_PREFIX}bullet3)
+if(INCLUDE_DIR)
+    set(BULLET3_INCLUDE_INSTALL_DIR ${INCLUDE_DIR}/bullet)
+else()
+    set(BULLET3_INCLUDE_INSTALL_DIR include/bullet)
+endif()
+if(DALI_EXPORT_INCLUDE_DIR)
+    set(BULLET3_EXPORT_INCLUDE_DIR ${DALI_EXPORT_INCLUDE_DIR}/bullet)
+else()
+    set(BULLET3_EXPORT_INCLUDE_DIR include/bullet)
+endif()
+
 # Build the main bullet3 library
 set(BULLET3_LIBRARY_TYPE "STATIC")
 if(BULLET3_BUILD_SHARED)
@@ -78,6 +97,7 @@ if(BULLET3_BUILD_SHARED)
 endif()
 add_library(bullet3 ${BULLET3_LIBRARY_TYPE} ${BULLET3_SOURCES})
 set_target_properties(bullet3 PROPERTIES
+    OUTPUT_NAME ${BULLET3_LIB_NAME}
     WINDOWS_EXPORT_ALL_SYMBOLS 1
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION}
@@ -85,7 +105,7 @@ set_target_properties(bullet3 PROPERTIES
 target_include_directories(bullet3
     SYSTEM INTERFACE
         $<BUILD_INTERFACE:${bullet_SOURCE_DIR}/src>
-        $<INSTALL_INTERFACE:include/bullet>
+        $<INSTALL_INTERFACE:${BULLET3_EXPORT_INCLUDE_DIR}>
     PRIVATE
         ${bullet_SOURCE_DIR}/src
 )
@@ -111,10 +131,14 @@ if(ENABLE_PKG_CONFIGURE)
     if( NOT LIB_DIR )
         set( LIB_DIR ${prefix}/lib )
     endif()
-    set(DEV_INCLUDE_PATH ${prefix}/include/bullet)
+    if(IS_ABSOLUTE ${BULLET3_INCLUDE_INSTALL_DIR})
+        set(DEV_INCLUDE_PATH ${BULLET3_INCLUDE_INSTALL_DIR})
+    else()
+        set(DEV_INCLUDE_PATH ${prefix}/${BULLET3_INCLUDE_INSTALL_DIR})
+    endif()
 
-    set(bullet_pkg_cfg_file bullet3.pc)
-    configure_file(${CMAKE_CURRENT_LIST_DIR}/${bullet_pkg_cfg_file}.cmake ${bullet_pkg_cfg_file} @ONLY)
+    set(bullet_pkg_cfg_file ${BULLET3_LIB_NAME}.pc)
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/bullet3.pc.cmake ${bullet_pkg_cfg_file} @ONLY)
 
     # Installation
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${bullet_pkg_cfg_file}
@@ -128,12 +152,22 @@ install(
     EXPORT bullet3-targets
 )
 
+# DALi 2.x shipped this library as libbullet3 with bullet3.pc and
+# include/bullet; DALI_LEGACY_ALIASES=ON adds those names as links.
+if(COMMAND dali_legacy_library_alias)
+    dali_legacy_library_alias(bullet3 bullet3 ${PROJECT_VERSION})
+    dali_legacy_include_alias(bullet)
+    if(ENABLE_PKG_CONFIGURE)
+        dali_legacy_pkgconfig_alias(${CMAKE_CURRENT_BINARY_DIR}/${bullet_pkg_cfg_file} bullet3)
+    endif()
+endif()
+
 if(INSTALL_CMAKE_MODULES)
   install(
       EXPORT bullet3-targets
       NAMESPACE bullet3::
-      FILE bullet3-targets.cmake
-      DESTINATION share/bullet3
+      FILE ${BULLET3_LIB_NAME}-targets.cmake
+      DESTINATION share/${BULLET3_LIB_NAME}
   )
 endif()
 
@@ -144,20 +178,20 @@ endif()
 install(FILES
     "${bullet_SOURCE_DIR}/src/btBulletCollisionCommon.h"
     "${bullet_SOURCE_DIR}/src/btBulletDynamicsCommon.h"
-    DESTINATION "include/bullet"
+    DESTINATION "${BULLET3_INCLUDE_INSTALL_DIR}"
 )
 foreach(SUB ${BULLET_SUBMODULES})
     install(
         DIRECTORY "${bullet_SOURCE_DIR}/src/${SUB}"
-        DESTINATION "include/bullet"
+        DESTINATION "${BULLET3_INCLUDE_INSTALL_DIR}"
         FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp"
     )
 endforeach()
 
 if(INSTALL_CMAKE_MODULES)
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/bullet3-config.cmake "
+  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${BULLET3_LIB_NAME}-config.cmake "
     include(CMakeFindDependencyMacro)
-    include(\${CMAKE_CURRENT_LIST_DIR}/bullet3-targets.cmake)
+    include(\${CMAKE_CURRENT_LIST_DIR}/${BULLET3_LIB_NAME}-targets.cmake)
   ")
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/bullet3-config.cmake DESTINATION share/bullet3)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${BULLET3_LIB_NAME}-config.cmake DESTINATION share/${BULLET3_LIB_NAME})
 endif()

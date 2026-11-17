@@ -43,15 +43,6 @@ protected:
 
 public:
   /**
-   * Construct a new GlView.
-   */
-  explicit GlViewImpl(GlView::BackendMode backendMode)
-  : ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(CONTROL_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
-    mBackendMode(backendMode)
-  {
-  }
-
-  /**
    * @copydoc Dali::Toolkit::GlView::RegisterGlCallbacks()
    */
   virtual void RegisterGlCallbacks(std::unique_ptr<CallbackBase> initCallback, std::unique_ptr<CallbackBase> renderFrameCallback, std::unique_ptr<CallbackBase> terminateCallback) = 0;
@@ -98,6 +89,16 @@ public:
    * @copydoc Dali::Toolkit::GlView::Terminate()
    */
   virtual void Terminate() = 0;
+
+protected:
+  /**
+   * Construct a new GlView.
+   */
+  explicit GlViewImpl(GlView::BackendMode backendMode)
+  : ControlImpl(ControlBehaviour(static_cast<ControlBehaviour>(CONTROL_BEHAVIOUR_DEFAULT) | DISABLE_STYLE_CHANGE_SIGNALS)),
+    mBackendMode(backendMode)
+  {
+  }
 
 private: // From Control
   /**

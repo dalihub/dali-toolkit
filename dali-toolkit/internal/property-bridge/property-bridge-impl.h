@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <string>
 
@@ -41,14 +42,23 @@ class PropertyBridge : public Dali::BaseObject
 {
 public:
   /**
-   * Construct a new PropertyBridge.
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  PropertyBridge();
+  static DALI_INTERNAL PropertyBridge* NewForBaseHandle()
+  {
+    return new PropertyBridge();
+  }
 
   /**
-   * Destructor
+   * @brief Creates a reference-counted implementation.
    */
-  ~PropertyBridge();
+  static Dali::IntrusivePtr<PropertyBridge> New()
+  {
+    return Dali::IntrusivePtr<PropertyBridge>(new PropertyBridge());
+  }
 
   /**
    * @copydoc Dali::Toolkit::PropertyBridge::Get()
@@ -70,6 +80,17 @@ public:
    * @brief EnsureStringGetter.
    */
   bool EnsureStringGetter();
+
+protected:
+  /**
+   * Construct a new PropertyBridge.
+   */
+  PropertyBridge();
+
+  /**
+   * Destructor
+   */
+  ~PropertyBridge();
 
 private:
   // Undefined

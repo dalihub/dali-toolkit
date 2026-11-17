@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/extents.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel-buffer.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -54,17 +55,13 @@ public:
     LOAD_COMPLETE,   ///< NPatch loading is completed successfully.
     LOAD_FAILED      ///< NPatch loading is failed.
   };
-
-public:
   /**
-   * Constructor
+   * @brief Creates a reference-counted implementation.
    */
-  NPatchData();
-
-  /**
-   * Destructor, non-virtual as not a base class
-   */
-  ~NPatchData();
+  static Dali::IntrusivePtr<NPatchData> New()
+  {
+    return Dali::IntrusivePtr<NPatchData>(new NPatchData());
+  }
 
 public:
   /**
@@ -265,6 +262,17 @@ public:
    */
   void NotifyObserver(TextureUploadObserver* observer, const bool& loadSuccess);
 
+protected:
+  /**
+   * Constructor
+   */
+  NPatchData();
+
+  /**
+   * Destructor, non-virtual as not a base class
+   */
+  ~NPatchData();
+
 private:
   /**
    * @copydoc TextureUploadObserver::LoadComplete
@@ -282,8 +290,9 @@ private:
   void ObserverDestroyed(TextureUploadObserver* observer);
 
 private:
-  using ObserverListType = Dali::Vector<TextureUploadObserver*>;
-
+  using ObserverListType                        = Dali::Vector<TextureUploadObserver*>;
+  NPatchData(const NPatchData&)                 = delete;
+  NPatchData&      operator=(const NPatchData&) = delete;
   NPatchDataId     mId;
   ObserverListType mObserverList;    ///< Container used to store all observer clients of this Texture
   ObserverListType mQueuedObservers; ///< Container observers when user try to add during notify observers

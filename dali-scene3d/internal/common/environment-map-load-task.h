@@ -42,16 +42,12 @@ class EnvironmentMapLoadTask : public AsyncTask
 {
 public:
   /**
-   * Constructor
-   * @param[in] environmentMapUrl The url of the environment map image file.
-   * @param[in] callback The callback that is called when the operation is completed.
+   * @brief Creates a reference-counted implementation.
    */
-  EnvironmentMapLoadTask(const std::string& environmentMapUrl, Dali::Scene3D::EnvironmentMapType environmentMapType, CallbackBase* callback);
-
-  /**
-   * Destructor.
-   */
-  ~EnvironmentMapLoadTask();
+  static Dali::IntrusivePtr<EnvironmentMapLoadTask> New(const std::string& environmentMapUrl, Dali::Scene3D::EnvironmentMapType environmentMapType, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<EnvironmentMapLoadTask>(new EnvironmentMapLoadTask(environmentMapUrl, environmentMapType, callback));
+  }
 
   /**
    * Whether the task has succeeded.
@@ -91,6 +87,19 @@ public: // Implementation of AsyncTask
   {
     return Dali::StringView("EnvironmentMapLoadTask");
   }
+
+protected:
+  /**
+   * Constructor
+   * @param[in] environmentMapUrl The url of the environment map image file.
+   * @param[in] callback The callback that is called when the operation is completed.
+   */
+  EnvironmentMapLoadTask(const std::string& environmentMapUrl, Dali::Scene3D::EnvironmentMapType environmentMapType, CallbackBase* callback);
+
+  /**
+   * Destructor.
+   */
+  ~EnvironmentMapLoadTask();
 
 private:
   // Undefined

@@ -346,7 +346,7 @@ SceneView::SceneView()
   mSkyboxIntensity(1.0f),
   mFailedCaptureCallbacks(nullptr),
   mLightObservers(),
-  mShaderManager(new Scene3D::Loader::ShaderManager())
+  mShaderManager(Scene3D::Loader::ShaderManager::New())
 {
 }
 
@@ -609,7 +609,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
         // Request image resource GC
         Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
       }
-      mIblDiffuseLoadTask = new EnvironmentMapLoadTask(mDiffuseIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &SceneView::OnIblDiffuseLoadComplete));
+      mIblDiffuseLoadTask = EnvironmentMapLoadTask::New(mDiffuseIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &SceneView::OnIblDiffuseLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblDiffuseLoadTask);
       mIblDiffuseDirty = false;
     }
@@ -624,7 +624,7 @@ void SceneView::SetImageBasedLightSource(const std::string& diffuseUrl, const st
         // Request image resource GC
         Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
       }
-      mIblSpecularLoadTask = new EnvironmentMapLoadTask(mSpecularIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &SceneView::OnIblSpecularLoadComplete));
+      mIblSpecularLoadTask = EnvironmentMapLoadTask::New(mSpecularIblUrl, Scene3D::EnvironmentMapType::CUBEMAP, MakeCallback(this, &SceneView::OnIblSpecularLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mIblSpecularLoadTask);
       mIblSpecularDirty = false;
     }
@@ -1561,7 +1561,7 @@ void SceneView::UpdateSkybox(const std::string& skyboxUrl, Scene3D::EnvironmentM
         Dali::Scene3D::Internal::ImageResourceLoader::RequestGarbageCollect();
       }
 
-      mSkyboxLoadTask = new EnvironmentMapLoadTask(mSkyboxUrl, mSkyboxEnvironmentMapType, MakeCallback(this, &SceneView::OnSkyboxLoadComplete));
+      mSkyboxLoadTask = EnvironmentMapLoadTask::New(mSkyboxUrl, mSkyboxEnvironmentMapType, MakeCallback(this, &SceneView::OnSkyboxLoadComplete));
       Dali::AsyncTaskManager::Get().AddTask(mSkyboxLoadTask);
       mSkyboxDirty = false;
     }

@@ -73,14 +73,10 @@ public:
     SizeType mBlock;       // Block within atlas used for image
   };
 
-  AtlasManager();
-
   /**
    * Create a new AtlasManager
    */
   static AtlasManagerPtr New();
-
-  virtual ~AtlasManager();
 
   /**
    * @copydoc: Toolkit::AtlasManager::CreateAtlas
@@ -166,6 +162,10 @@ public:
    * @copydoc Toolkit::AtlasManager::SetTextures
    */
   void SetTextures(AtlasId atlas, TextureSet& textureSet);
+
+protected:
+  AtlasManager();
+  virtual ~AtlasManager();
 
 private:
   std::vector<AtlasDescriptor>         mAtlasList;     // List of atlases created

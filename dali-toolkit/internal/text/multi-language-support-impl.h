@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/icu.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/connection-tracker.h>
 #include <cstddef>
@@ -151,16 +152,23 @@ class MultilanguageSupport : public BaseObject, public ConnectionTracker
 {
 public:
   /**
-   * Constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  MultilanguageSupport(bool connectLocaleChangedSignal = true);
+  static DALI_INTERNAL MultilanguageSupport* NewForBaseHandle(bool connectLocaleChangedSignal = true)
+  {
+    return new MultilanguageSupport(connectLocaleChangedSignal);
+  }
 
   /**
-   * Destructor
-   *
-   * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   * @brief Creates a reference-counted implementation.
    */
-  ~MultilanguageSupport();
+  static Dali::IntrusivePtr<MultilanguageSupport> New(bool connectLocaleChangedSignal = true)
+  {
+    return Dali::IntrusivePtr<MultilanguageSupport>(new MultilanguageSupport(connectLocaleChangedSignal));
+  }
 
   /**
    * @copydoc Dali::MultilanguageSupport::Get()
@@ -214,6 +222,19 @@ public:
    */
   void UpdateICULineBreak(const std::string& text, TextAbstraction::Length numberOfCharacters,
                           TextAbstraction::LineBreakInfo* breakInfo);
+
+protected:
+  /**
+   * Constructor
+   */
+  MultilanguageSupport(bool connectLocaleChangedSignal = true);
+
+  /**
+   * Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
+   */
+  ~MultilanguageSupport();
 
 private:
   TextAbstraction::ICU               mICU;                       ///< Handle to the dali ICU.

@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/particle-system/particle-domain.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
@@ -28,6 +29,29 @@ namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 {
 class ParticleDomain : public Dali::BaseObject
 {
+public:
+  /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL ParticleDomain* NewForBaseHandle()
+  {
+    return new ParticleDomain();
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<ParticleDomain> New()
+  {
+    return Dali::IntrusivePtr<ParticleDomain>(new ParticleDomain());
+  }
+
+protected:
+  ParticleDomain()           = default;
+  ~ParticleDomain() override = default;
 };
 
 } //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal

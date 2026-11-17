@@ -21,6 +21,7 @@
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali/devel-api/adaptor-framework/async-task-manager.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel-buffer.h>
 
 // INTERNAL INCLUDES
@@ -45,16 +46,13 @@ using RemoteDecodeTaskPtr = IntrusivePtr<RemoteDecodeTask>;
 class RemoteDecodeTask : public AsyncTask
 {
 public:
-  RemoteDecodeTask(TextureManagerType::TextureId            textureId,
-                   const std::string&                       localFilePath,
-                   const Dali::ImageDimensions&             desiredSize,
-                   Dali::SamplingMode::Type                 samplingMode,
-                   bool                                     orientationCorrection,
-                   DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
-                   bool                                     loadYuvPlanes,
-                   CallbackBase*                            callback);
-
-  ~RemoteDecodeTask() override;
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<RemoteDecodeTask> New(TextureManagerType::TextureId textureId, const std::string& localFilePath, const Dali::ImageDimensions& desiredSize, Dali::SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad, bool loadYuvPlanes, CallbackBase* callback)
+  {
+    return Dali::IntrusivePtr<RemoteDecodeTask>(new RemoteDecodeTask(textureId, localFilePath, desiredSize, samplingMode, orientationCorrection, preMultiplyOnLoad, loadYuvPlanes, callback));
+  }
 
 public: // Implementation of AsyncTask
   void Process() override;
@@ -66,7 +64,22 @@ public: // Implementation of AsyncTask
 
 public:
   TextureManagerType::TextureId textureId;
-  std::vector<PixelBuffer>      pixelBuffers;
+
+protected:
+  RemoteDecodeTask(TextureManagerType::TextureId            textureId,
+                   const std::string&                       localFilePath,
+                   const Dali::ImageDimensions&             desiredSize,
+                   Dali::SamplingMode::Type                 samplingMode,
+                   bool                                     orientationCorrection,
+                   DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad,
+                   bool                                     loadYuvPlanes,
+                   CallbackBase*                            callback);
+
+public:
+  std::vector<PixelBuffer> pixelBuffers;
+
+protected:
+  ~RemoteDecodeTask() override;
 
 private:
   std::string                              mLocalFilePath;

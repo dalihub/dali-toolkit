@@ -61,6 +61,7 @@ struct AsyncTextParameters
 {
   AsyncTextParameters()
   : text{},
+    textLanguage{},
     fontFamily{},
     textColor{Color::BLACK},
     underlineColor{Color::BLACK},
@@ -142,8 +143,9 @@ struct AsyncTextParameters
   {
   }
 
-  std::string text;       ///< The text to be rendered encoded in utf8.
-  std::string fontFamily; ///< The font's family.
+  std::string text;         ///< The text to be rendered encoded in utf8.
+  std::string textLanguage; ///< Shaping language validated and normalized by TextAbstraction::NormalizeLanguageTag(); empty uses the system path.
+  std::string fontFamily;   ///< The font's family.
 
   Vector4 textColor; ///< The default text's color. Default is white.
   Vector4 underlineColor;

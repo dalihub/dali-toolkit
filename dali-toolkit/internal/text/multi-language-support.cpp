@@ -47,9 +47,9 @@ MultilanguageSupport MultilanguageSupport::Get()
 
 MultilanguageSupport MultilanguageSupport::New(bool connectLocaleChangedSignal)
 {
-  auto multilanguageSupportImpl = new Internal::MultilanguageSupport(connectLocaleChangedSignal);
+  auto multilanguageSupportImpl = Internal::MultilanguageSupport::New(connectLocaleChangedSignal);
 
-  return MultilanguageSupport(multilanguageSupportImpl);
+  return MultilanguageSupport(multilanguageSupportImpl.Get());
 }
 
 void MultilanguageSupport::SetScripts(const Vector<Character>& text,

@@ -42,9 +42,9 @@ AsyncTextModule::AsyncTextModule(Internal::AsyncTextModule* implementation)
 
 AsyncTextModule AsyncTextModule::New()
 {
-  auto asyncTextModuleImpl = new Internal::AsyncTextModule();
+  auto asyncTextModuleImpl = Internal::AsyncTextModule::New();
 
-  return AsyncTextModule(asyncTextModuleImpl);
+  return AsyncTextModule(asyncTextModuleImpl.Get());
 }
 
 void AsyncTextModule::ClearCache()

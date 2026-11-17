@@ -174,6 +174,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "renderScale",   
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY(Toolkit, TextLabel, "needRequestAsyncRender",       BOOLEAN, NEED_REQUEST_ASYNC_RENDER      )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "layoutDirectionPolicy",        INTEGER, LAYOUT_DIRECTION_POLICY        )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "autoScrollDirection",          INTEGER, AUTO_SCROLL_DIRECTION          )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextLabel, "textLanguage",                 STRING,  TEXT_LANGUAGE                  )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(Toolkit, TextLabel, "textColor",       Color::BLACK,     TEXT_COLOR       )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(Toolkit,    TextLabel, "textColorRed",    TEXT_COLOR_RED,   TEXT_COLOR,     0)
@@ -322,6 +323,18 @@ void TextLabel::SetProperty(BaseObject* object, Property::Index index, const Pro
           // When using the vector-based rendering, the size of the GLyphs are different
           TextAbstraction::GlyphType glyphType = (DevelText::RENDERING_VECTOR_BASED == impl.mRenderingBackend) ? TextAbstraction::VECTOR_GLYPH : TextAbstraction::BITMAP_GLYPH;
           impl.mController->SetGlyphType(glyphType);
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::TEXT_LANGUAGE:
+      {
+        if(value.GetType() == Property::STRING)
+        {
+          const auto previous = impl.mController->GetTextLanguage();
+          if(impl.mController->SetTextLanguage(ToStdString(value)) && previous != impl.mController->GetTextLanguage())
+          {
+            impl.mTextUpdateNeeded = true;
+          }
         }
         break;
       }
@@ -795,6 +808,11 @@ Property::Value TextLabel::GetProperty(BaseObject* object, Property::Index index
       case Toolkit::DevelTextLabel::Property::RENDERING_BACKEND:
       {
         value = impl.mRenderingBackend;
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::TEXT_LANGUAGE:
+      {
+        value = ToPropertyValue(impl.mController->GetTextLanguage());
         break;
       }
       case Toolkit::TextLabel::Property::TEXT:
@@ -1748,6 +1766,7 @@ AsyncTextParameters TextLabel::GetAsyncTextParameters(const Async::RequestType r
   parameters.padding         = padding;
   parameters.layoutDirection = layoutDirection;
   parameters.text            = text;
+  parameters.textLanguage    = mController->GetTextLanguage();
 
   parameters.maxTextureSize         = Dali::GetMaxTextureSize();
   parameters.fontSize               = mController->GetDefaultFontSize(Text::Controller::POINT_SIZE);

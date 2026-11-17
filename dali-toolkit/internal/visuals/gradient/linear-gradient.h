@@ -19,6 +19,8 @@
  */
 
 #include <dali-toolkit/internal/visuals/gradient/gradient.h>
+#include <dali/public-api/common/intrusive-ptr.h>
+#include <utility>
 
 #include <dali/public-api/math/vector2.h>
 
@@ -36,17 +38,12 @@ class LinearGradient : public Gradient
 {
 public:
   /**
-   * Constructor.
-   * @param[in] startPosition The starting point onto which the 0% gradient stops are mapped.
-   * @param[in] endPosition The ending point r onto which the 100% gradient stops are mapped.
-   * @param[in] oldGradient Previous gradient feature, to copy old variables.
+   * @brief Creates a reference-counted implementation.
    */
-  LinearGradient(const Vector2& startPosition, const Vector2& endPosition, IntrusivePtr<Gradient> oldGradient);
-
-  /**
-   * Destructor.
-   */
-  virtual ~LinearGradient();
+  static Dali::IntrusivePtr<LinearGradient> New(const Vector2& startPosition, const Vector2& endPosition, IntrusivePtr<Gradient> oldGradient)
+  {
+    return Dali::IntrusivePtr<LinearGradient>(new LinearGradient(startPosition, endPosition, std::move(oldGradient)));
+  }
 
   /**
    * Set the starting and ending points of the vector onto which the gradient stops are mapped.
@@ -66,6 +63,20 @@ public:
    * @return The ending point of the gradient vector.
    */
   const Vector2& GetEndPosition() const;
+
+protected:
+  /**
+   * Constructor.
+   * @param[in] startPosition The starting point onto which the 0% gradient stops are mapped.
+   * @param[in] endPosition The ending point r onto which the 100% gradient stops are mapped.
+   * @param[in] oldGradient Previous gradient feature, to copy old variables.
+   */
+  LinearGradient(const Vector2& startPosition, const Vector2& endPosition, IntrusivePtr<Gradient> oldGradient);
+
+  /**
+   * Destructor.
+   */
+  virtual ~LinearGradient();
 
 private:
   // Undefined

@@ -283,7 +283,7 @@ void CanvasView::AddRasterizationTask(bool forceProcess)
     mLastCommitRasterized = false;
     if(mIsSynchronous)
     {
-      CanvasRendererRasterizingTaskPtr rasterizingTask = new CanvasRendererRasterizingTask(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
+      CanvasRendererRasterizingTaskPtr rasterizingTask = CanvasRendererRasterizingTask::New(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
       rasterizingTask->Process();
       ApplyRasterizedImage(rasterizingTask);
       rasterizingTask.Reset(); // We don't need it anymore.
@@ -297,7 +297,7 @@ void CanvasView::AddRasterizationTask(bool forceProcess)
         mRasterizingTask.Reset();
       }
 
-      mRasterizingTask = new CanvasRendererRasterizingTask(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
+      mRasterizingTask = CanvasRendererRasterizingTask::New(mCanvasRenderer, MakeCallback(this, &CanvasView::ApplyRasterizedImage));
       AsyncTaskManager::Get().AddTask(mRasterizingTask);
     }
   }

@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/particle-system/particle-list.h>
 #include <dali-toolkit/public-api/particle-system/particle.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/list-wrapper.h>
@@ -95,9 +96,24 @@ struct ParticleDataStream
 class ParticleList : public Dali::BaseObject
 {
 public:
-  ParticleList(uint32_t capacity, ParticleSystem::ParticleList::ParticleStreamTypeFlags streamFlags);
+  /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL ParticleList* NewForBaseHandle(uint32_t capacity, ParticleSystem::ParticleList::ParticleStreamTypeFlags streamFlags)
+  {
+    return new ParticleList(capacity, streamFlags);
+  }
 
-  ~ParticleList();
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<ParticleList> New(uint32_t capacity, ParticleSystem::ParticleList::ParticleStreamTypeFlags streamFlags)
+  {
+    return Dali::IntrusivePtr<ParticleList>(new ParticleList(capacity, streamFlags));
+  }
 
   /**
    * Returns raw pointer to the stream data
@@ -169,6 +185,11 @@ public:
    * Adds new stream and returns index
    */
   uint32_t AddStream(uint32_t sizeOfDataType, const void* defaultValue, ParticleStream::StreamDataType dataType, const char* streamName, bool localStream);
+
+protected:
+  ParticleList(uint32_t capacity, ParticleSystem::ParticleList::ParticleStreamTypeFlags streamFlags);
+
+  ~ParticleList();
 
 private:
   std::vector<char> mBuffer[2];

@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/list-wrapper.h>
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <string>
 
@@ -42,19 +43,21 @@ namespace Internal
 class JsonParser : public BaseObject
 {
 public:
-  /*
-   * @copydoc Toolkit::JsonParser::JsonParser()
+  /**
+   * @brief Creates a reference-counted implementation.
    */
-  JsonParser();
+  static Dali::IntrusivePtr<JsonParser> New(const TreeNode& tree)
+  {
+    return Dali::IntrusivePtr<JsonParser>(new JsonParser(tree));
+  }
 
-  /*
-   * @copydoc Toolkit::JsonParser::JsonParser(const TreeNode& tree)
+  /**
+   * @brief Creates a reference-counted implementation.
    */
-  explicit JsonParser(const TreeNode& tree);
-
-  /*
-   */
-  ~JsonParser() override;
+  static Dali::IntrusivePtr<JsonParser> New()
+  {
+    return Dali::IntrusivePtr<JsonParser>(new JsonParser());
+  }
 
   /*
    * @copydoc Toolkit::JsonParser::Parse()
@@ -100,6 +103,21 @@ public:
    * @copydoc Toolkit::JsonParser::Write()
    */
   void Write(std::ostream& output, int indent) const;
+
+protected:
+  /*
+   * @copydoc Toolkit::JsonParser::JsonParser()
+   */
+  JsonParser();
+
+  /*
+   * @copydoc Toolkit::JsonParser::JsonParser(const TreeNode& tree)
+   */
+  explicit JsonParser(const TreeNode& tree);
+
+  /*
+   */
+  ~JsonParser() override;
 
 private:
   /**

@@ -94,7 +94,7 @@ INSTALL(PROGRAMS ${EXEC_NAME}
   DESTINATION ${BIN_DIR}/${EXEC_NAME}
 )
 
-SET(SHADER_GENERATOR dali-shader-generator)
+SET(SHADER_GENERATOR dali3-shader-generator)
 SET(GENERATED_FOLDER ${CMAKE_CURRENT_BINARY_DIR}/shader/generated)
 SET(SHADER_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/shader)
 
@@ -142,4 +142,22 @@ ADD_CUSTOM_TARGET(
   COMMAND rm -rf ${GENERATED_FOLDER}/no_overwrite
   COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/no_overwrite/generated | grep "SHADER_SHADER_DEFINE_DEF" | grep "shader-define-def.h" > /dev/null 2>&1
   COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/no_overwrite/generated | grep "SHADER_SHADER_DEFINE_DEF" | grep "shader-define-def.h" > /dev/null 2>&1 && exit 1 || echo "test_no_overwrite Succeeded"
+  VERBATIM)
+# On the second run every shader header is up to date, so only the missing built-in file makes the
+# generator write the two built-in files again.
+ADD_CUSTOM_TARGET(
+  test_missing_built_in_source
+  ALL
+  COMMAND rm -rf ${GENERATED_FOLDER}/missing_built_in_source
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/missing_built_in_source/generated > /dev/null 2>&1
+  COMMAND rm ${GENERATED_FOLDER}/missing_built_in_source/generated/builtin-shader-gen.cpp
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/missing_built_in_source/generated | grep -c Generating | grep -x 2 > /dev/null 2>&1 && test -f ${GENERATED_FOLDER}/missing_built_in_source/generated/builtin-shader-gen.cpp && echo "test_missing_built_in_source Succeeded"
+  VERBATIM)
+ADD_CUSTOM_TARGET(
+  test_missing_built_in_header
+  ALL
+  COMMAND rm -rf ${GENERATED_FOLDER}/missing_built_in_header
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/missing_built_in_header/generated > /dev/null 2>&1
+  COMMAND rm ${GENERATED_FOLDER}/missing_built_in_header/builtin-shader-extern-gen.h
+  COMMAND ${SHADER_GENERATOR} ${SHADER_FOLDER} ${GENERATED_FOLDER}/missing_built_in_header/generated | grep -c Generating | grep -x 2 > /dev/null 2>&1 && test -f ${GENERATED_FOLDER}/missing_built_in_header/builtin-shader-extern-gen.h && echo "test_missing_built_in_header Succeeded"
   VERBATIM)

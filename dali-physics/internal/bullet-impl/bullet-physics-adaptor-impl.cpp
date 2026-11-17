@@ -44,8 +44,13 @@ namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 PhysicsAdaptorPtr CreateNewPhysicsAdaptor(const Dali::Matrix& transform, Uint16Pair worldSize)
 {
+  return BulletPhysicsAdaptor::New(transform, worldSize);
+}
+
+PhysicsAdaptorPtr BulletPhysicsAdaptor::New(const Dali::Matrix& transform, Uint16Pair size)
+{
   PhysicsAdaptorPtr adaptor(new BulletPhysicsAdaptor());
-  adaptor->Initialize(transform, worldSize);
+  adaptor->Initialize(transform, size);
   return adaptor;
 }
 

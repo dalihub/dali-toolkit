@@ -49,7 +49,7 @@ ColliderMeshProcessor ColliderMeshProcessor::Get()
     if(!processor)
     {
       // If not, create the focus manager and register it as a singleton
-      processor = ColliderMeshProcessor(new Internal::ColliderMeshProcessor());
+      processor = ColliderMeshProcessor(Internal::ColliderMeshProcessor::NewForBaseHandle());
       singletonService.Register(gSingletonTypeInfoId, processor);
     }
   }

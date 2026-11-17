@@ -312,7 +312,7 @@ int UtcTextureManagerRemoteDecodeTaskPremultiply(void)
 {
   tet_infoline("UtcTextureManagerRemoteDecodeTaskPremultiply");
 
-  RemoteDecodeTaskPtr remoteDecodeTask = new RemoteDecodeTask(
+  RemoteDecodeTaskPtr remoteDecodeTask = RemoteDecodeTask::New(
     1,
     TEST_IMAGE_4_FILE_NAME,
     ImageDimensions(),

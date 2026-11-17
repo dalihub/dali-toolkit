@@ -2070,6 +2070,12 @@ void Controller::Impl::SetUserInteractionEnabled(bool enabled)
   }
 }
 
+const std::string& Controller::Impl::GetTextLanguage() const
+{
+  static const std::string empty;
+  return mTextLanguage ? *mTextLanguage : empty;
+}
+
 void Controller::Impl::ClearFontData()
 {
   if(mFontDefaults)

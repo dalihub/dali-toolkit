@@ -43,13 +43,6 @@ PhysicsAdaptorPtr CreateNewPhysicsAdaptor(const Dali::Matrix& transform, Uint16P
 class PhysicsAdaptor : public BaseObject
 {
 public:
-  PhysicsAdaptor();
-
-  /**
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  ~PhysicsAdaptor() override;
-
   // Remove copy constructor and copy assignment
   PhysicsAdaptor(const PhysicsAdaptor& handle)            = delete;
   PhysicsAdaptor& operator=(const PhysicsAdaptor& handle) = delete;
@@ -186,6 +179,13 @@ public:
   UniquePtr<PhysicsWorld>& GetPhysicsWorld();
 
 protected:
+  PhysicsAdaptor();
+
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  ~PhysicsAdaptor() override;
+
   UniquePtr<PhysicsWorld>                       mPhysicsWorld;
   std::unordered_map<uint32_t, PhysicsActorPtr> mPhysicsActors;
   Actor                                         mRootActor;

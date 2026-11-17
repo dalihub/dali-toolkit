@@ -17,6 +17,7 @@
  *
  */
 
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <memory>
 
 #include <dali-toolkit/public-api/particle-system/particle-emitter.h>
@@ -51,7 +52,24 @@ class ParticleList;
 class ParticleRenderer : public Dali::BaseObject
 {
 public:
-  ParticleRenderer();
+  /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL ParticleRenderer* NewForBaseHandle()
+  {
+    return new ParticleRenderer();
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<ParticleRenderer> New()
+  {
+    return Dali::IntrusivePtr<ParticleRenderer>(new ParticleRenderer());
+  }
 
   /**
    * Create shader
@@ -95,6 +113,10 @@ public:
   UniquePtr<Dali::VertexBufferUpdateCallback> mStreamBufferUpdateCallback;
 
   bool mInitialized{false};
+
+protected:
+  ParticleRenderer();
+  ~ParticleRenderer() override = default;
 };
 } //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal
 namespace DALI_NAMESPACE

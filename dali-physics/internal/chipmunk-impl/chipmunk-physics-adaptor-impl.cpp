@@ -41,7 +41,7 @@ namespace DALI_NAMESPACE::Toolkit::Physics::Internal
 {
 PhysicsAdaptorPtr CreateNewPhysicsAdaptor(const Dali::Matrix& transform, Uint16Pair worldSize)
 {
-  PhysicsAdaptorPtr adaptor(new ChipmunkPhysicsAdaptor());
+  PhysicsAdaptorPtr adaptor(ChipmunkPhysicsAdaptor::New());
   adaptor->Initialize(transform, worldSize);
   return adaptor;
 }

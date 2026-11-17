@@ -25,7 +25,7 @@ namespace DALI_NAMESPACE::Toolkit::ParticleSystem
 {
 ParticleList ParticleList::New(uint32_t capacity, const ParticleStreamTypeFlags& defaultStreams)
 {
-  return {new ParticleSystem::Internal::ParticleList(capacity, defaultStreams)};
+  return {ParticleSystem::Internal::ParticleList::NewForBaseHandle(capacity, defaultStreams)};
 }
 
 ParticleList ParticleList::DownCast(BaseHandle handle)

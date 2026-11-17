@@ -43,11 +43,6 @@ public:
   static DepthLayoutPtr New();
 
   /**
-   * Virtual destructor.
-   */
-  virtual ~DepthLayout();
-
-  /**
    * Apply depth layout Properties.
    * @param[in] properties The properties of the layout.
    */
@@ -159,6 +154,12 @@ public:
    * @copydoc ItemLayout::GetNextFocusItemID()
    */
   int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled) override;
+
+protected:
+  /**
+   * Virtual destructor.
+   */
+  virtual ~DepthLayout();
 
 private:
   /**

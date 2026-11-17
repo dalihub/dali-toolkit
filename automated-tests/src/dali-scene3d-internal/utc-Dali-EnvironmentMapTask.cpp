@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ int UtcDaliEnvironmentMapTaskSuccess01(void)
   EnvironmentMapLoadTaskPtr environmentMapLoadTask;
 
   auto path              = TEST_RESOURCE_DIR "/forest_radiance.ktx";
-  environmentMapLoadTask = new EnvironmentMapLoadTask(path, Dali::Scene3D::EnvironmentMapType::AUTO, Dali::MakeCallback(LoadComplete));
+  environmentMapLoadTask = EnvironmentMapLoadTask::New(path, Dali::Scene3D::EnvironmentMapType::AUTO, Dali::MakeCallback(LoadComplete));
   Dali::AsyncTaskManager::Get().AddTask(environmentMapLoadTask);
 
   DALI_TEST_CHECK(!called);

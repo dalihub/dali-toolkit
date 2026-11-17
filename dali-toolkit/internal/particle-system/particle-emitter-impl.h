@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <chrono>
 #include <ctime>
@@ -42,14 +43,23 @@ class ParticleEmitter : public Dali::BaseObject, public Dali::ConnectionTracker
 {
 public:
   /**
-   * @brief Constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  ParticleEmitter();
+  static DALI_INTERNAL ParticleEmitter* NewForBaseHandle()
+  {
+    return new ParticleEmitter();
+  }
 
   /**
-   * @brief Destructor
+   * @brief Creates a reference-counted implementation.
    */
-  ~ParticleEmitter() override;
+  static Dali::IntrusivePtr<ParticleEmitter> New()
+  {
+    return Dali::IntrusivePtr<ParticleEmitter>(new ParticleEmitter());
+  }
 
   /**
    * @brief Tests whether emitter is complete (ready for simulation)
@@ -160,6 +170,17 @@ public:
 
   bool                           mParallelProcessing{false};
   std::unique_ptr<FrameCallback> mFrameCallback;
+
+protected:
+  /**
+   * @brief Constructor
+   */
+  ParticleEmitter();
+
+  /**
+   * @brief Destructor
+   */
+  ~ParticleEmitter() override;
 };
 
 } //namespace DALI_NAMESPACE::Toolkit::ParticleSystem::Internal

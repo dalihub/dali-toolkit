@@ -78,6 +78,14 @@ void TextEditor::PropertyHandler::SetProperty(Toolkit::TextEditor textEditor, Pr
       }
       break;
     }
+    case Toolkit::DevelTextEditor::Property::TEXT_LANGUAGE:
+    {
+      if(value.GetType() == Property::STRING)
+      {
+        impl.mController->SetTextLanguage(ToStdString(value));
+      }
+      break;
+    }
     case Toolkit::TextEditor::Property::TEXT:
     {
       const std::string text = ToStdString(value);
@@ -805,6 +813,11 @@ Property::Value TextEditor::PropertyHandler::GetProperty(Toolkit::TextEditor tex
     case Toolkit::DevelTextEditor::Property::RENDERING_BACKEND:
     {
       value = impl.mRenderingBackend;
+      break;
+    }
+    case Toolkit::DevelTextEditor::Property::TEXT_LANGUAGE:
+    {
+      value = ToPropertyValue(impl.mController->GetTextLanguage());
       break;
     }
     case Toolkit::TextEditor::Property::TEXT:

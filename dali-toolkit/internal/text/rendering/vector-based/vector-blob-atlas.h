@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -49,18 +50,12 @@ class VectorBlobAtlas : public RefObject
 {
 public:
   /**
-   * @brief Create a blob atlas.
-   *
-   * @param[in] textureWidth The atlas width.
-   * @param[in] textureHeight The atlas height.
-   * @param[in] itemWidth The width of an item in the atlas.
-   * @param[in] itemHeightQuantum The item height quantum.
-   * When blobs are added to columns in the atlas, the Y position is advanced by a multiple of this value.
+   * @brief Creates a reference-counted implementation.
    */
-  VectorBlobAtlas(unsigned int textureWidth,
-                  unsigned int textureHeight,
-                  unsigned int itemWidth,
-                  unsigned int itemHeightQuantum);
+  static Dali::IntrusivePtr<VectorBlobAtlas> New(unsigned int textureWidth, unsigned int textureHeight, unsigned int itemWidth, unsigned int itemHeightQuantum)
+  {
+    return Dali::IntrusivePtr<VectorBlobAtlas>(new VectorBlobAtlas(textureWidth, textureHeight, itemWidth, itemHeightQuantum));
+  }
 
   /**
    * @brief Query whether the atlas is full.
@@ -122,6 +117,22 @@ public:
     return mTextureSet;
   }
 
+protected:
+  /**
+   * @brief Create a blob atlas.
+   *
+   * @param[in] textureWidth The atlas width.
+   * @param[in] textureHeight The atlas height.
+   * @param[in] itemWidth The width of an item in the atlas.
+   * @param[in] itemHeightQuantum The item height quantum.
+   * When blobs are added to columns in the atlas, the Y position is advanced by a multiple of this value.
+   */
+  VectorBlobAtlas(unsigned int textureWidth,
+                  unsigned int textureHeight,
+                  unsigned int itemWidth,
+                  unsigned int itemHeightQuantum);
+  ~VectorBlobAtlas() override = default;
+
 private:
   /**
    * @brief Helper for uploading data to the texture atlas.
@@ -163,7 +174,8 @@ private:
   {
     BlobCoordinate coords[4];
   };
-
+  VectorBlobAtlas(const VectorBlobAtlas&)             = delete;
+  VectorBlobAtlas&  operator=(const VectorBlobAtlas&) = delete;
   std::vector<Key>  mItemLookup;
   std::vector<Item> mItemCache;
 

@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/slot-delegate.h>
 #include <cstdint>
@@ -63,9 +64,23 @@ public:
   };
 
   /**
-   * @brief Constructor
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
    */
-  AtlasGlyphManager();
+  static DALI_INTERNAL AtlasGlyphManager* NewForBaseHandle()
+  {
+    return new AtlasGlyphManager();
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<AtlasGlyphManager> New()
+  {
+    return Dali::IntrusivePtr<AtlasGlyphManager>(new AtlasGlyphManager());
+  }
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::Add
@@ -151,6 +166,12 @@ public:
    * and if Adaptor is available.
    */
   void EnsureLocaleChangedConnection();
+
+protected:
+  /**
+   * @brief Constructor
+   */
+  AtlasGlyphManager();
 
 private:
   /**

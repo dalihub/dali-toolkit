@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <string>
 
@@ -47,11 +48,6 @@ class KeyInputFocusManager : public Dali::BaseObject, public Dali::ConnectionTra
 {
 public:
   /**
-   * Construct a new KeyInputFocusManager.
-   */
-  KeyInputFocusManager();
-
-  /**
    * @copydoc Toolkit::SetFocus
    */
   void SetFocus(Toolkit::Control control);
@@ -79,6 +75,25 @@ public:
   Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusChangedSignal();
 
   /**
+   * @brief Creates an unreferenced implementation only for BaseHandle construction.
+   * @warning Pass the result directly to a BaseHandle-derived handle constructor.
+   * The constructor must acquire its first reference (the returned reference count is zero).
+   * Use New() when an IntrusivePtr owner is required.
+   */
+  static DALI_INTERNAL KeyInputFocusManager* NewForBaseHandle()
+  {
+    return new KeyInputFocusManager();
+  }
+
+  /**
+   * @brief Creates a reference-counted implementation.
+   */
+  static Dali::IntrusivePtr<KeyInputFocusManager> New()
+  {
+    return Dali::IntrusivePtr<KeyInputFocusManager>(new KeyInputFocusManager());
+  }
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -90,6 +105,11 @@ public:
   static bool DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
 protected:
+  /**
+   * Construct a new KeyInputFocusManager.
+   */
+  KeyInputFocusManager();
+
   /**
    * Destructor
    */
@@ -127,8 +147,6 @@ private:
    * Gets the current native window id
    */
   uint32_t GetCurrentWindowId() const;
-
-private:
   // Undefined
   KeyInputFocusManager(const KeyInputFocusManager&);
 

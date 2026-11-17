@@ -8,5 +8,5 @@ Name: bullet
 Description: Bullet Continuous Collision Detection and Physics Library
 Version: ${apiversion}
 Requires:
-Libs: -L${libdir} -lbullet3
+Libs: -L${libdir} -l@BULLET3_LIB_NAME@
 Cflags: -I${includedir}

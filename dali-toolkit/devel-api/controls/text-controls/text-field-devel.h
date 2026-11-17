@@ -275,6 +275,25 @@ enum
    * @details Name "enableCursorInset", type Property::BOOLEAN.
    */
   ENABLE_CURSOR_INSET,
+
+  /**
+   * @brief Specifies the language used to select language-specific glyph forms.
+   * @details Name "textLanguage", type Property::STRING.
+   *
+   * Some fonts provide different glyph forms for the same Unicode characters
+   * depending on the language, for example Russian and Bulgarian Cyrillic text.
+   * Accepts an ASCII BCP 47 language tag, such as "bg" (Bulgarian), "ru" (Russian)
+   * or "sr-Cyrl" (Serbian Cyrillic).
+   * Subtags use hyphens. Tags are case-insensitive and limited to 255 bytes.
+   * Reading this property returns the tag normalized to lowercase.
+   * Invalid input leaves the previous value unchanged.
+   * Applies to both entered text and placeholder text.
+   *
+   * @note An empty string ("") removes the override and uses the system language.
+   * This is the default. Reading the property then returns "", not the system language.
+   * @note This property does not affect font selection, font fallback or layout direction.
+   */
+  TEXT_LANGUAGE,
 };
 
 } // namespace Property

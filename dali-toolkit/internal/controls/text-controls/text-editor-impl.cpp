@@ -171,6 +171,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "removeBackInset
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "fontVariations",                       MAP,       FONT_VARIATIONS                     )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableCursorInset",                    BOOLEAN,   ENABLE_CURSOR_INSET                 )
 DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "enableDeferredRelayout",               BOOLEAN,   ENABLE_DEFERRED_RELAYOUT            )
+DALI_DEVEL_PROPERTY_REGISTRATION(Toolkit,           TextEditor, "textLanguage",                         STRING,    TEXT_LANGUAGE                       )
 
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "textChanged",           SIGNAL_TEXT_CHANGED           )
 DALI_SIGNAL_REGISTRATION(Toolkit, TextEditor, "inputStyleChanged",     SIGNAL_INPUT_STYLE_CHANGED    )

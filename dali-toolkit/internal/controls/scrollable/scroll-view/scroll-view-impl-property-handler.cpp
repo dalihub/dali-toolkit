@@ -119,7 +119,7 @@ void ScrollViewPropertyHandler::SetScrollMode(ScrollView& scrollView, const Prop
   if(!xAxisScrollEnabled)
   {
     // Default ruler and disabled
-    rulerX = new Toolkit::DefaultRuler();
+    rulerX = Toolkit::DefaultRuler::New();
     rulerX->Disable();
   }
   else
@@ -129,12 +129,12 @@ void ScrollViewPropertyHandler::SetScrollMode(ScrollView& scrollView, const Prop
     if(valuePtr && valuePtr->Get(xAxisSnapToInterval))
     {
       // Fixed ruler and enabled
-      rulerX = new Toolkit::FixedRuler(xAxisSnapToInterval);
+      rulerX = Toolkit::FixedRuler::New(xAxisSnapToInterval);
     }
     else
     {
       // Default ruler and enabled
-      rulerX = new Toolkit::DefaultRuler();
+      rulerX = Toolkit::DefaultRuler::New();
     }
 
     valuePtr                  = scrollModeMap.Find(Toolkit::ScrollMode::X_AXIS_SCROLL_BOUNDARY, "xAxisScrollBoundary");
@@ -157,7 +157,7 @@ void ScrollViewPropertyHandler::SetScrollMode(ScrollView& scrollView, const Prop
   if(!yAxisScrollEnabled)
   {
     // Default ruler and disabled
-    rulerY = new Toolkit::DefaultRuler();
+    rulerY = Toolkit::DefaultRuler::New();
     rulerY->Disable();
   }
   else
@@ -167,12 +167,12 @@ void ScrollViewPropertyHandler::SetScrollMode(ScrollView& scrollView, const Prop
     if(valuePtr && valuePtr->Get(yAxisSnapToInterval))
     {
       // Fixed ruler and enabled
-      rulerY = new Toolkit::FixedRuler(yAxisSnapToInterval);
+      rulerY = Toolkit::FixedRuler::New(yAxisSnapToInterval);
     }
     else
     {
       // Default ruler and enabled
-      rulerY = new Toolkit::DefaultRuler();
+      rulerY = Toolkit::DefaultRuler::New();
     }
 
     valuePtr                  = scrollModeMap.Find(Toolkit::ScrollMode::Y_AXIS_SCROLL_BOUNDARY, "yAxisScrollBoundary");

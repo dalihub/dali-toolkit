@@ -42,6 +42,10 @@ Then run the following command to set up the build:
 
 If a Debug build is required, then add -DCMAKE_BUILD_TYPE=Debug
 
+To also install the DALi 2.x names as links to the dali3 files, add
+-DDALI_LEGACY_ALIASES=ON (see "Install layout and the DALi 2.x names" in the
+dali-core README).
+
 To build run:
 
          $ make install -j8
@@ -116,6 +120,7 @@ vcpkg-script folder in the windows-dependencies repository.
     - ENABLE_DEBUG               ---> Whether to build with debug enabled.
     - USE_DEFAULT_RESOURCE_DIR   ---> Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR
     - ENABLE_GPU_MEMORY_PROFILE  ---> Whether to build with GPU memory profiler enabled.
+    - DALI_LEGACY_ALIASES        ---> Whether to also install the DALi 2.x names (dali2-toolkit.dll, the dali2-toolkit package, include/dali-toolkit, ...) as copies of the dali3 files. ON by default on Windows, where applications still load the 2.x names.
 
 ## 4. Building for MacOS
 

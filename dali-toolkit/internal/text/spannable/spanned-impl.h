@@ -44,6 +44,24 @@ typedef const Spanned*        SpannedConstPtr;
 class Spanned : public CharacterSequence
 {
 public:
+  // Removed constructors and assignment operators
+  // Constructors
+  Spanned(const Spanned&)            = delete; ///< Deleted copy constructor
+  Spanned(Spanned&&)                 = delete; ///< Deleted move constructor
+  Spanned& operator=(const Spanned&) = delete; ///< Deleted copy assignment operator
+  Spanned& operator=(Spanned&&)      = delete; ///< Deleted move assignment operator
+public:                                        //Methods
+  /**
+   * @copydoc Dali::Toolkit::Text::Spanned::GetAllSpans()
+   */
+  virtual std::vector<Dali::Toolkit::Text::BaseSpan> GetAllSpans() const = 0;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::Spanned::RetrieveAllSpansAndRanges()
+   */
+  virtual void RetrieveAllSpansAndRanges(std::vector<Dali::Toolkit::Text::BaseSpan>& spans, std::vector<Dali::Toolkit::Text::Range>& ranges) const = 0;
+
+protected:
   /**
    * This constructor is only used by derived classes.
    */
@@ -55,25 +73,6 @@ public:
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~Spanned() = 0;
-
-  // Removed constructors and assignment operators
-public:                                        // Constructors
-  Spanned(const Spanned&)            = delete; ///< Deleted copy constructor
-  Spanned(Spanned&&)                 = delete; ///< Deleted move constructor
-  Spanned& operator=(const Spanned&) = delete; ///< Deleted copy assignment operator
-  Spanned& operator=(Spanned&&)      = delete; ///< Deleted move assignment operator
-
-public: //Methods
-  /**
-   * @copydoc Dali::Toolkit::Text::Spanned::GetAllSpans()
-   */
-  virtual std::vector<Dali::Toolkit::Text::BaseSpan> GetAllSpans() const = 0;
-
-  /**
-   * @copydoc Dali::Toolkit::Text::Spanned::RetrieveAllSpansAndRanges()
-   */
-  virtual void RetrieveAllSpansAndRanges(std::vector<Dali::Toolkit::Text::BaseSpan>& spans, std::vector<Dali::Toolkit::Text::Range>& ranges) const = 0;
-
 }; // class Spanned
 
 } // namespace Internal

@@ -680,7 +680,7 @@ void ScrollView::OnInitialize()
 
   // By default we'll allow the user to freely drag the scroll view,
   // while disabling the other rulers.
-  RulerPtr ruler = new DefaultRuler();
+  RulerPtr ruler = DefaultRuler::New();
   mRulerX        = ruler;
   mRulerY        = ruler;
 

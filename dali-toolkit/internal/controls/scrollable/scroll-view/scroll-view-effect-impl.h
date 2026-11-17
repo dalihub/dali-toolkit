@@ -44,8 +44,6 @@ class ScrollViewEffect;
 class ScrollViewEffect : public Dali::BaseObject, public ConnectionTracker
 {
 public:
-  ScrollViewEffect();
-
   /**
    * Attaches this effect to scrollView.
    * @pre must not be already attached to a scrollView
@@ -82,6 +80,8 @@ public:
   virtual void OnDetach(Toolkit::ScrollView& scrollView) = 0;
 
 protected:
+  ScrollViewEffect();
+
   /**
    * Returns the ScrollView handle that this effect is
    * attached to.
@@ -91,7 +91,6 @@ protected:
    */
   Toolkit::ScrollView GetScrollView();
 
-protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */

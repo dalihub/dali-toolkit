@@ -34,14 +34,14 @@ namespace Toolkit
 {
 JsonParser JsonParser::New()
 {
-  Internal::JsonParser* internal = new Internal::JsonParser();
-  return JsonParser(internal);
+  auto internal = Internal::JsonParser::New();
+  return JsonParser(internal.Get());
 }
 
 JsonParser JsonParser::New(const TreeNode& tree)
 {
-  Internal::JsonParser* internal = new Internal::JsonParser(tree);
-  return JsonParser(internal);
+  auto internal = Internal::JsonParser::New(tree);
+  return JsonParser(internal.Get());
 }
 
 JsonParser::JsonParser()
