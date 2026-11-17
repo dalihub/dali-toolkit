@@ -232,7 +232,7 @@ TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
   for(unsigned int mapIdx = 0; mapIdx < map.Count(); ++mapIdx)
   {
     const KeyValuePair pair(map.GetKeyValue(mapIdx));
-    if(pair.first.type == Property::Key::INDEX)
+    if(pair.first.type == Property::Key::Type::INDEX)
     {
       continue; // We don't consider index keys.
     }
@@ -279,7 +279,7 @@ TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
       for(size_t animatorMapIdx = 0; animatorMapIdx < animatorMap.Count(); ++animatorMapIdx)
       {
         const KeyValuePair animatorPair(animatorMap.GetKeyValue(animatorMapIdx));
-        if(animatorPair.first.type == Property::Key::INDEX)
+        if(animatorPair.first.type == Property::Key::Type::INDEX)
         {
           continue; // We don't consider index keys.
         }
@@ -319,7 +319,7 @@ TransitionData::Animator* TransitionData::ConvertMap(const Property::Map& map)
           for(size_t timeMapIdx = 0; timeMapIdx < timeMap.Count(); ++timeMapIdx)
           {
             const KeyValuePair timePair(timeMap.GetKeyValue(timeMapIdx));
-            if(timePair.first.type == Property::Key::INDEX)
+            if(timePair.first.type == Property::Key::Type::INDEX)
             {
               continue;
             }
@@ -392,7 +392,7 @@ Property::Map TransitionData::GetAnimatorAt(size_t index)
 
   map[TOKEN_TARGET] = Property::Value(ToDaliString(animator->objectName));
 
-  if(animator->propertyKey.type == Property::Key::INDEX)
+  if(animator->propertyKey.type == Property::Key::Type::INDEX)
   {
     map[TOKEN_PROPERTY] = animator->propertyKey.indexKey;
   }

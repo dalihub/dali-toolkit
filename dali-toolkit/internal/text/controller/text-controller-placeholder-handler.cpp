@@ -55,7 +55,7 @@ const char* const PLACEHOLDER_ELLIPSIS     = "ellipsis";
  */
 static Dali::Property::Index GetIntKey(const Dali::Property::Key& key)
 {
-  if(key.type == Dali::Property::Key::INDEX)
+  if(key.type == Dali::Property::Key::Type::INDEX)
   {
     return key.indexKey;
   }

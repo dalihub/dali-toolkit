@@ -253,7 +253,7 @@ void InputMethodOptions::ApplyProperty(const Property::Map& settings)
   for(unsigned int i = 0, count = settings.Count(); i < count; ++i)
   {
     Property::Key key = settings.GetKeyAt(i);
-    if(key.type == Property::Key::INDEX)
+    if(key.type == Property::Key::Type::INDEX)
     {
       continue;
     }

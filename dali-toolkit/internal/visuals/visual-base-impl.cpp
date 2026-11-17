@@ -99,7 +99,7 @@ const uint16_t PROPERTY_NAME_INDEX_TABLE_COUNT = sizeof(PROPERTY_NAME_INDEX_TABL
 
 Property::Index GetVisualPropertyIndex(Property::Key key)
 {
-  if(key.type == Property::Key::STRING)
+  if(key.type == Property::Key::Type::STRING)
   {
     for(auto tableId = 0u; tableId < PROPERTY_NAME_INDEX_TABLE_COUNT; ++tableId)
     {
@@ -1055,7 +1055,7 @@ VisualRenderer Visual::Base::GetRenderer() const
 
 Property::Index Visual::Base::GetIntKey(Property::Key key)
 {
-  if(key.type == Property::Key::INDEX)
+  if(key.type == Property::Key::Type::INDEX)
   {
     return key.indexKey;
   }
@@ -1215,8 +1215,8 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
   }
 
   // Fast-out for invalid key.
-  if((key.type == Property::Key::INDEX && key.indexKey == Property::INVALID_KEY) ||
-     (key.type == Property::Key::STRING && key.stringKey.Empty()))
+  if((key.type == Property::Key::Type::INDEX && key.indexKey == Property::INVALID_KEY) ||
+     (key.type == Property::Key::Type::STRING && key.stringKey.Empty()))
   {
     return Property::INVALID_INDEX;
   }
@@ -1234,7 +1234,7 @@ Property::Index Visual::Base::GetPropertyIndex(Property::Key key) const
       // independently, as shaders are shared across multiple renderers.
       Dali::String    keyName;
       Property::Index keyIndex(Property::INVALID_KEY);
-      if(key.type == Property::Key::INDEX)
+      if(key.type == Property::Key::Type::INDEX)
       {
         keyName  = shader.GetPropertyName(index);
         keyIndex = key.indexKey;
@@ -1385,7 +1385,7 @@ void Visual::Base::AnimateRendererProperty(
       // Try writing target value into transform property map
       // if it's not a valid key, then it won't alter mTransform
       Property::Map map;
-      if(animator.propertyKey.type == Property::Key::INDEX)
+      if(animator.propertyKey.type == Property::Key::Type::INDEX)
       {
         map.Add(animator.propertyKey.indexKey, animator.targetValue);
       }
@@ -1589,7 +1589,7 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key, bool cha
     default:
     {
       // Special case for MIX_COLOR
-      if(key.type == Property::Key::INDEX &&
+      if(key.type == Property::Key::Type::INDEX &&
          ((mImpl->mType == Toolkit::Visual::COLOR && key.indexKey == ColorVisual::Property::MIX_COLOR) ||
           (mImpl->mType == Toolkit::Visual::PRIMITIVE && key.indexKey == PrimitiveVisual::Property::MIX_COLOR)))
       {
@@ -1598,8 +1598,8 @@ Dali::Property Visual::Base::GetPropertyObject(Dali::Property::Key key, bool cha
 
       // Special case for BLUR_RADIUS
       if(mImpl->mType == Toolkit::Visual::COLOR &&
-         ((key.type == Property::Key::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) ||
-          (key.type == Property::Key::STRING && key.stringKey == BLUR_RADIUS_NAME)))
+         ((key.type == Property::Key::Type::INDEX && key.indexKey == DevelColorVisual::Property::BLUR_RADIUS) ||
+          (key.type == Property::Key::Type::STRING && key.stringKey == BLUR_RADIUS_NAME)))
       {
         // Request to color-visual class
         return OnGetPropertyObject(key, changeProperties);

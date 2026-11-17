@@ -188,7 +188,7 @@ Property::Map TextVisual::ConvertStringKeysToIndexKeys(const Property::Map& prop
 
     Property::Index indexKey = keyValue.first.indexKey;
 
-    if(keyValue.first.type == Property::Key::STRING)
+    if(keyValue.first.type == Property::Key::Type::STRING)
     {
       indexKey = StringKeyToIndexKey(ToStdString(keyValue.first.stringKey));
     }
@@ -320,7 +320,7 @@ void TextVisual::DoSetProperties(const Property::Map& propertyMap)
 
     Property::Index indexKey = keyValue.first.indexKey;
 
-    if(keyValue.first.type == Property::Key::STRING)
+    if(keyValue.first.type == Property::Key::Type::STRING)
     {
       indexKey = StringKeyToIndexKey(ToStdString(keyValue.first.stringKey));
     }

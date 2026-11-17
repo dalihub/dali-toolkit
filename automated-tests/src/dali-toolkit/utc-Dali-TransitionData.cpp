@@ -97,7 +97,7 @@ void CHECK_MAP_EQUALS(Property::Map test, Property::Map result)
     KeyValuePair     keyValue = test.GetKeyValue(i);
     Property::Value* value;
 
-    if(keyValue.first.type == Property::Key::STRING)
+    if(keyValue.first.type == Property::Key::Type::STRING)
     {
       value = result.Find(keyValue.first.stringKey);
     }
