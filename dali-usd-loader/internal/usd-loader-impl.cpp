@@ -30,7 +30,11 @@ using Dali::Integration::ToDaliStringView;
 
 // Some TBB/USD headers produce compile warnings
 #pragma GCC diagnostic push
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
+#pragma GCC diagnostic ignored "-Wtemplate-id-cdtor"
+#pragma GCC diagnostic ignored "-Wcast-user-defined"
+#endif
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/usd/primRange.h>
 #include <pxr/usd/usd/stage.h>
@@ -1077,7 +1081,6 @@ void UsdLoaderImpl::Impl::ConvertMesh(LoadResult& output, const UsdPrim& prim, I
   Vector3    position;
   Quaternion rotation;
   Vector3    scale;
-  Matrix     transformMatrix;
 
   // Handle transformation for non-skeleton mesh nodes
   bool isNonSkeletonMeshNode = prim.IsA<UsdGeomXformable>() && !prim.IsA<UsdSkelSkeleton>();
