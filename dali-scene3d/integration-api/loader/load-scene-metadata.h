@@ -18,9 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/open-hash-map-managed.h>
 #include <dali/public-api/adaptor-framework/image-options.h>
 #include <dali/public-api/common/dali-string.h>
-#include <dali/public-api/common/open-hash-map-managed.h>
 #include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
@@ -38,7 +38,7 @@ struct ImageMetadata
   SamplingMode::Type mSamplingMode{SamplingMode::BOX_THEN_LINEAR}; ///< The sampling mode used to resize the image. @SINCE_2_2.5
 };
 
-using ImageMetadataMap = Dali::ManagedOpenHashMap<Dali::String, ImageMetadata, Dali::StringHash, Dali::StringEqual>;
+using ImageMetadataMap = Dali::Integration::ManagedOpenHashMap<Dali::String, ImageMetadata, Dali::StringHash, Dali::StringEqual>;
 
 /**
  * @brief Stores the metadata for a scene.
