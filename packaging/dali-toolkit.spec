@@ -29,7 +29,7 @@
 
 Name:       dali3-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    3.0.0
+Version:    3.0.1
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT and Zlib and Unlicense
@@ -708,7 +708,7 @@ exit 0
 ##############################
 # The Lua scriptlets run up to the next section, so nothing but another
 # scriptlet or %files may follow them. Every earlier package (DALi 2.x and
-# dali3 3.0.0 alike) installed these include directories as real
+# dali3 3.0.1 alike) installed these include directories as real
 # directories; rpm cannot replace a directory with a link, so the alias
 # packages clear them before the transaction unpacks.
 %if %{with dali2_aliases}
