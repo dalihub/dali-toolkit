@@ -82,7 +82,7 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
       const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue(index);
 
       const Property::Value* valueSet = NULL;
-      if(valueGet.first.type == Property::Key::INDEX)
+      if(valueGet.first.type == Property::Key::Type::INDEX)
       {
         valueSet = fontStyleMapSet.Find(valueGet.first.indexKey);
       }
@@ -131,7 +131,7 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
       }
       else
       {
-        if(valueGet.first.type == Property::Key::INDEX)
+        if(valueGet.first.type == Property::Key::Type::INDEX)
         {
           tet_printf("  The key %d doesn't exist.", valueGet.first.indexKey);
         }

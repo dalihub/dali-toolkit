@@ -109,7 +109,7 @@ void PrecompileShaderOption::ConvertShaderMap(const Property::Map& shaderOption)
   for(unsigned int shaderIdx = 0; shaderIdx < shaderOption.Count(); ++shaderIdx)
   {
     const KeyValuePair pair(shaderOption.GetKeyValue(shaderIdx));
-    if(pair.first.type == Property::Key::INDEX)
+    if(pair.first.type == Property::Key::Type::INDEX)
     {
       continue; // We don't consider index keys.
     }
@@ -132,7 +132,7 @@ void PrecompileShaderOption::ConvertShaderMap(const Property::Map& shaderOption)
       {
         const KeyValuePair optionPair(optionMap.GetKeyValue(optionMapIdx));
 
-        if(optionPair.first.type == Property::Key::INDEX)
+        if(optionPair.first.type == Property::Key::Type::INDEX)
         {
           continue; // We don't consider index keys.
         }

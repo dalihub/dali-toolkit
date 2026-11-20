@@ -370,7 +370,7 @@ void Controller::SetVariationsMap(const Property::Map& map)
   {
     const KeyValuePair& keyvalue = map.GetKeyValue(index);
 
-    if(keyvalue.first.type == Property::Key::STRING)
+    if(keyvalue.first.type == Property::Key::Type::STRING)
     {
       float value = 0.f;
       if(keyvalue.first.stringKey.Size() == 4 && keyvalue.second.Get(value)) // Variable tag must be 4-length string.

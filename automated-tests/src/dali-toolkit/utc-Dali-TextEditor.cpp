@@ -15,13 +15,13 @@
  *
  */
 
-#include <dali-toolkit/devel-api/text/text-geometry-devel.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali-toolkit/devel-api/text/text-geometry-devel.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/integration-api/string-utils.h>
 
@@ -311,7 +311,7 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
       const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue(index);
 
       const Property::Value* valueSet = NULL;
-      if(valueGet.first.type == Property::Key::INDEX)
+      if(valueGet.first.type == Property::Key::Type::INDEX)
       {
         valueSet = fontStyleMapSet.Find(valueGet.first.indexKey);
       }
@@ -360,7 +360,7 @@ bool DaliTestCheckMaps(const Property::Map& fontStyleMapGet, const Property::Map
       }
       else
       {
-        if(valueGet.first.type == Property::Key::INDEX)
+        if(valueGet.first.type == Property::Key::Type::INDEX)
         {
           tet_printf("  The key %d doesn't exist.", valueGet.first.indexKey);
         }
@@ -1640,7 +1640,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 0u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -1671,7 +1671,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 0u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -1692,7 +1692,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 2u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -1720,7 +1720,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 6u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -1757,7 +1757,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 7u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -1778,7 +1778,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 12u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -1810,7 +1810,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 13u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -1830,7 +1830,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
 int utcDaliTextEditorInputStyleChanged02(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto editor = TextEditor::New();
+  auto                   editor = TextEditor::New();
   editor.SetProperty(Actor::Property::SIZE, Vector2(300.f, 100.f));
   editor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   editor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
@@ -1838,7 +1838,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   editor.SetProperty(TextEditor::Property::ENABLE_MARKUP, true);
   editor.SetProperty(TextEditor::Property::TEXT, "<color value='blue'>ab</color><color value='green'>cd</color>");
   editor.InputStyleChangedSignal().Connect(&TestInputStyleChangedCallback);
-  bool signal = false;
+  bool                               signal  = false;
   std::unique_ptr<ConnectionTracker> tracker = std::make_unique<ConnectionTracker>();
   editor.ConnectSignal(tracker.get(), "inputStyleChanged", CallbackFunctor(&signal));
   application.GetScene().Add(editor);
@@ -1848,17 +1848,17 @@ int utcDaliTextEditorInputStyleChanged02(void)
   application.RunIdles();
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 0u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
     application.SendNotification();
     application.Render();
     application.RunIdles();
   }
   gInputStyleChangedCallbackCalled = false;
-  signal = false;
+  signal                           = false;
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 3u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
   application.SendNotification();
@@ -1873,7 +1873,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   DALI_TEST_EQUALS(editor.GetProperty<Vector4>(TextEditor::Property::INPUT_COLOR), Color::YELLOW, TEST_LOCATION);
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 0u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
   application.SendNotification();
@@ -1937,7 +1937,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 0u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -1968,7 +1968,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 0u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -1989,7 +1989,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 2u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -2020,7 +2020,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 6u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -2042,7 +2042,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 7u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -2067,7 +2067,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 12u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -2099,7 +2099,7 @@ int utcDaliTextEditorInputStyleChanged03(void)
   // Create a tap event to touch the text editor.
   {
     const auto rectangle = Text::TextGeometry::GetCharacterBoundingRectangle(editor, 13u);
-    const auto line = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
+    const auto line      = Text::TextGeometry::GetLineBoundingRectangle(editor, 0u);
     TestGenerateTap(application, rectangle.x + rectangle.width * 0.75f, line.y + line.height * 0.5f, 0);
   }
 
@@ -5054,7 +5054,7 @@ int utcDaliTextEditorCursorPositionChangedSignal(void)
 int utcDaliTextEditorGeometryEllipsisStart(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto editor = TextEditor::New();
+  auto                   editor = TextEditor::New();
   editor.SetProperty(Actor::Property::SIZE, Vector2(40.f, 100.f));
   editor.SetProperty(TextEditor::Property::PIXEL_SIZE, 16.f);
   editor.SetProperty(TextEditor::Property::FONT_FAMILY, "Test Sans");
@@ -5067,7 +5067,7 @@ int utcDaliTextEditorGeometryEllipsisStart(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextEditor::GetTextPosition(editor, 0u, 9u);
-  const auto sizes = DevelTextEditor::GetTextSize(editor, 0u, 9u);
+  const auto sizes     = DevelTextEditor::GetTextSize(editor, 0u, 9u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   for(const auto& size : sizes) DALI_TEST_CHECK(size.width > 0.f && size.width <= 40.f);
@@ -5077,7 +5077,7 @@ int utcDaliTextEditorGeometryEllipsisStart(void)
 int utcDaliTextEditorGeometryEllipsisMiddle(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto editor = TextEditor::New();
+  auto                   editor = TextEditor::New();
   editor.SetProperty(Actor::Property::SIZE, Vector2(40.f, 100.f));
   editor.SetProperty(TextEditor::Property::PIXEL_SIZE, 16.f);
   editor.SetProperty(TextEditor::Property::FONT_FAMILY, "Test Sans");
@@ -5090,7 +5090,7 @@ int utcDaliTextEditorGeometryEllipsisMiddle(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextEditor::GetTextPosition(editor, 0u, 9u);
-  const auto sizes = DevelTextEditor::GetTextSize(editor, 0u, 9u);
+  const auto sizes     = DevelTextEditor::GetTextSize(editor, 0u, 9u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   for(const auto& size : sizes) DALI_TEST_CHECK(size.width > 0.f && size.width <= 40.f);
@@ -5100,7 +5100,7 @@ int utcDaliTextEditorGeometryEllipsisMiddle(void)
 int utcDaliTextEditorGeometryEllipsisEnd(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto editor = TextEditor::New();
+  auto                   editor = TextEditor::New();
   editor.SetProperty(Actor::Property::SIZE, Vector2(40.f, 100.f));
   editor.SetProperty(TextEditor::Property::PIXEL_SIZE, 16.f);
   editor.SetProperty(TextEditor::Property::FONT_FAMILY, "Test Sans");
@@ -5113,7 +5113,7 @@ int utcDaliTextEditorGeometryEllipsisEnd(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextEditor::GetTextPosition(editor, 0u, 9u);
-  const auto sizes = DevelTextEditor::GetTextSize(editor, 0u, 9u);
+  const auto sizes     = DevelTextEditor::GetTextSize(editor, 0u, 9u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   for(const auto& size : sizes) DALI_TEST_CHECK(size.width > 0.f && size.width <= 40.f);
@@ -5123,7 +5123,7 @@ int utcDaliTextEditorGeometryEllipsisEnd(void)
 int utcDaliTextEditorGeometryRTL(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto editor = TextEditor::New();
+  auto                   editor = TextEditor::New();
   editor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
   editor.SetProperty(TextEditor::Property::PIXEL_SIZE, 16.f);
   editor.SetProperty(TextEditor::Property::FONT_FAMILY, "Test Sans");
@@ -5134,7 +5134,7 @@ int utcDaliTextEditorGeometryRTL(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextEditor::GetTextPosition(editor, 0u, 3u);
-  const auto sizes = DevelTextEditor::GetTextSize(editor, 0u, 3u);
+  const auto sizes     = DevelTextEditor::GetTextSize(editor, 0u, 3u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
@@ -5146,7 +5146,7 @@ int utcDaliTextEditorGeometryRTL(void)
 int utcDaliTextEditorGeometryGlyphMiddle(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto editor = TextEditor::New();
+  auto                   editor = TextEditor::New();
   editor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
   editor.SetProperty(TextEditor::Property::PIXEL_SIZE, 16.f);
   editor.SetProperty(TextEditor::Property::FONT_FAMILY, "Test Sans");
@@ -5157,7 +5157,7 @@ int utcDaliTextEditorGeometryGlyphMiddle(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextEditor::GetTextPosition(editor, 2u, 3u);
-  const auto sizes = DevelTextEditor::GetTextSize(editor, 2u, 3u);
+  const auto sizes     = DevelTextEditor::GetTextSize(editor, 2u, 3u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
@@ -5169,7 +5169,7 @@ int utcDaliTextEditorGeometryGlyphMiddle(void)
 int utcDaliTextEditorGeometryOneGlyph(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto editor = TextEditor::New();
+  auto                   editor = TextEditor::New();
   editor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
   editor.SetProperty(TextEditor::Property::PIXEL_SIZE, 16.f);
   editor.SetProperty(TextEditor::Property::FONT_FAMILY, "Test Sans");
@@ -5180,7 +5180,7 @@ int utcDaliTextEditorGeometryOneGlyph(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextEditor::GetTextPosition(editor, 0u, 0u);
-  const auto sizes = DevelTextEditor::GetTextSize(editor, 0u, 0u);
+  const auto sizes     = DevelTextEditor::GetTextSize(editor, 0u, 0u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
@@ -6244,7 +6244,7 @@ int UtcDaliTextEditorLineSpacingKeyArrowDown(void)
 int UtcDaliTextEditorNegativeLineSpacingWithEllipsis(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto editor = TextEditor::New();
+  auto                   editor = TextEditor::New();
   editor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 40.f));
   editor.SetProperty(TextEditor::Property::POINT_SIZE, 12.f);
   editor.SetProperty(TextEditor::Property::TEXT, "a\nb\nc\nd\ne");
@@ -6456,7 +6456,7 @@ int utcDaliTextEditorPanGesturePropagation(void)
 int utcDaliTextEditorGetTextBoundingRectangle(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto editor = TextEditor::New();
+  auto                   editor = TextEditor::New();
   editor.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
   editor.SetProperty(TextEditor::Property::PIXEL_SIZE, 16.f);
   editor.SetProperty(TextEditor::Property::FONT_FAMILY, "Test Sans");
@@ -6467,7 +6467,7 @@ int utcDaliTextEditorGetTextBoundingRectangle(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextEditor::GetTextPosition(editor, 0u, 5u);
-  const auto sizes = DevelTextEditor::GetTextSize(editor, 0u, 5u);
+  const auto sizes     = DevelTextEditor::GetTextSize(editor, 0u, 5u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
@@ -6559,7 +6559,7 @@ int utcDaliTextEditorFontVariationsRegister(void)
   const KeyValuePair& keyvalue = fontVariationsGet.GetKeyValue(0);
 
   String key = "";
-  if(keyvalue.first.type == Property::Key::STRING)
+  if(keyvalue.first.type == Property::Key::Type::STRING)
   {
     key = keyvalue.first.stringKey;
   }

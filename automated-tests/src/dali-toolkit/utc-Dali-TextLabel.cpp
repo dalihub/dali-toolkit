@@ -218,7 +218,7 @@ bool DaliTestCheckMaps(const Property::Map& mapGet, const Property::Map& mapSet,
       }
       else
       {
-        if(valueGet.first.type == Property::Key::INDEX)
+        if(valueGet.first.type == Property::Key::Type::INDEX)
         {
           tet_printf("  The key %d doesn't exist.", valueGet.first.indexKey);
         }
@@ -2764,21 +2764,21 @@ int ConvertPointToPixel(float point)
 int UtcDaliToolkitTextlabelTextFit(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto label = TextLabel::New();
+  auto                   label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(80.f, 40.f));
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
   label.SetProperty(TextLabel::Property::MULTI_LINE, false);
   Property::Map fit;
-  fit["enable"] = true;
-  fit["minSize"] = 5.f;
-  fit["maxSize"] = 50.f;
-  fit["stepSize"] = 5.f;
+  fit["enable"]       = true;
+  fit["minSize"]      = 5.f;
+  fit["maxSize"]      = 50.f;
+  fit["stepSize"]     = 5.f;
   fit["fontSizeType"] = "pointSize";
   label.SetProperty(DevelTextLabel::Property::TEXT_FIT, fit);
-  bool signaled = false;
-  std::unique_ptr<ConnectionTracker> tracker = std::make_unique<ConnectionTracker>();
+  bool                               signaled = false;
+  std::unique_ptr<ConnectionTracker> tracker  = std::make_unique<ConnectionTracker>();
   label.ConnectSignal(tracker.get(), "textFitChanged", CallbackFunctor(&signaled));
   application.GetScene().Add(label);
   for(unsigned int iteration = 0u; iteration < 2u; ++iteration)
@@ -2793,9 +2793,9 @@ int UtcDaliToolkitTextlabelTextFit(void)
   }
   DALI_TEST_CHECK(signaled);
   fit["fontSizeType"] = "pixelSize";
-  fit["minSize"] = 8.f;
-  fit["maxSize"] = 64.f;
-  fit["stepSize"] = 4.f;
+  fit["minSize"]      = 8.f;
+  fit["maxSize"]      = 64.f;
+  fit["stepSize"]     = 4.f;
   label.SetProperty(DevelTextLabel::Property::TEXT_FIT, fit);
   application.SendNotification();
   application.Render();
@@ -2807,21 +2807,21 @@ int UtcDaliToolkitTextlabelTextFit(void)
 int UtcDaliToolkitTextlabelTextFitStressTest(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto label = TextLabel::New();
+  auto                   label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(80.f, 40.f));
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
   label.SetProperty(TextLabel::Property::MULTI_LINE, false);
   Property::Map fit;
-  fit["enable"] = true;
-  fit["minSize"] = 5.f;
-  fit["maxSize"] = 50.f;
-  fit["stepSize"] = 5.f;
+  fit["enable"]       = true;
+  fit["minSize"]      = 5.f;
+  fit["maxSize"]      = 50.f;
+  fit["stepSize"]     = 5.f;
   fit["fontSizeType"] = "pointSize";
   label.SetProperty(DevelTextLabel::Property::TEXT_FIT, fit);
-  bool signaled = false;
-  std::unique_ptr<ConnectionTracker> tracker = std::make_unique<ConnectionTracker>();
+  bool                               signaled = false;
+  std::unique_ptr<ConnectionTracker> tracker  = std::make_unique<ConnectionTracker>();
   label.ConnectSignal(tracker.get(), "textFitChanged", CallbackFunctor(&signaled));
   application.GetScene().Add(label);
   for(unsigned int iteration = 0u; iteration < 40u; ++iteration)
@@ -2884,21 +2884,21 @@ int UtcDaliToolkitTextlabelFastTextFitStressTest(void)
 int UtcDaliToolkitTextlabelTextFitMultiLine(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto label = TextLabel::New();
+  auto                   label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(80.f, 40.f));
   label.SetProperty(DevelTextLabel::Property::REMOVE_FRONT_INSET, true);
   label.SetProperty(DevelTextLabel::Property::REMOVE_BACK_INSET, true);
   label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
   label.SetProperty(TextLabel::Property::MULTI_LINE, true);
   Property::Map fit;
-  fit["enable"] = true;
-  fit["minSize"] = 5.f;
-  fit["maxSize"] = 50.f;
-  fit["stepSize"] = 5.f;
+  fit["enable"]       = true;
+  fit["minSize"]      = 5.f;
+  fit["maxSize"]      = 50.f;
+  fit["stepSize"]     = 5.f;
   fit["fontSizeType"] = "pointSize";
   label.SetProperty(DevelTextLabel::Property::TEXT_FIT, fit);
-  bool signaled = false;
-  std::unique_ptr<ConnectionTracker> tracker = std::make_unique<ConnectionTracker>();
+  bool                               signaled = false;
+  std::unique_ptr<ConnectionTracker> tracker  = std::make_unique<ConnectionTracker>();
   label.ConnectSignal(tracker.get(), "textFitChanged", CallbackFunctor(&signaled));
   application.GetScene().Add(label);
   for(unsigned int iteration = 0u; iteration < 2u; ++iteration)
@@ -2918,7 +2918,7 @@ int UtcDaliToolkitTextlabelTextFitMultiLine(void)
 int UtcDaliToolkitTextlabelTextFitArray(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto label = TextLabel::New();
+  auto                   label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(80.f, 40.f));
   label.SetProperty(TextLabel::Property::POINT_SIZE, 12.f);
   label.SetProperty(TextLabel::Property::TEXT, "abcd");
@@ -2929,7 +2929,7 @@ int UtcDaliToolkitTextlabelTextFitArray(void)
   options.emplace_back(20.f, 28.f);
   options.emplace_back(30.f, 40.f);
   DevelTextLabel::SetTextFitArray(label, true, options);
-  const bool enabled = DevelTextLabel::IsTextFitArrayEnabled(label);
+  const bool enabled   = DevelTextLabel::IsTextFitArrayEnabled(label);
   const auto retrieved = DevelTextLabel::GetTextFitArray(label);
   DALI_TEST_CHECK(enabled);
   DALI_TEST_EQUALS(retrieved.size(), 3u, TEST_LOCATION);
@@ -3498,7 +3498,7 @@ int utcDaliTextLabelGetHeightForWidthChangeLineCountWhenTextChanged(void)
 int utcDaliTextLabelGeometryRTL(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto label = TextLabel::New();
+  auto                   label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
   label.SetProperty(TextLabel::Property::PIXEL_SIZE, 16.f);
   label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
@@ -3510,7 +3510,7 @@ int utcDaliTextLabelGeometryRTL(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextLabel::GetTextPosition(label, 0u, 3u);
-  const auto sizes = DevelTextLabel::GetTextSize(label, 0u, 3u);
+  const auto sizes     = DevelTextLabel::GetTextSize(label, 0u, 3u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
@@ -3522,7 +3522,7 @@ int utcDaliTextLabelGeometryRTL(void)
 int utcDaliTextLabelGeometryGlyphMiddle(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto label = TextLabel::New();
+  auto                   label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
   label.SetProperty(TextLabel::Property::PIXEL_SIZE, 16.f);
   label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
@@ -3534,7 +3534,7 @@ int utcDaliTextLabelGeometryGlyphMiddle(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextLabel::GetTextPosition(label, 2u, 3u);
-  const auto sizes = DevelTextLabel::GetTextSize(label, 2u, 3u);
+  const auto sizes     = DevelTextLabel::GetTextSize(label, 2u, 3u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
@@ -3546,7 +3546,7 @@ int utcDaliTextLabelGeometryGlyphMiddle(void)
 int utcDaliTextLabelGeometryOneGlyph(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto label = TextLabel::New();
+  auto                   label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
   label.SetProperty(TextLabel::Property::PIXEL_SIZE, 16.f);
   label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
@@ -3558,7 +3558,7 @@ int utcDaliTextLabelGeometryOneGlyph(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextLabel::GetTextPosition(label, 0u, 0u);
-  const auto sizes = DevelTextLabel::GetTextSize(label, 0u, 0u);
+  const auto sizes     = DevelTextLabel::GetTextSize(label, 0u, 0u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
@@ -3906,7 +3906,7 @@ int UtcDaliTextTextLabelSizeNegativeLineSpacing(void)
 int UtcDaliTextLabelNegativeLineSpacingWithEllipsis(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto label = TextLabel::New();
+  auto                   label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 40.f));
   label.SetProperty(TextLabel::Property::POINT_SIZE, 12.f);
   label.SetProperty(TextLabel::Property::TEXT, "a\nb\nc\nd\ne");
@@ -3973,7 +3973,7 @@ int UtcDaliToolkitTextlabelParagraphTag(void)
 int utcDaliTextLabelGetTextBoundingRectangle(void)
 {
   ToolkitTestApplication application(480u, 800u, 96.f, 96.f);
-  auto label = TextLabel::New();
+  auto                   label = TextLabel::New();
   label.SetProperty(Actor::Property::SIZE, Vector2(200.f, 100.f));
   label.SetProperty(TextLabel::Property::PIXEL_SIZE, 16.f);
   label.SetProperty(TextLabel::Property::FONT_FAMILY, "Test Sans");
@@ -3985,7 +3985,7 @@ int utcDaliTextLabelGetTextBoundingRectangle(void)
   application.SendNotification();
   application.Render();
   const auto positions = DevelTextLabel::GetTextPosition(label, 0u, 5u);
-  const auto sizes = DevelTextLabel::GetTextSize(label, 0u, 5u);
+  const auto sizes     = DevelTextLabel::GetTextSize(label, 0u, 5u);
   DALI_TEST_EQUALS(positions.Count(), sizes.Count(), TEST_LOCATION);
   DALI_TEST_CHECK(!sizes.Empty());
   DALI_TEST_EQUALS(sizes.Count(), 1u, TEST_LOCATION);
@@ -4079,7 +4079,7 @@ int utcDaliTextLabelFontVariationsRegister(void)
   const KeyValuePair& keyvalue = fontVariationsGet.GetKeyValue(0);
 
   String key = "";
-  if(keyvalue.first.type == Property::Key::STRING)
+  if(keyvalue.first.type == Property::Key::Type::STRING)
   {
     key = keyvalue.first.stringKey;
   }

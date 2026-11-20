@@ -69,7 +69,7 @@ inline Dali::Property::Index GetPropertyIndexWithCompatibility(const Dali::Handl
 {
   Dali::Property::Index index = handle.GetPropertyIndex(key);
   if(index == Dali::Property::INVALID_INDEX &&
-     key.type == Dali::Property::Key::STRING &&
+     key.type == Dali::Property::Key::Type::STRING &&
      Dali::Actor::DownCast(handle))
   {
     const Dali::StringView propertyName(key.stringKey);

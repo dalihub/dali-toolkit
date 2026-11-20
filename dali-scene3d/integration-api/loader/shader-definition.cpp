@@ -254,7 +254,7 @@ Shader ShaderDefinition::Load(RawData&& raw) const
   for(Property::Map::SizeType i0 = 0, i1 = mUniforms.Count(); i0 != i1; ++i0)
   {
     auto pair = mUniforms.GetKeyValue(i0);
-    DALI_ASSERT_ALWAYS(pair.first.type == Property::Key::STRING);
+    DALI_ASSERT_ALWAYS(pair.first.type == Property::Key::Type::STRING);
     shader.RegisterProperty(pair.first.stringKey, pair.second);
   }
 
