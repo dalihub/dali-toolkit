@@ -28,6 +28,12 @@ BackgroundBlurEffect::BackgroundBlurEffect(const BackgroundBlurEffect& handle)
 {
 }
 
+BackgroundBlurEffect::BackgroundBlurEffect(BackgroundBlurEffect&& handle) noexcept = default;
+
+BackgroundBlurEffect& BackgroundBlurEffect::operator=(const BackgroundBlurEffect& handle) = default;
+
+BackgroundBlurEffect& BackgroundBlurEffect::operator=(BackgroundBlurEffect&& handle) noexcept = default;
+
 BackgroundBlurEffect::BackgroundBlurEffect(Internal::BackgroundBlurEffectImpl* backgroundBlurEffectImpl)
 : RenderEffect(backgroundBlurEffectImpl)
 {
