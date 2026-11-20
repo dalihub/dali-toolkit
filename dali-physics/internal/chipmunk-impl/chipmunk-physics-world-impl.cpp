@@ -118,9 +118,9 @@ Dali::Any ChipmunkPhysicsWorld::HitTest(Dali::Vector3 rayFromWorld, Dali::Vector
 {
   cpVect           spacePosition = cpv(rayFromWorld.x, rayFromWorld.y);
   cpFloat          radius        = 5.0f;
-  cpPointQueryInfo info          = {0};
-  cpShapeFilter    filter        = nativeFilter.Get<cpShapeFilter>();
-  cpShape*         shape         = cpSpacePointQueryNearest(mSpace, spacePosition, radius, filter, &info);
+  cpPointQueryInfo info{};
+  cpShapeFilter    filter = nativeFilter.Get<cpShapeFilter>();
+  cpShape*         shape  = cpSpacePointQueryNearest(mSpace, spacePosition, radius, filter, &info);
   cpBody*          hitBody{nullptr};
 
   if(shape && cpBodyGetMass(cpShapeGetBody(shape)) < INFINITY)

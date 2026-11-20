@@ -1787,7 +1787,7 @@ void DliLoaderImpl::Impl::ParseAnimations(const TreeNode* tnAnimations, LoadPara
           const TreeNode* tnValue = tnProperty.GetChild("value");
           if(tnValue)
           {
-            animProp.mValue.Reset(new AnimatedProperty::Value{ReadPropertyValue(*tnValue)});
+            animProp.mValue.Reset(new AnimatedProperty::Value{ReadPropertyValue(*tnValue), false}); // mIsRelative will be read next line.
             ReadBool(tnProperty.GetChild("relative"), animProp.mValue->mIsRelative);
           }
           else

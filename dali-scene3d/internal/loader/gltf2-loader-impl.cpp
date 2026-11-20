@@ -61,7 +61,7 @@ bool Gltf2LoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::
   }
 
   auto                         path = stdUrl.substr(0, stdUrl.rfind('/') + 1);
-  Gltf2Util::ConversionContext context{result, path, INVALID_INDEX};
+  Gltf2Util::ConversionContext context{result, path, INVALID_INDEX, {}, {}};
 
   Gltf2Util::ConvertGltfToContext(document, context, isMRendererModel);
 
