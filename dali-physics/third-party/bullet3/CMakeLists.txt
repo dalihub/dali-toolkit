@@ -114,7 +114,8 @@ target_include_directories(bullet3
 if(MSVC)
     target_compile_options(bullet3 PRIVATE /w)
 else()
-    target_compile_options(bullet3 PRIVATE -w)
+    target_compile_options(bullet3 PRIVATE -w -Wno-odr)
+    set_property(TARGET bullet3 APPEND_STRING PROPERTY LINK_FLAGS " -Wno-odr")
 endif()
 
 target_compile_options(bullet3 PRIVATE -fvisibility=default)
