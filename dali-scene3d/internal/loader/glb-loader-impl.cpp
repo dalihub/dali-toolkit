@@ -127,7 +127,7 @@ bool GlbLoaderImpl::LoadModel(const Dali::String& url, Dali::Scene3D::Loader::Lo
   }
 
   auto                         path = stdUrl.substr(0, stdUrl.rfind('/') + 1);
-  Gltf2Util::ConversionContext context{result, path, INVALID_INDEX};
+  Gltf2Util::ConversionContext context{result, path, INVALID_INDEX, {}, {}};
 
   auto& outBuffers = context.mOutput.mResources.mBuffers;
   outBuffers.Reserve(document.mBuffers.size());
