@@ -104,24 +104,13 @@ public:
     {
     }
 
-    AnimationData& operator=(const AnimationData& rhs)
-    {
-      resendFlag |= rhs.resendFlag; // OR resend flag
-      playRange                = rhs.playRange;
-      playState                = rhs.playState;
-      stopBehavior             = rhs.stopBehavior;
-      loopingMode              = rhs.loopingMode;
-      currentFrame             = rhs.currentFrame;
-      width                    = rhs.width;
-      height                   = rhs.height;
-      loopCount                = rhs.loopCount;
-      playStateId              = rhs.playStateId;
-      frameSpeedFactor         = rhs.frameSpeedFactor;
-      notifyAfterRasterization = rhs.notifyAfterRasterization;
+    AnimationData(const AnimationData& rhs) = default;
 
-      dynamicProperties.insert(dynamicProperties.end(), rhs.dynamicProperties.begin(), rhs.dynamicProperties.end());
-      return *this;
-    }
+    AnimationData(AnimationData&& rhs) noexcept = default;
+
+    AnimationData& operator=(const AnimationData& rhs) = default;
+
+    AnimationData& operator=(AnimationData&& rhs) noexcept = default;
 
     uint32_t                             resendFlag;
     Property::Array                      playRange;

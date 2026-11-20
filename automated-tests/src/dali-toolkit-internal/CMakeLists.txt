@@ -46,6 +46,7 @@ SET(TC_SOURCES
  utc-Dali-TextLanguage.cpp
  utc-Dali-TextSelectionPopup-internal.cpp
  utc-Dali-TextureManager.cpp
+ utc-Dali-VectorAnimationData-internal.cpp
  utc-Dali-Visuals-internal.cpp
  utc-Dali-VisualModel.cpp
  utc-Dali-VisualUrl.cpp
