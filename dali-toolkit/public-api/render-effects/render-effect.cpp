@@ -25,8 +25,22 @@ namespace DALI_NAMESPACE
 {
 namespace Toolkit
 {
+RenderEffect::RenderEffect()
+{
+}
+
 RenderEffect::RenderEffect(const RenderEffect& handle)
 : BaseHandle(handle)
+{
+}
+
+RenderEffect::RenderEffect(RenderEffect&& handle) noexcept = default;
+
+RenderEffect& RenderEffect::operator=(const RenderEffect& handle) = default;
+
+RenderEffect& RenderEffect::operator=(RenderEffect&& handle) noexcept = default;
+
+RenderEffect::~RenderEffect()
 {
 }
 

@@ -31,6 +31,12 @@ GaussianBlurEffect::GaussianBlurEffect(const GaussianBlurEffect& handle)
 {
 }
 
+GaussianBlurEffect::GaussianBlurEffect(GaussianBlurEffect&& handle) noexcept = default;
+
+GaussianBlurEffect& GaussianBlurEffect::operator=(const GaussianBlurEffect& handle) = default;
+
+GaussianBlurEffect& GaussianBlurEffect::operator=(GaussianBlurEffect&& handle) noexcept = default;
+
 GaussianBlurEffect::GaussianBlurEffect(Internal::GaussianBlurEffectImpl* GaussianBlurEffectImpl)
 : RenderEffect(GaussianBlurEffectImpl)
 {

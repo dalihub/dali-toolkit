@@ -26,13 +26,15 @@
 #include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/integration-api/string-utils.h>
 
+#include <utility>
+
 using namespace Dali;
 using Dali::Integration::ToDaliString;
 using namespace Dali::Toolkit;
 
 namespace
 {
-constexpr uint32_t DEFAULT_BLUR_RENDER_TASK_COUNT             = 3u;
+constexpr uint32_t DEFAULT_BLUR_RENDER_TASK_COUNT            = 3u;
 constexpr uint32_t INTERMEDIATE_DOWNSAMPLE_RENDER_TASK_COUNT = 4u;
 
 void CheckTaskFrameBufferSize(RenderTask task, uint32_t expectedWidth, uint32_t expectedHeight)
@@ -72,6 +74,49 @@ int UtcDaliRenderEffectNewP(void)
   MaskEffect maskEffect4 = maskEffect3;
   DALI_TEST_CHECK(maskEffect4);
 
+  END_TEST;
+}
+
+int UtcDaliRenderEffectHandleCopyMove(void)
+{
+  ToolkitTestApplication application;
+
+  RenderEffect source = BackgroundBlurEffect::New();
+  RenderEffect copy(source);
+  DALI_TEST_CHECK(copy == source);
+
+  RenderEffect copyAssigned;
+  DALI_TEST_CHECK(&(copyAssigned = source) == &copyAssigned);
+  DALI_TEST_CHECK(copyAssigned == source);
+
+  RenderEffect moved(std::move(copy));
+  DALI_TEST_CHECK(moved == source);
+  DALI_TEST_CHECK(!copy);
+
+  RenderEffect moveAssigned;
+  DALI_TEST_CHECK(&(moveAssigned = std::move(copyAssigned)) == &moveAssigned);
+  DALI_TEST_CHECK(moveAssigned == source);
+  DALI_TEST_CHECK(!copyAssigned);
+
+  auto CheckEffectCopyMove = [](auto effect)
+  {
+    using Effect = decltype(effect);
+    Effect copy(effect);
+    DALI_TEST_CHECK(copy == effect);
+    Effect copyAssigned;
+    DALI_TEST_CHECK(&(copyAssigned = effect) == &copyAssigned);
+    DALI_TEST_CHECK(copyAssigned == effect);
+    Effect moved(std::move(copy));
+    DALI_TEST_CHECK(moved == effect);
+    DALI_TEST_CHECK(!copy);
+    Effect moveAssigned;
+    DALI_TEST_CHECK(&(moveAssigned = std::move(copyAssigned)) == &moveAssigned);
+    DALI_TEST_CHECK(moveAssigned == effect);
+    DALI_TEST_CHECK(!copyAssigned);
+  };
+  CheckEffectCopyMove(BackgroundBlurEffect::New());
+  CheckEffectCopyMove(GaussianBlurEffect::New());
+  CheckEffectCopyMove(MaskEffect::New(Control::New()));
   END_TEST;
 }
 

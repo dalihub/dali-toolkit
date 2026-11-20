@@ -95,6 +95,29 @@ public:
   MaskEffect(const MaskEffect& handle);
 
   /**
+   * @brief Move constructor. Transfers the referenced object from another handle.
+   * @param[in] handle The handle to move from.
+   * @SINCE_3_0.2
+   */
+  MaskEffect(MaskEffect&& handle) noexcept;
+
+  /**
+   * @brief Copy assignment operator. Shares the referenced object with another handle.
+   * @param[in] handle The handle to copy from.
+   * @return A reference to this handle.
+   * @SINCE_3_0.2
+   */
+  MaskEffect& operator=(const MaskEffect& handle);
+
+  /**
+   * @brief Move assignment operator. Transfers the referenced object from another handle.
+   * @param[in] handle The handle to move from.
+   * @return A reference to this handle.
+   * @SINCE_3_0.2
+   */
+  MaskEffect& operator=(MaskEffect&& handle) noexcept;
+
+  /**
    * @brief Destructor
    * @SINCE_2_4.15
    */

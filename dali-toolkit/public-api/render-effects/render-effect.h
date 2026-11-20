@@ -55,20 +55,43 @@ public:
    * @brief Creates an uninitialized effect.
    * @SINCE_2_3.28
    */
-  RenderEffect() = default;
+  RenderEffect();
 
   /**
    * @brief Destructor.
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_2_3.28
    */
-  ~RenderEffect() = default;
+  ~RenderEffect();
 
   /**
    * @brief Copy constructor. Creates another handle that points to the same real object.
    * @SINCE_2_3.28
    */
   RenderEffect(const RenderEffect& handle);
+
+  /**
+   * @brief Move constructor. Transfers the referenced object from another handle.
+   * @param[in] handle The handle to move from.
+   * @SINCE_3_0.2
+   */
+  RenderEffect(RenderEffect&& handle) noexcept;
+
+  /**
+   * @brief Copy assignment operator. Shares the referenced object with another handle.
+   * @param[in] handle The handle to copy from.
+   * @return A reference to this handle.
+   * @SINCE_3_0.2
+   */
+  RenderEffect& operator=(const RenderEffect& handle);
+
+  /**
+   * @brief Move assignment operator. Transfers the referenced object from another handle.
+   * @param[in] handle The handle to move from.
+   * @return A reference to this handle.
+   * @SINCE_3_0.2
+   */
+  RenderEffect& operator=(RenderEffect&& handle) noexcept;
 
   /**
    * @brief Activates effect on ownerControl

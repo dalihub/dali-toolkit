@@ -87,6 +87,29 @@ public:
   BackgroundBlurEffect(const BackgroundBlurEffect& handle);
 
   /**
+   * @brief Move constructor. Transfers the referenced object from another handle.
+   * @param[in] handle The handle to move from.
+   * @SINCE_3_0.2
+   */
+  BackgroundBlurEffect(BackgroundBlurEffect&& handle) noexcept;
+
+  /**
+   * @brief Copy assignment operator. Shares the referenced object with another handle.
+   * @param[in] handle The handle to copy from.
+   * @return A reference to this handle.
+   * @SINCE_3_0.2
+   */
+  BackgroundBlurEffect& operator=(const BackgroundBlurEffect& handle);
+
+  /**
+   * @brief Move assignment operator. Transfers the referenced object from another handle.
+   * @param[in] handle The handle to move from.
+   * @return A reference to this handle.
+   * @SINCE_3_0.2
+   */
+  BackgroundBlurEffect& operator=(BackgroundBlurEffect&& handle) noexcept;
+
+  /**
    * @brief Destructor
    * @SINCE_2_3.28
    */

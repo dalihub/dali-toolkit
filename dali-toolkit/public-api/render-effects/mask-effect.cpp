@@ -30,6 +30,12 @@ MaskEffect::MaskEffect(const MaskEffect& handle)
 {
 }
 
+MaskEffect::MaskEffect(MaskEffect&& handle) noexcept = default;
+
+MaskEffect& MaskEffect::operator=(const MaskEffect& handle) = default;
+
+MaskEffect& MaskEffect::operator=(MaskEffect&& handle) noexcept = default;
+
 MaskEffect::MaskEffect(Internal::MaskEffectImpl* maskEffectImpl)
 : RenderEffect(maskEffectImpl)
 {
