@@ -28,18 +28,19 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 
-#define LOG_CACHE                                                                                                                                                        \
-  if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                                                                                                                    \
-  {                                                                                                                                                                      \
-    std::ostringstream oss;                                                                                                                                              \
-    oss.imbue(std::locale::classic());                                                                                                                                   \
-    oss << "Size:" << mQueue.Count() << " [ ";                                                                                                                           \
-    for(std::size_t _i = 0; _i < mQueue.Count(); ++_i)                                                                                                                   \
-    {                                                                                                                                                                    \
-      oss << _i << "={ tex:" << mImageUrls[mQueue[_i].mUrlIndex].mTextureId << " urlId:" << mQueue[_i].mUrlIndex << " rdy:" << (mQueue[_i].mReady ? "T" : "F") << "}, "; \
-    }                                                                                                                                                                    \
-    oss << " ]" << std::endl;                                                                                                                                            \
-    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                                                                                           \
+#define LOG_CACHE                                                                                                   \
+  if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                                                               \
+  {                                                                                                                 \
+    std::ostringstream oss;                                                                                         \
+    oss.imbue(std::locale::classic());                                                                              \
+    oss << "Size:" << mQueue.Count() << " [ ";                                                                      \
+    for(std::size_t _i = 0; _i < mQueue.Count(); ++_i)                                                              \
+    {                                                                                                               \
+      oss << _i << "={ tex:" << mImageUrls[mQueue[_i].mUrlIndex].mTextureId << " urlId:" << mQueue[_i].mUrlIndex;   \
+      oss << " observer:" << mQueue[_i].mLoadObserver.get() << " rdy:" << (mQueue[_i].mReady ? "T" : "F") << "}, "; \
+    }                                                                                                               \
+    oss << " ]" << std::endl;                                                                                       \
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                                      \
   }
 
 #else
@@ -149,17 +150,14 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
   {
     ImageFrame imageFrame;
 
-    VisualUrl& url       = mImageUrls[frameIndex].mUrl;
-    imageFrame.mUrlIndex = frameIndex;
-    imageFrame.mReady    = false;
+    VisualUrl& url           = mImageUrls[frameIndex].mUrl;
+    imageFrame.mUrlIndex     = frameIndex;
+    imageFrame.mReady        = false;
+    imageFrame.mLoadObserver = std::make_shared<LoadRequestObserver>(*this, frameIndex);
 
     mQueue.PushBack(imageFrame);
 
-    // Note, if the image is already loaded, then LoadComplete will get called
-    // from within this method. This means it won't yet have a texture id, so we
-    // need to account for this inside the LoadComplete method using mRequestingLoad.
-    mRequestingLoad = true;
-    mLoadState      = TextureManager::LoadState::LOADING;
+    mLoadState = TextureManager::LoadState::LOADING;
 
     bool synchronousLoading = false;
     bool loadingStatus      = false;
@@ -169,10 +167,8 @@ void RollingImageCache::LoadBatch(uint32_t frameIndex)
 
     TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
     TextureSet                textureSet    = mTextureManager.LoadTexture(
-      url, mDesiredSize, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, loadingStatus, this, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
+      url, mDesiredSize, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, loadingStatus, imageFrame.mLoadObserver.get(), ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
     mImageUrls[imageFrame.mUrlIndex].mTextureId = loadTextureId;
-
-    mRequestingLoad = false;
 
     ++frameIndex;
     frameIndex %= mImageUrls.size();
@@ -199,9 +195,11 @@ TextureManager::TextureId RollingImageCache::GetCachedTextureId(int index) const
 
 void RollingImageCache::PopFrontCache()
 {
+  auto requestObserver = mQueue.Front().mLoadObserver;
+  mQueue.Front().mLoadObserver.reset(); ///< PopFront() did not call destructor of ImageFrame. LoadRequestObserver manually.
   ImageFrame imageFrame = mQueue.PopFront();
 
-  mTextureManager.RequestRemove(mImageUrls[imageFrame.mUrlIndex].mTextureId, this);
+  mTextureManager.RequestRemove(mImageUrls[imageFrame.mUrlIndex].mTextureId, requestObserver.get());
   mImageUrls[imageFrame.mUrlIndex].mTextureId = TextureManager::INVALID_TEXTURE_ID;
 
   if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
@@ -225,33 +223,33 @@ void RollingImageCache::ClearCache()
   mLoadState = TextureManager::LoadState::NOT_STARTED;
 }
 
-void RollingImageCache::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
+void RollingImageCache::OnLoadResult(LoadRequestObserver& requestObserver, uint32_t frameIndex, bool loadSuccess, TextureUploadObserver::TextureInformation textureInformation)
 {
-  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
+  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "RollingImageCache::OnLoadResult(textureId:%d) start\n", textureInformation.textureId);
   LOG_CACHE;
+
+  bool frontFrameReady = IsFrontReady();
+  bool requestFound    = false;
+  for(std::size_t i = 0; i < mQueue.Count(); ++i)
+  {
+    if(mQueue[i].mLoadObserver.get() == &requestObserver)
+    {
+      mQueue[i].mLoadObserver.reset();
+      mQueue[i].mReady = loadSuccess;
+      requestFound     = true;
+      break;
+    }
+  }
+
+  if(!requestFound)
+  {
+    return;
+  }
 
   if(loadSuccess)
   {
-    mLoadState           = TextureManager::LoadState::LOAD_FINISHED;
-    bool frontFrameReady = IsFrontReady();
-    if(!mRequestingLoad)
-    {
-      for(std::size_t i = 0; i < mQueue.Count(); ++i)
-      {
-        if(GetCachedTextureId(i) == textureInformation.textureId)
-        {
-          mQueue[i].mReady = true;
-          break;
-        }
-      }
-    }
-    else
-    {
-      // LoadComplete has been called from within RequestLoad. TextureManager must
-      // therefore already have the texture cached, so make the texture ready.
-      // (Use the last texture, as the texture id hasn't been assigned yet)
-      mQueue.Back().mReady = true;
-    }
+    mLoadState                        = TextureManager::LoadState::LOAD_FINISHED;
+    mImageUrls[frameIndex].mTextureId = textureInformation.textureId;
 
     if(!frontFrameReady && IsFrontReady())
     {
@@ -264,8 +262,6 @@ void RollingImageCache::LoadComplete(bool loadSuccess, TextureInformation textur
     // preMultiplied should be false because broken image don't premultiply alpha on load
     mObserver.FrameReady(TextureSet(), 0, false);
   }
-
-  LOG_CACHE;
 }
 
 } //namespace Internal

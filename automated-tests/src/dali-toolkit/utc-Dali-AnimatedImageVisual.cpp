@@ -3957,6 +3957,146 @@ int UtcDaliAnimatedImageVisualSynchronousSizingMultiImage02(void)
   END_TEST;
 }
 
+namespace
+{
+void ImageSequenceContinuesAfterFirstTick(ToolkitTestApplication& application, const char* secondImageUrl, unsigned int expectedLoadCount)
+{
+  Property::Array urls;
+  urls.PushBack(TEST_MASK_IMAGE_FILE_NAME);
+  urls.PushBack(secondImageUrl);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, urls);
+  propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+
+  Visual::Base      visual    = VisualFactory::Get().CreateVisual(propertyMap);
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(expectedLoadCount), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::GetTimerCount() == 1, true, TEST_LOCATION);
+
+  Test::EmitGlobalTimerSignal();
+
+  DALI_TEST_EQUALS(Test::AreTimersRunning(), true, TEST_LOCATION);
+}
+} // namespace
+
+int UtcDaliAnimatedImageVisualDistinctUrlsContinueAfterFirstTick(void)
+{
+  ToolkitTestApplication application;
+
+  ImageSequenceContinuesAfterFirstTick(application, TEST_WEBP_FILE_NAME, 2u);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualDuplicateUrlsContinueAfterFirstTick(void)
+{
+  ToolkitTestApplication application;
+
+  // Both frames share one cached texture. Each frame must still become ready.
+  ImageSequenceContinuesAfterFirstTick(application, TEST_MASK_IMAGE_FILE_NAME, 1u);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualDuplicateUrlsContinueAfterFirstTickRollingCache(void)
+{
+  ToolkitTestApplication application;
+
+  Property::Array urls;
+  urls.PushBack(TEST_MASK_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_MASK_IMAGE_FILE_NAME);
+  urls.PushBack(TEST_WEBP_FILE_NAME);
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, urls);
+  propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 2);
+  propertyMap.Insert(ImageVisual::Property::FRAME_DELAY, 20);
+
+  Visual::Base      visual    = VisualFactory::Get().CreateVisual(propertyMap);
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_LOCATION);
+
+  // The next frame shares the first frame's texture and must already be ready.
+  Test::EmitGlobalTimerSignal();
+  DALI_TEST_EQUALS(Test::AreTimersRunning(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualBatchAndCacheLargerThanGifFrameCount(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction&     gl = application.GetGlAbstraction();
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_GIF_FILE_NAME);
+  propertyMap.Insert(ImageVisual::Property::BATCH_SIZE, 16);
+  propertyMap.Insert(ImageVisual::Property::CACHE_SIZE, 16);
+
+  Visual::Base      visual    = VisualFactory::Get().CreateVisual(propertyMap);
+  DummyControl      actor     = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual(Control::CONTROL_PROPERTY_END_INDEX + 1, visual);
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+
+  // The GIF has four frames, so the oversized batch should load exactly four.
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(4), true, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+
+  Property::Map resultMap;
+  visual.CreatePropertyMap(resultMap);
+  Property::Value* frameCount = resultMap.Find(DevelImageVisual::Property::TOTAL_FRAME_NUMBER);
+  DALI_TEST_CHECK(frameCount);
+  DALI_TEST_EQUALS(frameCount->Get<int>(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::GetTimerCount(), 1, TEST_LOCATION);
+
+  for(int tick = 0; tick < 8; ++tick)
+  {
+    Test::EmitGlobalTimerSignal();
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(Test::AreTimersRunning(), true, TEST_LOCATION);
+  }
+
+  DALI_TEST_EQUALS(gl.GetNumGeneratedTextures(), 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(Test::WaitForEventThreadTrigger(1, 1), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliAnimatedImageVisualLoadImagePlanesMultiImage01(void)
 {
   EnvironmentVariable::SetTestEnvironmentVariable(LOAD_IMAGE_YUV_PLANES_ENV, "1");

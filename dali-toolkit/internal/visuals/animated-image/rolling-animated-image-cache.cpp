@@ -44,7 +44,8 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
       oss << _i << "={ frm#: " << mQueue[_i].mFrameNumber << " tex: ";         \
       oss << (DALI_LIKELY(mQueue[_i].mFrameNumber < mTextureIds.size()) ?      \
               mTextureIds[mQueue[_i].mFrameNumber] :                           \
-              TextureManager::INVALID_TEXTURE_ID) << "}, ";                    \
+              TextureManager::INVALID_TEXTURE_ID);                          \
+      oss << " observer:" << mQueue[_i].mLoadObserver.get() << "}, ";        \
     }                                                                          \
     oss << " ]" << std::endl;                                                  \
     DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str()); \
@@ -213,8 +214,9 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex)
 TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, bool synchronousLoading, TextureManager::MultiplyOnLoad& preMultiplyOnLoading)
 {
   ImageFrame imageFrame;
-  imageFrame.mFrameNumber = frameIndex;
-  imageFrame.mReady       = false;
+  imageFrame.mFrameNumber  = frameIndex;
+  imageFrame.mReady        = false;
+  imageFrame.mLoadObserver = std::make_shared<LoadRequestObserver>(*this, frameIndex);
 
   mQueue.PushBack(imageFrame);
 
@@ -229,7 +231,7 @@ TextureSet RollingAnimatedImageCache::RequestFrameLoading(uint32_t frameIndex, b
                                                                                      mDesiredSize,
                                                                                      mSamplingMode,
                                                                                      synchronousLoading,
-                                                                                     this,
+                                                                                     imageFrame.mLoadObserver.get(),
                                                                                      preMultiplyOnLoading,
                                                                                      mReloadPolicy);
   mReloadPolicy                           = TextureManager::ReloadPolicy::CACHED;
@@ -269,18 +271,6 @@ void RollingAnimatedImageCache::LoadBatch(uint32_t frameIndex)
   LOG_CACHE;
 }
 
-void RollingAnimatedImageCache::SetImageFrameReady(TextureManager::TextureId textureId)
-{
-  for(std::size_t i = 0; i < mQueue.Count(); ++i)
-  {
-    if(GetCachedTextureId(i) == textureId)
-    {
-      mQueue[i].mReady = true;
-      break;
-    }
-  }
-}
-
 TextureSet RollingAnimatedImageCache::GetFrontTextureSet() const
 {
   DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "RollingAnimatedImageCache::GetFrontTextureSet() FrameNumber:%d\n", mQueue[0].mFrameNumber);
@@ -303,9 +293,11 @@ TextureManager::TextureId RollingAnimatedImageCache::GetCachedTextureId(int inde
 
 void RollingAnimatedImageCache::PopFrontCache()
 {
+  auto requestObserver = mQueue.Front().mLoadObserver;
+  mQueue.Front().mLoadObserver.reset(); ///< PopFront() did not call destructor of ImageFrame. LoadRequestObserver manually.
   ImageFrame imageFrame = mQueue.PopFront();
 
-  mTextureManager.RequestRemove(mTextureIds[imageFrame.mFrameNumber], this);
+  mTextureManager.RequestRemove(mTextureIds[imageFrame.mFrameNumber], requestObserver.get());
   mTextureIds[imageFrame.mFrameNumber] = TextureManager::INVALID_TEXTURE_ID;
 
   if(mMaskingData && mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID)
@@ -364,9 +356,24 @@ void RollingAnimatedImageCache::MakeFrameReady(bool loadSuccess, TextureSet text
   }
 }
 
-void RollingAnimatedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
+void RollingAnimatedImageCache::OnLoadResult(LoadRequestObserver& requestObserver, uint32_t frameIndex, bool loadSuccess, TextureUploadObserver::TextureInformation textureInformation)
 {
-  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
+  bool requestFound = false;
+  for(std::size_t i = 0; i < mQueue.Count(); ++i)
+  {
+    if(mQueue[i].mFrameNumber == frameIndex && mQueue[i].mLoadObserver.get() == &requestObserver)
+    {
+      mQueue[i].mLoadObserver.reset();
+      requestFound = true;
+      break;
+    }
+  }
+  if(!requestFound)
+  {
+    return;
+  }
+
+  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "RollingAnimatedImageCache::OnLoadResult(textureId:%d) start\n", textureInformation.textureId);
   LOG_CACHE;
 
   if(textureInformation.textureSet && (mWrapModeU != Dali::WrapMode::DEFAULT || mWrapModeV != Dali::WrapMode::DEFAULT))

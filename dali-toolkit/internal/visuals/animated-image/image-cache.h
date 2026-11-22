@@ -18,6 +18,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/texture-manager/texture-upload-observer.h>
 
@@ -30,6 +33,51 @@ namespace Internal
 class ImageCache
 {
 public:
+  class LoadRequestObserver;
+
+  /**
+   * @brief Receives the result of a texture load request.
+   */
+  class LoadResultObserver
+  {
+  public:
+    virtual ~LoadResultObserver() = default;
+
+    /**
+     * @brief Informs the cache that one texture load request has completed.
+     * @param[in] requestObserver The observer for the completed request.
+     * @param[in] frameIndex The requested frame index.
+     * @param[in] loadSuccess Whether the texture loaded successfully.
+     * @param[in] textureInformation The loaded texture information.
+     */
+    virtual void OnLoadResult(LoadRequestObserver& requestObserver, uint32_t frameIndex, bool loadSuccess, TextureUploadObserver::TextureInformation textureInformation) = 0;
+  };
+
+  /**
+   * @brief Observes one texture load request and forwards its result to the cache.
+   */
+  class LoadRequestObserver : public TextureUploadObserver, public std::enable_shared_from_this<LoadRequestObserver>
+  {
+  public:
+    /**
+     * @brief Constructor.
+     * @param[in] resultObserver The cache that receives the load result.
+     * @param[in] frameIndex The requested frame index.
+     */
+    LoadRequestObserver(LoadResultObserver& resultObserver, uint32_t frameIndex);
+
+    /**
+     * @brief Forwards the load result while keeping this observer alive until the callback returns.
+     * @param[in] loadSuccess Whether the texture loaded successfully.
+     * @param[in] textureInformation The loaded texture information.
+     */
+    void LoadComplete(bool loadSuccess, TextureInformation textureInformation) override;
+
+  private:
+    LoadResultObserver& mResultObserver;
+    uint32_t            mFrameIndex;
+  };
+
   /**
    * Observer class to inform when the next image is ready
    */
@@ -153,7 +201,6 @@ protected:
   uint32_t                            mInterval;
   TextureManager::LoadState           mLoadState;
   Dali::SamplingMode::Type            mSamplingMode : 5;
-  bool                                mRequestingLoad : 1;
   bool                                mPreMultiplyOnLoad : 1;
 };
 
