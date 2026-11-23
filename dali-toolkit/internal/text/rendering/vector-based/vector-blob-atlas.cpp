@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/texture-integ.h>
 
 namespace
 {
@@ -69,6 +70,10 @@ VectorBlobAtlas::VectorBlobAtlas(unsigned int textureWidth,
   DALI_LOG_INFO(gLogFilter, Debug::General, "Blob atlas %p size %dx%d, item width %d, height quantum %d\n", this, textureWidth, textureHeight, itemWidth, itemHeightQuantum);
 
   mAtlasTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, textureWidth, textureHeight);
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+  {
+    Dali::Integration::TextureUploadWithContent(mAtlasTexture, PixelData(), "VectorBlobAtlas", Dali::Integration::TextureContextTypeHint::TEXT_ATLAS, true);
+  }
 
   mTextureSet = TextureSet::New();
   mTextureSet.SetTexture(0, mAtlasTexture);

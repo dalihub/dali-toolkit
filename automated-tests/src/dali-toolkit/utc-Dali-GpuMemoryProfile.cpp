@@ -16,6 +16,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstdlib>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit-test-suite-utils.h>
@@ -24,9 +25,13 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/internal/particle-system/particle-emitter-impl.h>
+#include <dali-toolkit/internal/particle-system/particle-renderer-impl.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-manager.h>
+#include <dali-toolkit/internal/text/rendering/vector-based/vector-blob-atlas.h>
 #include <dali-toolkit/public-api/image-loader/image-url-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/adaptor-framework/image-loading-devel.h>
 #include <dali/devel-api/adaptor-framework/texture-upload-manager.h>
 #include <toolkit-environment-variable.h>
 #include <toolkit-event-thread-callback.h>
@@ -130,6 +135,75 @@ int UtcDaliToolkitGpuMemoryProfileVisuals(void)
     application.Render();
   }
   DALI_TEST_CHECK(true);
+  END_TEST;
+}
+
+int UtcDaliToolkitGpuMemoryProfileTextTiling(void)
+{
+  ToolkitTestApplication application;
+  const uint32_t         maxTextureSize = static_cast<uint32_t>(Dali::GetMaxTextureSize());
+  DALI_TEST_CHECK(maxTextureSize > 0u);
+
+  std::string    text;
+  const uint32_t lineCount = maxTextureSize / 4u + 64u;
+  text.reserve(lineCount * 2u);
+  for(uint32_t line = 0u; line < lineCount; ++line)
+  {
+    text += "X\n";
+  }
+
+  Toolkit::TextLabel label = Toolkit::TextLabel::New(text.c_str());
+  label.SetProperty(Toolkit::TextLabel::Property::MULTI_LINE, true);
+  label.SetProperty(Toolkit::TextLabel::Property::POINT_SIZE, 32.0f);
+  label.SetProperty(Actor::Property::SIZE, Vector2(96.0f, static_cast<float>(maxTextureSize + 64u)));
+  application.GetScene().Add(label);
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(label.GetRendererCount() >= 2u);
+  END_TEST;
+}
+
+int UtcDaliToolkitGpuMemoryProfileAdditionalUploads(void)
+{
+#if defined(__linux__)
+  ToolkitTestApplication application;
+
+  Property::Map meshProperties;
+  meshProperties.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::MESH);
+  meshProperties.Insert(Toolkit::MeshVisual::Property::OBJECT_URL, TEST_RESOURCE_DIR "/Cube.obj");
+  meshProperties.Insert(Toolkit::MeshVisual::Property::MATERIAL_URL, TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl");
+  meshProperties.Insert(Toolkit::MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/");
+  Toolkit::Visual::Base meshVisual = Toolkit::VisualFactory::Get().CreateVisual(meshProperties);
+  Toolkit::Control      mesh       = Toolkit::Control::New();
+  mesh.SetProperty(Actor::Property::SIZE, Vector2(200.0f, 200.0f));
+  Toolkit::DevelControl::RegisterVisual(Toolkit::GetImplementation(mesh), 1100, meshVisual);
+  application.GetScene().Add(mesh);
+
+  auto atlas = Toolkit::Text::VectorBlobAtlas::New(64u, 64u, 8u, 8u);
+  DALI_TEST_CHECK(atlas->GetTextureSet().GetTexture(0u));
+
+  Toolkit::ParticleSystem::ParticleEmitter  emitter      = Toolkit::ParticleSystem::ParticleEmitter::New();
+  Toolkit::ParticleSystem::ParticleRenderer renderer     = Toolkit::ParticleSystem::ParticleRenderer::New();
+  auto&                                     emitterImpl  = Toolkit::ParticleSystem::GetImplementation(emitter);
+  auto&                                     rendererImpl = GetImplementation(renderer);
+  rendererImpl.SetEmitter(&emitterImpl);
+  DALI_TEST_CHECK(rendererImpl.Initialize());
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(mesh.GetRendererCount() > 0u);
+  for(unsigned int tick = 0u; tick < 4u; ++tick)
+  {
+    application.GetPlatform().TriggerTimer();
+  }
+  DALI_TEST_CHECK(true);
+#else
+  tet_printf("GPU memory profile additional upload UTC skipped: test timer requires Linux.\n");
+  DALI_TEST_CHECK(true);
+#endif
   END_TEST;
 }
 

@@ -28,6 +28,7 @@
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
+#include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/common/capabilities.h>
 
 using Dali::Integration::ToDaliStringView;
@@ -257,7 +258,14 @@ void ParticleRenderer::CreateShader()
       0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
 
     auto pixelData = PixelData::New(reinterpret_cast<uint8_t*>(pixelArray), 16, 2, 2, Pixel::Format::RGBA8888, PixelData::DELETE_ARRAY);
-    mTexture.Upload(pixelData);
+    if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+    {
+      Dali::Integration::TextureUploadWithContent(mTexture, pixelData, "ParticleRendererDefault", Dali::Integration::TextureContextTypeHint::STANDARD_IMAGE);
+    }
+    else
+    {
+      mTexture.Upload(pixelData);
+    }
   }
   mTextureSet = TextureSet::New();
   mTextureSet.SetTexture(0, mTexture);

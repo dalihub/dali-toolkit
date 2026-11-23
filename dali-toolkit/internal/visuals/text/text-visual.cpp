@@ -726,6 +726,13 @@ void TextVisual::AddTilingTexture(TextureSet& textureSet, TilingInfo& tilingInfo
                                  data.GetPixelFormat(),
                                  tilingInfo.width,
                                  tilingInfo.height);
+  if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
+  {
+    std::string text;
+    mController->GetText(text);
+    text += " : (" + std::to_string(tilingInfo.offsetHeight) + ")";
+    Dali::Integration::TextureUploadWithContent(texture, PixelData(), ToDaliString(std::move(text)), Dali::Integration::TextureContextTypeHint::TEXT_SIMPLE_LABEL, true);
+  }
   DevelTexture::UploadSubPixelData(texture, data, 0u, tilingInfo.offsetHeight, tilingInfo.width, tilingInfo.height);
 
   textureSet.SetTexture(textureSetIndex, texture);
