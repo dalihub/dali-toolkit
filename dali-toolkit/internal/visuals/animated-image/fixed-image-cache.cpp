@@ -34,18 +34,20 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
 
-#define LOG_CACHE                                                                                                                                        \
-  if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                                                                                                    \
-  {                                                                                                                                                      \
-    std::ostringstream oss;                                                                                                                              \
-    oss.imbue(std::locale::classic());                                                                                                                   \
-    oss << "Size:" << mImageUrls.size() << " / Batch: " << mReadyFlags.size() << " [ ";                                                                  \
-    for(std::size_t _i = 0; _i < mImageUrls.size(); ++_i)                                                                                                \
-    {                                                                                                                                                    \
-      oss << _i << "={ #frm:" << " tex:" << mImageUrls[_i].mTextureId << " rdy:" << ((_i < mReadyFlags.size() && mReadyFlags[_i]) ? "T" : "F") << "}, "; \
-    }                                                                                                                                                    \
-    oss << " ]" << std::endl;                                                                                                                            \
-    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                                                                           \
+#define LOG_CACHE                                                                               \
+  if(gAnimImgLogFilter->IsEnabledFor(Debug::Concise))                                           \
+  {                                                                                             \
+    std::ostringstream oss;                                                                     \
+    oss.imbue(std::locale::classic());                                                          \
+    oss << "Size:" << mImageUrls.size() << " / Batch: " << mReadyFlags.size() << " [ ";         \
+    for(std::size_t _i = 0; _i < mImageUrls.size(); ++_i)                                       \
+    {                                                                                           \
+      oss << _i << "={ tex:" << mImageUrls[_i].mTextureId;                                      \
+      oss << " observer:" << (_i < mLoadObservers.size() ? mLoadObservers[_i].get() : nullptr); \
+      oss << " rdy:" << ((_i < mReadyFlags.size() && mReadyFlags[_i]) ? "T" : "F") << "}, ";    \
+    }                                                                                           \
+    oss << " ]" << std::endl;                                                                   \
+    DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "%s", oss.str().c_str());                  \
   }
 
 #else
@@ -70,6 +72,7 @@ FixedImageCache::FixedImageCache(TextureManager&                     textureMana
   mCurrentFrameIndex(FIRST_FRAME_INDEX)
 {
   mReadyFlags.reserve(mImageUrls.size());
+  mLoadObservers.reserve(mImageUrls.size());
 }
 
 FixedImageCache::~FixedImageCache()
@@ -148,12 +151,9 @@ void FixedImageCache::LoadBatch()
     VisualUrl& url        = mImageUrls[frameIndex].mUrl;
 
     mReadyFlags.push_back(false);
-
-    // Note, if the image is already loaded, then LoadComplete will get called
-    // from within this method. This means it won't yet have a texture id, so we
-    // need to account for this inside the LoadComplete method using mRequestingLoad.
-    mRequestingLoad = true;
-    mLoadState      = TextureManager::LoadState::LOADING;
+    auto requestObserver = std::make_shared<LoadRequestObserver>(*this, frameIndex);
+    mLoadObservers.push_back(requestObserver);
+    mLoadState = TextureManager::LoadState::LOADING;
 
     bool synchronousLoading = false;
     bool loadingStatus      = false;
@@ -162,9 +162,8 @@ void FixedImageCache::LoadBatch()
                                                    : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     TextureManager::TextureId loadTextureId = TextureManager::INVALID_TEXTURE_ID;
-    mTextureManager.LoadTexture(url, mDesiredSize, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, loadingStatus, this, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
+    mTextureManager.LoadTexture(url, mDesiredSize, mSamplingMode, mMaskingData, synchronousLoading, loadTextureId, loadingStatus, requestObserver.get(), ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiplyOnLoading);
     mImageUrls[frameIndex].mTextureId = loadTextureId;
-    mRequestingLoad                   = false;
   }
 
   LOG_CACHE;
@@ -190,11 +189,12 @@ void FixedImageCache::ClearCache()
   {
     for(std::size_t i = 0u; i < mImageUrls.size(); ++i)
     {
-      mTextureManager.RequestRemove(mImageUrls[i].mTextureId, this);
+      mTextureManager.RequestRemove(mImageUrls[i].mTextureId, i < mLoadObservers.size() ? mLoadObservers[i].get() : nullptr);
       mImageUrls[i].mTextureId = TextureManager::INVALID_TEXTURE_ID;
     }
   }
   mReadyFlags.clear();
+  mLoadObservers.clear();
   mLoadState = TextureManager::LoadState::NOT_STARTED;
   if(mMaskingData)
   {
@@ -202,35 +202,25 @@ void FixedImageCache::ClearCache()
   }
 }
 
-void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureInformation)
+void FixedImageCache::OnLoadResult(LoadRequestObserver& requestObserver, uint32_t frameIndex, bool loadSuccess, TextureUploadObserver::TextureInformation textureInformation)
 {
-  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "AnimatedImageVisual::LoadComplete(textureId:%d) start\n", textureInformation.textureId);
+  DALI_LOG_INFO(gAnimImgLogFilter, Debug::Concise, "FixedImageCache::OnLoadResult(textureId:%d) start\n", textureInformation.textureId);
   LOG_CACHE;
+
+  DALI_ASSERT_ALWAYS(frameIndex < mLoadObservers.size() && "Invalid frameIndex received in OnLoadResult");
+
+  if(mLoadObservers[frameIndex].get() != &requestObserver)
+  {
+    return;
+  }
+  mLoadObservers[frameIndex].reset();
 
   if(loadSuccess)
   {
-    mLoadState                = TextureManager::LoadState::LOAD_FINISHED;
-    bool wasCurrentFrameReady = IsFrameReady(mCurrentFrameIndex);
-    if(!mRequestingLoad)
-    {
-      for(std::size_t i = 0; i < mImageUrls.size(); ++i)
-      {
-        if(mImageUrls[i].mTextureId == textureInformation.textureId)
-        {
-          mReadyFlags[i] = true;
-          break;
-        }
-      }
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(mReadyFlags.size() > 0u && "Some FixedImageCache::LoadBatch() called mismatched!");
-      size_t i = mReadyFlags.size() - 1u;
-
-      // texture id might not setup yet. Update it now.
-      mImageUrls[i].mTextureId = textureInformation.textureId;
-      mReadyFlags[i]           = true;
-    }
+    mLoadState                        = TextureManager::LoadState::LOAD_FINISHED;
+    bool wasCurrentFrameReady         = IsFrameReady(mCurrentFrameIndex);
+    mImageUrls[frameIndex].mTextureId = textureInformation.textureId;
+    mReadyFlags[frameIndex]           = true;
     MakeReady(wasCurrentFrameReady, mCurrentFrameIndex, textureInformation.preMultiplied);
   }
   else
@@ -239,8 +229,6 @@ void FixedImageCache::LoadComplete(bool loadSuccess, TextureInformation textureI
     // preMultiplied should be false because broken image don't premultiply alpha on load
     mObserver.FrameReady(TextureSet(), 0, false);
   }
-
-  LOG_CACHE;
 }
 
 } //namespace Internal

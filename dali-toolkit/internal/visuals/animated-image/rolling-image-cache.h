@@ -32,7 +32,7 @@ namespace Internal
  * Class to manage a rolling cache of images, where the cache size
  * is smaller than the total number of images.
  */
-class RollingImageCache : public ImageCache, public TextureUploadObserver
+class RollingImageCache : public ImageCache, public ImageCache::LoadResultObserver
 {
 public:
   /**
@@ -133,9 +133,9 @@ private:
 
 protected:
   /**
-   * @copydoc Toolkit::TextureUploadObserver::LoadComplete()
+   * @copydoc ImageCache::LoadResultObserver::OnLoadResult()
    */
-  void LoadComplete(bool loadSuccess, TextureInformation textureInformation) override;
+  void OnLoadResult(LoadRequestObserver& requestObserver, uint32_t frameIndex, bool loadSuccess, TextureUploadObserver::TextureInformation textureInformation) override;
 
 private:
   /**
@@ -143,8 +143,9 @@ private:
    */
   struct ImageFrame
   {
-    unsigned int mUrlIndex = 0u;
-    bool         mReady    = false;
+    std::shared_ptr<LoadRequestObserver> mLoadObserver;
+    unsigned int                         mUrlIndex = 0u;
+    bool                                 mReady    = false;
   };
 
   std::vector<UrlStore>&    mImageUrls;
