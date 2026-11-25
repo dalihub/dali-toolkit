@@ -4171,6 +4171,10 @@ int UtcDaliImageVisualLoadFastTrackImageResourceReady(void)
   DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.IsResourceReady(), true, TEST_LOCATION);
 
+  // Fast-track textures bypass Texture::Upload(), so the task must carry the premultiplied flag over.
+  Texture texture = actor.GetRendererAt(0u).GetTextures().GetTexture(0u);
+  DALI_TEST_CHECK(texture.IsAlphaPreMultiplied());
+
   END_TEST;
 }
 

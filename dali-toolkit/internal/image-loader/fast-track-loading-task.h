@@ -120,7 +120,8 @@ private:
   // Texture Upload relative API
   Dali::Devel::TextureUploadManager mTextureUploadManager;
 
-  // Note : mPixelData is invalid after upload requested. We should keep image size informations.
+  // Note : mPixelData is invalid after upload requested. We should keep the informations that
+  // Texture::Upload() would have recorded, so OnComplete can set them on the resource-id textures.
   struct ImageInformation
   {
     uint32_t resourceId;
@@ -128,6 +129,7 @@ private:
     uint32_t      width;
     uint32_t      height;
     Pixel::Format format;
+    bool          preMultiplied = false;
   };
   std::vector<ImageInformation> mImageInformations;
 
@@ -138,7 +140,6 @@ private:
 public:
   bool mLoadSuccess : 1;         ///< Whether image load successed or not.
   bool mLoadPlanesAvaliable : 1; ///< If image valid to load as planes or not.
-  bool mPremultiplied : 1;       ///< True if the image's color was multiplied by it's alpha
   bool mPlanesLoaded : 1;        ///< True if the image load as planes.
   bool mHasAlpha : 1;
 

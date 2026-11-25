@@ -97,7 +97,6 @@ FastTrackLoadingTask::FastTrackLoadingTask(const VisualUrl& url, ImageDimensions
   mOrientationCorrection(orientationCorrection),
   mLoadSuccess(false),
   mLoadPlanesAvaliable(loadPlanes),
-  mPremultiplied(false),
   mPlanesLoaded(false),
   mHasAlpha(false)
 {
@@ -139,6 +138,7 @@ void FastTrackLoadingTask::OnComplete(AsyncTaskPtr task)
     {
       Dali::Integration::SetTextureSize(mTextures[index], mImageInformations[index].width, mImageInformations[index].height);
       Dali::Integration::SetTexturePixelFormat(mTextures[index], mImageInformations[index].format);
+      Dali::Integration::SetTextureAlphaPreMultiplied(mTextures[index], mImageInformations[index].preMultiplied);
 
       if(DALI_UNLIKELY(Dali::Integration::IsGpuMemoryProfileEnabled()))
       {
@@ -270,7 +270,7 @@ void FastTrackLoadingTask::Load()
     if(!mPixelData.empty())
     {
       oss << "s:" << mPixelData[0].GetWidth() << "x" << mPixelData[0].GetHeight() << " ";
-      oss << "p:" << mPremultiplied << " ";
+      oss << "p:" << mPixelData[0].IsAlphaPreMultiplied() << " ";
     }
     oss << "u:" << mUrl.GetEllipsedUrl() << "]"; });
 }
@@ -280,7 +280,6 @@ void FastTrackLoadingTask::MultiplyAlpha(Dali::PixelBuffer pixelBuffer)
   if(mPreMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON)
   {
     DevelPixelBufferOperations::MultiplyColorByAlpha(pixelBuffer);
-    mPremultiplied = pixelBuffer.IsAlphaPreMultiplied();
   }
 }
 
@@ -293,9 +292,10 @@ void FastTrackLoadingTask::UploadToTexture()
     uint32_t index = 0u;
     for(auto&& pixelData : mPixelData)
     {
-      mImageInformations[index].width  = pixelData.GetWidth();
-      mImageInformations[index].height = pixelData.GetHeight();
-      mImageInformations[index].format = pixelData.GetPixelFormat();
+      mImageInformations[index].width         = pixelData.GetWidth();
+      mImageInformations[index].height        = pixelData.GetHeight();
+      mImageInformations[index].format        = pixelData.GetPixelFormat();
+      mImageInformations[index].preMultiplied = pixelData.IsAlphaPreMultiplied();
 
       mTextureUploadManager.RequestUpload(mImageInformations[index].resourceId, pixelData);
 
