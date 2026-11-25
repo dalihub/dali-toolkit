@@ -25,6 +25,11 @@
 #include <toolkit-timer.h>
 
 #include <dali-toolkit/internal/visuals/svg/svg-loader.h>
+#define private public
+#define protected public
+#include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+#undef protected
+#undef private
 
 #include <dali-toolkit/internal/texture-manager/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/svg/svg-loader-observer.h>
@@ -1068,6 +1073,81 @@ int UtcSvgLoaderRequestDuringObserver04(void)
   tet_printf("Test observer3 notify due to we load it synchronously already\n");
   observer3.CheckRasterizeTest(true, true, TEST_LOCATION);
   observer4.CheckRasterizeTest(true, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcSvgLoaderRasterizationFailureBeforeLoadCompletion(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Use private methods to ensure that rasterize comes first.");
+
+  Property::Map properties;
+  properties.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::SVG);
+  properties.Insert(Toolkit::ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
+  properties.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+
+  auto                  visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual        = visualFactory.CreateVisual(properties);
+  DALI_TEST_CHECK(visual);
+  auto& svgVisual = static_cast<SvgVisual&>(GetImplementation(visual));
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(64.0f, 64.0f));
+  application.GetScene().Add(actor);
+  svgVisual.SetOnScene(actor);
+  DALI_TEST_CHECK(svgVisual.IsOnScene());
+
+  SvgLoader& svgLoader = GetImplementation(visualFactory).GetSvgLoader();
+  const auto loadId    = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), nullptr, true);
+  auto       renderer  = svgLoader.GetVectorImageRenderer(loadId);
+  DALI_TEST_CHECK(renderer);
+
+  svgVisual.RasterizeComplete(SvgLoader::INVALID_SVG_RASTERIZE_ID, TextureSet());
+  DALI_TEST_EQUALS(svgVisual.GetResourceStatus(), Toolkit::Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  svgVisual.LoadComplete(loadId, renderer);
+  DALI_TEST_EQUALS(svgVisual.GetResourceStatus(), Toolkit::Visual::ResourceStatus::FAILED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcSvgLoaderRasterizationSuccessBeforeLoadCompletion(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("Use private methods to ensure that successful rasterization comes first.");
+
+  Property::Map properties;
+  properties.Insert(Toolkit::Visual::Property::TYPE, Toolkit::Visual::SVG);
+  properties.Insert(Toolkit::ImageVisual::Property::URL, TEST_SVG_FILE_NAME);
+  properties.Insert(Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+
+  auto                  visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual        = visualFactory.CreateVisual(properties);
+  DALI_TEST_CHECK(visual);
+  auto& svgVisual = static_cast<SvgVisual&>(GetImplementation(visual));
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(64.0f, 64.0f));
+  application.GetScene().Add(actor);
+  svgVisual.SetOnScene(actor);
+  DALI_TEST_CHECK(svgVisual.IsOnScene());
+
+  SvgLoader& svgLoader = GetImplementation(visualFactory).GetSvgLoader();
+  const auto loadId    = svgLoader.Load(std::string(TEST_SVG_FILE_NAME), nullptr, true);
+  auto       renderer  = svgLoader.GetVectorImageRenderer(loadId);
+  DALI_TEST_CHECK(renderer);
+
+  svgVisual.mLoadCompleted = false;
+  svgVisual.RasterizeComplete(SvgLoader::INVALID_SVG_RASTERIZE_ID, TextureSet::New());
+  DALI_TEST_CHECK(svgVisual.mRasterizeCompleted);
+  DALI_TEST_CHECK(svgVisual.mRasterizeSucceeded);
+  DALI_TEST_EQUALS(svgVisual.GetResourceStatus(), Toolkit::Visual::ResourceStatus::PREPARING, TEST_LOCATION);
+
+  svgVisual.LoadComplete(loadId, renderer);
+  DALI_TEST_EQUALS(svgVisual.GetResourceStatus(), Toolkit::Visual::ResourceStatus::READY, TEST_LOCATION);
 
   END_TEST;
 }
