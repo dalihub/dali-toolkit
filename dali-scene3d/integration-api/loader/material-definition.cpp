@@ -26,6 +26,7 @@
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/adaptor-framework/pixel-buffer-operations.h>
 #include <algorithm>
 
 // INTERNAL INCLUDES
@@ -154,7 +155,7 @@ uint32_t CombineMetallicRoughnessTextures(Dali::PixelBuffer& metallicTexture, Da
   if(metallicTexture.GetWidth() != roughnessTexture.GetWidth() || metallicTexture.GetHeight() != roughnessTexture.GetHeight())
   {
     // Resize the metallic texture to match the size of the roughness texture
-    metallicTexture.Resize(roughnessTexture.GetWidth(), roughnessTexture.GetHeight());
+    Dali::PixelBufferOperations::Resize(metallicTexture, roughnessTexture.GetWidth(), roughnessTexture.GetHeight());
   }
 
   // Combine the two textures together
