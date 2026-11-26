@@ -120,8 +120,8 @@ private:
   // Texture Upload relative API
   Dali::Devel::TextureUploadManager mTextureUploadManager;
 
-  // Note : mPixelData is invalid after upload requested. We should keep the informations that
-  // Texture::Upload() would have recorded, so OnComplete can set them on the resource-id textures.
+  // Note : mPixelData is invalid after upload requested. We should keep the information that
+  // Texture::Upload() would have recorded, so OnComplete can set it on the resource-id textures.
   struct ImageInformation
   {
     uint32_t resourceId;
@@ -131,7 +131,7 @@ private:
     Pixel::Format format;
     bool          preMultiplied = false;
   };
-  std::vector<ImageInformation> mImageInformations;
+  std::vector<ImageInformation> mImageInformation;
 
   std::vector<Dali::PixelData> mPixelData;
 
