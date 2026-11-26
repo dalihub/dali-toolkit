@@ -100,6 +100,7 @@ GaussianBlurEffectImpl::GaussianBlurEffectImpl(uint32_t blurRadius)
   mBlurStrengthAnimationActive(false),
   mZeroStrengthBypass(false)
 {
+  SetDitherNoiseStrength(0.1f);
   UpdateDownscaledBlurRadius(mDownscaleFactor);
 }
 

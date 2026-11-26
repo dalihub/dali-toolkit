@@ -150,12 +150,18 @@ protected:
 
   /**
    * @brief Sets dithering noise strength of the final render effect output.
+   *
+   * The default value for RenderEffect is 0.0f.
+   *
    * @param[in] strength The dithering noise strength, clamped to [0.0f, 1.0f].
    */
   void SetDitherNoiseStrength(float strength);
 
   /**
    * @brief Gets dithering noise strength of the final render effect output.
+   *
+   * The default value for RenderEffect is 0.0f.
+   *
    * @return The dithering noise strength.
    */
   float GetDitherNoiseStrength() const;
@@ -226,7 +232,7 @@ private:
 
   Vector2 mTargetSize; // The final size of mOwnerControl
 
-  float mDitherNoiseStrength;
+  float mDitherNoiseStrength{0.0f};
 
   bool mIsActivated : 1;
 };
