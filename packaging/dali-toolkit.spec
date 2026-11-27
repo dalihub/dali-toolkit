@@ -29,7 +29,7 @@
 
 Name:       dali3-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    3.0.1
+Version:    3.0.2
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT and Zlib and Unlicense
